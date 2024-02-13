@@ -1,5 +1,7 @@
 package io.oeid.core_security.configuration;
 
+import io.oeid.core_security.jwt.JwtAccessDeniedHandler;
+import io.oeid.core_security.jwt.JwtAuthenticationEntryPoint;
 import io.oeid.core_security.jwt.JwtAuthenticationFilter;
 import io.oeid.core_security.jwt.JwtHelper;
 import io.oeid.core_security.properties.JwtProperties;
@@ -29,6 +31,8 @@ public class SecurityConfiguration {
     private final UserDetailsService userDetailsService;
     private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
     private final AuthenticationSuccessHandler successHandler;
+    private final JwtAccessDeniedHandler accessDeniedHandler;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -48,6 +52,11 @@ public class SecurityConfiguration {
                     userInfoEndpointConfig -> userInfoEndpointConfig.userService(oAuth2UserService)
                 );
                 httpSecurityOAuth2LoginConfigurer.successHandler(successHandler);
+            })
+            .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> {
+                httpSecurityExceptionHandlingConfigurer.accessDeniedHandler(accessDeniedHandler);
+                httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(
+                    authenticationEntryPoint);
             })
             .build();
     }
