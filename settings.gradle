@@ -2,3 +2,9 @@ rootProject.name = 'MogakGo'
 
 include 'core'
 include 'core:core-security'
+include 'domain'
+include 'domain:domain-user'
+findProject(':domain:domain-user')?.name = 'domain-user'
+include 'core:core-jpa'
+findProject(':core:core-jpa')?.name = 'core-jpa'
+
