@@ -1,0 +1,19 @@
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    // Spring Boot Security
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.2.2'
+    // Spring Boot OAuth2 Client
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.2'
+    // JWT
+    implementation 'com.auth0:java-jwt:4.4.0'
+
+    // Spring Security Test
+    testImplementation 'org.springframework.security:spring-security-test:6.2.1'
+}

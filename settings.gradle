@@ -1,1 +1,4 @@
 rootProject.name = 'MogakGo'
+
+include 'core'
+include 'core:core-security'
