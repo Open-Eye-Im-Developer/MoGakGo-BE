@@ -17,14 +17,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @Entity
 @Table(name = "user_tb")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class User implements UserDetails {
+public class User {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -32,6 +31,9 @@ public class User implements UserDetails {
 
     @Column(name = "username", nullable = false)
     private String username;
+
+    @Column(name = "github_id", nullable = false)
+    private String githubId;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
@@ -54,9 +56,10 @@ public class User implements UserDetails {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    private User(Long id, String username, String avatarUrl, String githubUrl) {
+    private User(Long id, String githubId, String avatarUrl, String githubUrl) {
         this.id = id;
-        this.username = username;
+        this.username = githubId;
+        this.githubId = githubId;
         this.avatarUrl = avatarUrl;
         this.githubUrl = githubUrl;
         this.role = Role.ROLE_USER;
@@ -66,33 +69,8 @@ public class User implements UserDetails {
         return new User(id, username, avatarUrl, githubUrl);
     }
 
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
-    @Override
-    public String getPassword() {
-        return null;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return deletedAt == null;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return deletedAt == null;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return deletedAt == null;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return deletedAt == null;
-    }
 }

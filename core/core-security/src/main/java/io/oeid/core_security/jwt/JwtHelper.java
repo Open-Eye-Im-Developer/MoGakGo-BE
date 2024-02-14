@@ -6,16 +6,19 @@ import static com.auth0.jwt.JWT.require;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import io.oeid.core_security.properties.JwtProperties;
+import io.oeid.domain_user.infrastructure.UserJpaRepository;
 import java.util.Date;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import java.util.Map;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JwtHelper {
 
-    private static final String USER_ID_STR = "userId";
-    private static final String ROLES_STR = "roles";
+    public static final String USER_ID_STR = "userId";
+    public static final String ROLES_STR = "roles";
     private static final Long HOUR_TO_MILLIS = 3600000L;
 
     private final String issuer;
@@ -23,16 +26,15 @@ public class JwtHelper {
     private final long refreshTokenExpirySeconds;
     private final Algorithm algorithm;
     private final JWTVerifier jwtVerifier;
-    private final UserDetailsService userDetailsService;
+    private final UserJpaRepository userRepository;
 
-    public JwtHelper(String issuer, int accessTokenExpiryHours, int refreshTokenExpiryHours,
-        String clientSecret, UserDetailsService userDetailsService) {
-        this.issuer = issuer;
-        this.accessTokenExpirySeconds = hoursToMillis(accessTokenExpiryHours);
-        this.refreshTokenExpirySeconds = hoursToMillis(refreshTokenExpiryHours);
-        this.algorithm = Algorithm.HMAC256(clientSecret);
+    public JwtHelper(JwtProperties jwtProperties, UserJpaRepository userRepository) {
+        this.issuer = jwtProperties.getIssuer();
+        this.accessTokenExpirySeconds = hoursToMillis(jwtProperties.getAccessTokenExpiryHour());
+        this.refreshTokenExpirySeconds = hoursToMillis(jwtProperties.getRefreshTokenExpiryHour());
+        this.algorithm = Algorithm.HMAC256(jwtProperties.getClientSecret());
         this.jwtVerifier = require(algorithm).withIssuer(issuer).build();
-        this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
     }
 
     private static long hoursToMillis(int hour) {
@@ -61,7 +63,8 @@ public class JwtHelper {
         return JwtToken.of(userId, accessToken, refreshToken, refreshTokenExpiryDate);
     }
 
-    public Authentication verify(String token) throws JWTVerificationException {
+    public Map<String, Claim> verify(String token)
+        throws JWTVerificationException {
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
         var claims = decodedJWT.getClaims();
         String userId = claims.get(USER_ID_STR).asString();
@@ -69,8 +72,8 @@ public class JwtHelper {
         if (userId == null || roles == null) {
             throw new JWTVerificationException("Invalid token");
         }
-        var userDetails = userDetailsService.loadUserByUsername(userId);
-        return new UsernamePasswordAuthenticationToken(
-            userDetails, "", userDetails.getAuthorities());
+        userRepository.findById(Long.parseLong(userId))
+            .orElseThrow(() -> new JWTVerificationException("Invalid token"));
+        return claims;
     }
 }

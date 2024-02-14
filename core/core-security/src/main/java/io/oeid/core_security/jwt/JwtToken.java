@@ -20,4 +20,8 @@ public class JwtToken {
         Date refreshTokenExpiryDate) {
         return new JwtToken(userId, accessToken, refreshToken, refreshTokenExpiryDate);
     }
+
+    public static JwtToken of(Long userId, String accessToken) {
+        return new JwtToken(userId, accessToken, null, null);
+    }
 }
