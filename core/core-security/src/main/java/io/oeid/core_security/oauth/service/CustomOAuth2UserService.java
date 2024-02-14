@@ -25,7 +25,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             .getUserInfoEndpoint()
             .getUserNameAttributeName();
         long id = Integer.toUnsignedLong(oAuth2User.getAttribute(userNameAttributeName));
-        User user = mangeUserEntity(id, oAuth2User);
+        User user = manageUserEntity(id, oAuth2User);
         return generateOAuth2User(userNameAttributeName, id, user);
     }
 
@@ -37,7 +37,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return new DefaultOAuth2User(user.getAuthorities(), attributes, nameAttributeKey);
     }
 
-    private User mangeUserEntity(long userId, OAuth2User oAuth2User) {
+    private User manageUserEntity(long userId, OAuth2User oAuth2User) {
         String username = oAuth2User.getAttribute("login");
         String avatarUrl = oAuth2User.getAttribute("avatar_url");
         String githubUrl = oAuth2User.getAttribute("html_url");
