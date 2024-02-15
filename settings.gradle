@@ -1,5 +1,1 @@
 rootProject.name = 'MogakGo'
-
-include 'core:core-security'
-include 'core:core-jpa'
-include 'domain:domain-user'
