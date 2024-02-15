@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
@@ -33,52 +35,64 @@ public class User {
     private static final int MAX_TAG_SIZE = 3;
 
     @Id
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "github_pk")
+    private Long githubPk;
+
+    @Column(name = "username")
     private String username;
 
-    @Column(name = "github_id", nullable = false)
+    @Column(name = "github_id")
     private String githubId;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(name = "github_url", nullable = false)
+    @Column(name = "github_url")
     private String githubUrl;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("byteSize ASC")
     private final List<UserDevelopLanguageTag> userDevelopLanguageTags = new ArrayList<>();
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<UserWantedJobTag> userWantedJobTags = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
+    @Column(name = "role")
     private Role role;
+
     @Column(name = "bio", length = 50)
     private String bio;
-    @Column(name = "jandi_rate", nullable = false)
+
+    @Column(name = "jandi_rate")
     private double jandiRate;
+
     @Column(name = "region")
     private String region;
+
     @Column(name = "region_authentication_at")
     private LocalDateTime regionAuthenticationAt;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
     @Column(name = "available_join_count")
     private int availableJoinCount;
+
     @Column(name = "available_like_count")
     private int availableLikeCount;
 
 
-    private User(Long id, String githubId, String avatarUrl, String githubUrl) {
-        this.id = id;
+    private User(Long githubPk, String githubId, String avatarUrl, String githubUrl) {
+        this.githubPk = githubPk;
         this.username = githubId;
         this.githubId = githubId;
         this.avatarUrl = avatarUrl;
@@ -107,9 +121,6 @@ public class User {
         userWantedJobTags.add(userWantedJobTag);
     }
 
-    public void updateUsername(String username) {
-        this.username = username;
-    }
     public Collection<GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
