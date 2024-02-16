@@ -1,6 +1,6 @@
-package io.oeid.mogakgo.domain.project.domain;
+package io.oeid.mogakgo.domain.project.domain.entity;
 
-import io.oeid.mogakgo.domain.project.domain.enums.ProjectStatus;
+import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import io.oeid.mogakgo.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

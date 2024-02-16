@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.project.domain.enums;
+package io.oeid.mogakgo.domain.project.domain.entity.enums;
 
 import lombok.Getter;
 
