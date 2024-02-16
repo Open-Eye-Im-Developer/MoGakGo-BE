@@ -5,7 +5,7 @@ import static io.oeid.mogakgo.exception.code.ErrorCode400.PATH_PARAMETER_BAD_REQ
 import static io.oeid.mogakgo.exception.code.ErrorCode500.INTERNAL_SERVER_ERROR;
 
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
-import io.oeid.mogakgo.exception.exceptionClass.CustomException;
+import io.oeid.mogakgo.exception.exception_class.CustomException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

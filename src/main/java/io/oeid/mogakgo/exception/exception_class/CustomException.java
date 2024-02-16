@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.exception.exceptionClass;
+package io.oeid.mogakgo.exception.exception_class;
 
 import io.oeid.mogakgo.exception.code.ErrorCode;
 import lombok.Getter;
