@@ -31,7 +31,8 @@ dependencies {
     annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
     // MySQL
     runtimeOnly 'com.mysql:mysql-connector-j:8.2.0'
-
+    // Spring Boot Security
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.2.2'
     // JWT
     implementation 'com.auth0:java-jwt:4.4.0'
     // Spring Boot Data Redis
