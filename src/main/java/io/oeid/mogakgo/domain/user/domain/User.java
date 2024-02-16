@@ -22,9 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
 @Getter
 @Entity
 @Table(name = "user_tb")
@@ -121,8 +118,8 @@ public class User {
         userWantedJobTags.add(userWantedJobTag);
     }
 
-    public Collection<GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
-    }
+//    public Collection<GrantedAuthority> getAuthorities() {
+//        return List.of(new SimpleGrantedAuthority(role.name()));
+//    }
 
 }
