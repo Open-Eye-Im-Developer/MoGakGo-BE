@@ -1,5 +1,10 @@
 package io.oeid.mogakgo.domain.geo.domain.enums;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum Region {
 
     JONGRO("서울특별시", "종로구", 11110),
@@ -32,24 +37,6 @@ public enum Region {
     private final String depth1;
     private final String depth2;
     private final int areaCode;
-
-    Region(String depth1, String depth2, int areaCode) {
-        this.depth1 = depth1;
-        this.depth2 = depth2;
-        this.areaCode = areaCode;
-    }
-
-    public String getDepth1() {
-        return this.depth1;
-    }
-
-    public String getDepth2() {
-        return this.depth2;
-    }
-    
-    public int getAreaCode() {
-        return this.areaCode;
-    }
 
     public static Region getByAreaCode(int areaCode) {
         for (Region region : Region.values()) {
