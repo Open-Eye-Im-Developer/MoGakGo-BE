@@ -1,25 +1,24 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.2'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.springframework.boot' version '3.2.2' apply(false)
+    id 'io.spring.dependency-management' version '1.1.4' apply(false)
 }
 
-group = 'io.oeid'
-version = '0.0.1-SNAPSHOT'
-java {
-    sourceCompatibility = 17
-    targetCompatibility = 17
-}
-
-repositories {
-    mavenCentral()
+allprojects {
+    group = 'io.oeid'
+    version = '0.0.1-SNAPSHOT'
+    java {
+        sourceCompatibility = 17
+        targetCompatibility = 17
+    }
+    repositories {
+        mavenCentral()
+    }
 }
 
 dependencies {
     // Spring Boot Web
     implementation 'org.springframework.boot:spring-boot-starter-web:3.2.2'
-    // Spring Boot Security
-    implementation 'org.springframework.boot:spring-boot-starter-security:3.2.2'
     // Spring Boot Data JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.2.2'
     // Lombok
@@ -32,15 +31,13 @@ dependencies {
     annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
     // MySQL
     runtimeOnly 'com.mysql:mysql-connector-j:8.2.0'
-    // Spring Boot Security
-    implementation 'org.springframework.boot:spring-boot-starter-security:3.2.2'
-    // Spring Boot OAuth2 Client
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.2'
+
     // JWT
     implementation 'com.auth0:java-jwt:4.4.0'
     // Spring Boot Data Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.2.2'
-
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
     // SpringBoot Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.2'
     // TestContainers
@@ -51,6 +48,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test:6.1.3'
 }
 
-test {
-    useJUnitPlatform()
-}
+    test {
+        useJUnitPlatform()
+    }
+
