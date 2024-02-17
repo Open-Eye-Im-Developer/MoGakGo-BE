@@ -16,13 +16,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2AuthenticationSuccessHandler extends
-    SavedRequestAwareAuthenticationSuccessHandler {
+public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtHelper jwtHelper;
     private final JwtRedisDao jwtRedisDao;
@@ -42,6 +41,6 @@ public class OAuth2AuthenticationSuccessHandler extends
         authentication = new JwtAuthenticationToken(oAuth2User, null,
             oAuth2User.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        super.onAuthenticationSuccess(request, response, authentication);
+        response.sendRedirect("/login/success");
     }
 }

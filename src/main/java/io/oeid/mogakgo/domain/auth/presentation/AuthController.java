@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthController {
 
-    @GetMapping("/")
+    @GetMapping("/login/success")
     public ResponseEntity<String> init(@AuthenticationPrincipal OAuth2User oAuth2User) {
         log.info(oAuth2User.toString());
         return ResponseEntity.ok(oAuth2User.toString());
