@@ -1,6 +1,8 @@
 package io.oeid.mogakgo.domain.project.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.NOT_MATCH_MEET_LOCATION;
+import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_FORBIDDEN_OPERATION;
+import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_NOT_FOUND;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
 
 import io.oeid.mogakgo.domain.geo.application.GeoService;
@@ -41,8 +43,16 @@ public class ProjectService {
         return project.getId();
     }
 
-    public void delete() {
+    @Transactional
+    public void delete(Long userId, Long projectId) {
+        // 유저 존재 여부 체크
+        User user = getUser(userId);
 
+        // 프로젝트 존재 여부 체크
+        Project project = getProject(projectId);
+
+        // 프로젝트 삭제
+        project.delete(user);
     }
 
     private User getUser(Long userId) {
@@ -50,11 +60,24 @@ public class ProjectService {
             .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 
+    private Project getProject(Long projectId) {
+        return projectJpaRepository.findById(projectId)
+            .orElseThrow(() -> new ProjectException(PROJECT_NOT_FOUND));
+    }
+
     private void validateMeetLocation(Double lat, Double lng, Region userRegion) {
         Region reqArea = Region.getByAreaCode(
             geoService.getAreaCodeAboutCoordinates(lng, lat));
         if (userRegion != reqArea) {
             throw new ProjectException(NOT_MATCH_MEET_LOCATION);
+        }
+    }
+
+    private void validateProjectCardCreator(
+        User tokenUser, Long creatorId
+    ) {
+        if (!tokenUser.getId().equals(creatorId)) {
+            throw new ProjectException(PROJECT_FORBIDDEN_OPERATION);
         }
     }
 

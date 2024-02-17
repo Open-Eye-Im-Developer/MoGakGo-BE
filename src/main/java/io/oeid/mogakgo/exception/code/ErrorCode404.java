@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode404 implements ErrorCode {
     USER_NOT_FOUND("E020301", "해당 유저가 존재하지 않습니다."),
+    PROJECT_NOT_FOUND("E030301", "해당 프로젝트가 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.NOT_FOUND;

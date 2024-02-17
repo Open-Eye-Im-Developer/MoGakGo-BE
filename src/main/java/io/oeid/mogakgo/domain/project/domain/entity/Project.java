@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.project.domain.entity;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_PROJECT_TAG_COUNT;
+import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_FORBIDDEN_OPERATION;
 
 import io.oeid.mogakgo.common.base.BaseTimeEntity;
 import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
@@ -76,6 +77,17 @@ public class Project extends BaseTimeEntity {
             meetDetail);
         this.projectStatus = ProjectStatus.PENDING;
         addProjectTagsWithValidation(projectTags);
+    }
+
+    public void delete(User tokenUser) {
+        validateCreator(tokenUser);
+        super.delete();
+    }
+
+    private void validateCreator(User tokenUser) {
+        if (tokenUser == null || !this.creator.getId().equals(tokenUser.getId())) {
+            throw new ProjectException(PROJECT_FORBIDDEN_OPERATION);
+        }
     }
 
     private void addProjectTagsWithValidation(List<ProjectTagCreateReq> projectTags) {

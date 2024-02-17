@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProjectCreateReq {
 
-    @Schema(description = "프로젝트를 생성하는 유저 ID", example = "1", implementation = Long.class)
+    @Schema(description = "프로젝트를 생성하는 유저 ID", example = "2", implementation = Long.class)
     @NotNull
     private Long creatorId;
 

@@ -48,7 +48,7 @@ public class SecurityConfig {
             .sessionManagement(
                 management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(
-                requests -> requests.anyRequest().permitAll())
+                requests -> requests.anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(handling ->
                 handling.accessDeniedHandler(jwtAccessDeniedHandler)
