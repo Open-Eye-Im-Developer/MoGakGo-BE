@@ -133,5 +133,12 @@ public class User {
         this.githubUrl = githubUrl;
     }
 
+    public void updateUsername(String username) {
+        if(username == null || username.isBlank()){
+            throw new UserException(ErrorCode400.USERNAME_SHOULD_BE_NOT_EMPTY);
+        }
+        this.username = username;
+    }
+
 
 }
