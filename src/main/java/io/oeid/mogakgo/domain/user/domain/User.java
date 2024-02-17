@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.user.domain;
 
+import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -71,8 +72,9 @@ public class User {
     @Column(name = "jandi_rate")
     private double jandiRate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "region")
-    private String region;
+    private Region region;
 
     @Column(name = "region_authentication_at")
     private LocalDateTime regionAuthenticationAt;
