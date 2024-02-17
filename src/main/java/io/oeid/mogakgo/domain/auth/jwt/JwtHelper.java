@@ -65,7 +65,8 @@ public class JwtHelper {
         throws JWTVerificationException {
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
         var claims = decodedJWT.getClaims();
-        String userId = claims.get(USER_ID_STR).asString();
+//        String userId = claims.get(USER_ID_STR).asString();
+        Long userId = claims.get(USER_ID_STR).asLong();
         var roles = claims.get(ROLES_STR).asArray(String.class);
         if (userId == null || roles == null) {
             throw new JWTVerificationException("Invalid token");

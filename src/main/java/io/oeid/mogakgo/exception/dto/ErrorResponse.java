@@ -1,11 +1,13 @@
 package io.oeid.mogakgo.exception.dto;
 
 import io.oeid.mogakgo.exception.code.ErrorCode;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
 
+@Schema(description = "에러 응답")
 @Getter
 @Builder
 public class ErrorResponse {
