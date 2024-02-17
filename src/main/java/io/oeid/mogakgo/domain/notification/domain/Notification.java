@@ -35,14 +35,8 @@ public class Notification {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "notification_tag")
+    @Column(name = "tag")
     private NotificationTag notificationTag;
-
-    @Column(name = "title")
-    private String title;
-
-    @Column(name = "body")
-    private String body;
 
     @Column(name = "detail_data")
     private String detailData;
@@ -51,19 +45,14 @@ public class Notification {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    private Notification(User user, NotificationTag notificationTag, String title, String body,
-        String detailData) {
+    private Notification(User user, NotificationTag notificationTag, String detailData) {
         this.user = validateUser(user);
         this.notificationTag = validateNotificationTag(notificationTag);
-        this.title = validateTitle(title);
-        this.body = validateBody(body);
         this.detailData = validateDetailData(detailData);
     }
 
-    public static Notification of(User user, NotificationTag notificationTag, String title,
-        String body,
-        String detailData) {
-        return new Notification(user, notificationTag, title, body, detailData);
+    public static Notification of(User user, NotificationTag notificationTag, String detail) {
+        return new Notification(user, notificationTag, detail);
     }
 
     private User validateUser(User user) {
@@ -78,20 +67,6 @@ public class Notification {
             throw new IllegalArgumentException("notificationTag must not be null");
         }
         return notificationTag;
-    }
-
-    private String validateTitle(String title) {
-        if (title == null || title.isEmpty()) {
-            throw new IllegalArgumentException("title must not be null or empty");
-        }
-        return title;
-    }
-
-    private String validateBody(String body) {
-        if (body == null || body.isEmpty()) {
-            throw new IllegalArgumentException("body must not be null or empty");
-        }
-        return body;
     }
 
     private String validateDetailData(String detailData) {
