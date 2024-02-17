@@ -35,6 +35,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security:3.2.2'
     // Spring Boot OAuth2 Client
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.2.2'
+    // Feign Client
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
     // Firebase Admin
     implementation 'com.google.firebase:firebase-admin:9.2.0'
     // JWT
