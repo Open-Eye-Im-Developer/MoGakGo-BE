@@ -140,5 +140,8 @@ public class User {
         this.username = username;
     }
 
+    public void delete(){
+        this.deletedAt = LocalDateTime.now();
+    }
 
 }

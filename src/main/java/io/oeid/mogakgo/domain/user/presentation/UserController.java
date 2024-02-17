@@ -8,6 +8,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,4 +28,9 @@ public class UserController {
         return ResponseEntity.ok(UserSignUpApiResponse.from(response));
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> userDeleteApi(@UserId Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.ok().build();
+    }
 }

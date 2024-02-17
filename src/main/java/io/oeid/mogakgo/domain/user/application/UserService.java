@@ -33,4 +33,10 @@ public class UserService {
         }
         return UserSignUpResponse.from(user);
     }
+
+    public void deleteUser(Long userId){
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserException(ErrorCode404.USER_NOT_FOUND));
+        user.delete();
+    }
 }
