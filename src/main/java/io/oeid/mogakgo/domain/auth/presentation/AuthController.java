@@ -23,10 +23,7 @@ public class AuthController {
         String accessToken = oAuth2User.getAttributes().get("accessToken").toString();
         String refreshToken = oAuth2User.getAttributes().get("refreshToken").toString();
         int refreshTokenExpireTime = (int) oAuth2User.getAttributes().get("refreshTokenExpireTime");
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setMaxAge(refreshTokenExpireTime);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+        setCookie(refreshToken, refreshTokenExpireTime, response);
         return ResponseEntity.ok(AuthAccessTokenResponse.from(accessToken));
     }
 
@@ -37,6 +34,9 @@ public class AuthController {
     }
 
     private void setCookie(String refreshToken, int refreshTokenExpireTime, HttpServletResponse response) {
-
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setMaxAge(refreshTokenExpireTime);
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 }

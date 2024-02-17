@@ -57,7 +57,8 @@ public class JwtHelper {
             .withIssuedAt(now)
             .withExpiresAt(refreshTokenExpiryDate)
             .sign(algorithm);
-        return JwtToken.of(userId, accessToken, refreshToken, refreshTokenExpiryDate);
+        return JwtToken.of(userId, accessToken, refreshToken,
+            (int) refreshTokenExpirySeconds / 1000);
     }
 
     public Map<String, Claim> verify(String token)

@@ -39,8 +39,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         attributes.put("id", Long.parseLong(oAuth2User.getName()));
         attributes.put("accessToken", jwtToken.getAccessToken());
         attributes.put("refreshToken", jwtToken.getRefreshToken());
-        attributes.put("refreshTokenExpireTime",
-            (int) (jwtToken.getRefreshTokenExpiryDate().getTime() / MILLIS_PER_SECOND));
+        attributes.put("refreshTokenExpireTime", jwtToken.getRefreshTokenExpirySeconds());
         oAuth2User = new DefaultOAuth2User(oAuth2User.getAuthorities(), attributes, "id");
         authentication = new JwtAuthenticationToken(oAuth2User, null,
             oAuth2User.getAuthorities());
