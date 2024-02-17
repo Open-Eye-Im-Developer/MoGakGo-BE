@@ -15,6 +15,11 @@ public class GeoService {
     private final KakaoFeignClient kakaoFeignClient;
     private final KakaoProperties kakaoProperties;
 
+    public int getAreaCodeAboutCoordinates(Double x, Double y) {
+        AddressDocument document = getAddressInfoAboutAreaCode(x, y);
+        return extractAreaCode(document);
+    }
+
     public AddressDocument getAddressInfoAboutAreaCode(Double x, Double y) {
         String key = generateKey(kakaoProperties);
         AddressInfoDto response = kakaoFeignClient.getAreaCodeAboutCoordinates(key, x, y);
@@ -25,7 +30,7 @@ public class GeoService {
         return kakaoProperties.getPrefix() + SEPERATOR + kakaoProperties.getRestApiKey();
     }
 
-    public int extractAreaCode(AddressDocument document) {
+    private int extractAreaCode(AddressDocument document) {
         return Integer.parseInt(document.getCode().substring(0, 5));
     }
 }
