@@ -1,7 +1,9 @@
 package io.oeid.mogakgo.domain.notification.domain;
 
 import io.oeid.mogakgo.domain.notification.domain.enums.NotificationTag;
+import io.oeid.mogakgo.domain.notification.exception.NotificationException;
 import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.exception.code.ErrorCode400;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -46,7 +48,7 @@ public class Notification {
     private LocalDateTime createdAt;
 
     private Notification(User user, NotificationTag notificationTag, String detailData) {
-        this.user = validateUser(user);
+        this.user = user;
         this.notificationTag = validateNotificationTag(notificationTag);
         this.detailData = validateDetailData(detailData);
     }
@@ -55,23 +57,16 @@ public class Notification {
         return new Notification(user, notificationTag, detail);
     }
 
-    private User validateUser(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("user must not be null");
-        }
-        return user;
-    }
-
     private NotificationTag validateNotificationTag(NotificationTag notificationTag) {
         if (notificationTag == null) {
-            throw new IllegalArgumentException("notificationTag must not be null");
+            throw new NotificationException(ErrorCode400.NOTIFICATION_TAG_NOT_NULL);
         }
         return notificationTag;
     }
 
     private String validateDetailData(String detailData) {
         if (detailData == null || detailData.isEmpty()) {
-            throw new IllegalArgumentException("detailData must not be null or empty");
+            throw new NotificationException(ErrorCode400.NOTIFICATION_DETAIL_DATA_NOT_NULL);
         }
         return detailData;
     }
