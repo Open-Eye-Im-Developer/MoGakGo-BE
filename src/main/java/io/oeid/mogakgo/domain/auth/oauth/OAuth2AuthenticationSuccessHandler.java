@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
+    private static final long MILLIS_PER_SECOND = 1000;
+
     private final JwtHelper jwtHelper;
     private final JwtRedisDao jwtRedisDao;
 
@@ -37,10 +39,12 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         attributes.put("id", Long.parseLong(oAuth2User.getName()));
         attributes.put("accessToken", jwtToken.getAccessToken());
         attributes.put("refreshToken", jwtToken.getRefreshToken());
+        attributes.put("refreshTokenExpireTime",
+            (int) (jwtToken.getRefreshTokenExpiryDate().getTime() / MILLIS_PER_SECOND));
         oAuth2User = new DefaultOAuth2User(oAuth2User.getAuthorities(), attributes, "id");
         authentication = new JwtAuthenticationToken(oAuth2User, null,
             oAuth2User.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        response.sendRedirect("/login/success");
+        response.sendRedirect("/oauth/login/success");
     }
 }
