@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     @GetMapping("/login/success")
-    public ResponseEntity<AuthAccessTokenResponse> init(
+    public ResponseEntity<AuthAccessTokenResponse> loginSuccess(
         @AuthenticationPrincipal OAuth2User oAuth2User, HttpServletResponse response) {
         String accessToken = oAuth2User.getAttributes().get("accessToken").toString();
         String refreshToken = oAuth2User.getAttributes().get("refreshToken").toString();
