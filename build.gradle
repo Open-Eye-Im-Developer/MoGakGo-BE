@@ -31,13 +31,15 @@ dependencies {
     annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
     // MySQL
     runtimeOnly 'com.mysql:mysql-connector-j:8.2.0'
-
+    // Firebase Admin
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
     // JWT
     implementation 'com.auth0:java-jwt:4.4.0'
     // Spring Boot Data Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.2.2'
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
     // SpringBoot Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.2'
     // TestContainers
