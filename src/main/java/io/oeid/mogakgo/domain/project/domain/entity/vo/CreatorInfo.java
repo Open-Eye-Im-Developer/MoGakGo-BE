@@ -54,6 +54,6 @@ public class CreatorInfo {
         if (user.getRegion() == null) {
             throw new RuntimeException("need to authenticate your neighborhood!");
         }
-        return user.getRegion();
+        return user.getRegion().name();
     }
 }

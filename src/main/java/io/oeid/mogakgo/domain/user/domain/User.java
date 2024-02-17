@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.user.domain;
 
+import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -22,6 +23,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 @Getter
 @Entity
 @Table(name = "user_tb")
@@ -68,8 +72,9 @@ public class User {
     @Column(name = "jandi_rate")
     private double jandiRate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "region")
-    private String region;
+    private Region region;
 
     @Column(name = "region_authentication_at")
     private LocalDateTime regionAuthenticationAt;
@@ -98,8 +103,8 @@ public class User {
         this.jandiRate = 0d;
     }
 
-    public static User of(long id, String username, String avatarUrl, String githubUrl) {
-        return new User(id, username, avatarUrl, githubUrl);
+    public static User of(long githubPk, String username, String avatarUrl, String githubUrl) {
+        return new User(githubPk, username, avatarUrl, githubUrl);
     }
 
     public void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
@@ -118,8 +123,15 @@ public class User {
         userWantedJobTags.add(userWantedJobTag);
     }
 
-//    public Collection<GrantedAuthority> getAuthorities() {
-//        return List.of(new SimpleGrantedAuthority(role.name()));
-//    }
+    public Collection<GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    public void updateGithubInfo(String githubId, String avatarUrl, String githubUrl) {
+        this.githubId = githubId;
+        this.avatarUrl = avatarUrl;
+        this.githubUrl = githubUrl;
+    }
+
 
 }
