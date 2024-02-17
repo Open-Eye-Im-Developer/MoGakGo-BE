@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.user.service.dto.res;
+package io.oeid.mogakgo.domain.user.application.dto.res;
 
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;

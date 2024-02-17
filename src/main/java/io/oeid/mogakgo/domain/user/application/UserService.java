@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.user.service;
+package io.oeid.mogakgo.domain.user.application;
 
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
@@ -6,8 +6,8 @@ import io.oeid.mogakgo.domain.user.domain.enums.WantedJob;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
 import io.oeid.mogakgo.domain.user.infrastructure.UserWantedJobTagJpaRepository;
-import io.oeid.mogakgo.domain.user.service.dto.req.UserSignUpRequest;
-import io.oeid.mogakgo.domain.user.service.dto.res.UserSignUpResponse;
+import io.oeid.mogakgo.domain.user.application.dto.req.UserSignUpRequest;
+import io.oeid.mogakgo.domain.user.application.dto.res.UserSignUpResponse;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
