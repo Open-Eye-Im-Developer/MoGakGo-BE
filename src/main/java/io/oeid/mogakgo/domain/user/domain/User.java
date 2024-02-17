@@ -101,8 +101,8 @@ public class User {
         this.jandiRate = 0d;
     }
 
-    public static User of(long id, String username, String avatarUrl, String githubUrl) {
-        return new User(id, username, avatarUrl, githubUrl);
+    public static User of(long githubPk, String username, String avatarUrl, String githubUrl) {
+        return new User(githubPk, username, avatarUrl, githubUrl);
     }
 
     public void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
@@ -124,5 +124,12 @@ public class User {
     public Collection<GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
+
+    public void updateGithubInfo(String githubId, String avatarUrl, String githubUrl) {
+        this.githubId = githubId;
+        this.avatarUrl = avatarUrl;
+        this.githubUrl = githubUrl;
+    }
+
 
 }

@@ -26,9 +26,9 @@ public class GithubOAuth2UserService extends DefaultOAuth2UserService {
             .getProviderDetails()
             .getUserInfoEndpoint()
             .getUserNameAttributeName();
-        long id = Integer.toUnsignedLong(oAuth2User.getAttribute(userNameAttributeName));
-        User user = manageUserEntity(id, oAuth2User);
-        return generateOAuth2User(userNameAttributeName, id, user);
+        long githubPk = Integer.toUnsignedLong(oAuth2User.getAttribute(userNameAttributeName));
+        User user = manageUserEntity(githubPk, oAuth2User);
+        return generateOAuth2User(userNameAttributeName, user.getId(), user);
     }
 
     private OAuth2User generateOAuth2User(String nameAttributeKey, long id, User user) {
@@ -39,12 +39,14 @@ public class GithubOAuth2UserService extends DefaultOAuth2UserService {
         return new DefaultOAuth2User(user.getAuthorities(), attributes, nameAttributeKey);
     }
 
-    private User manageUserEntity(long userId, OAuth2User oAuth2User) {
-        String username = oAuth2User.getAttribute("login");
+    private User manageUserEntity(long githubPk, OAuth2User oAuth2User) {
+        String githubId = oAuth2User.getAttribute("login");
         String avatarUrl = oAuth2User.getAttribute("avatar_url");
         String githubUrl = oAuth2User.getAttribute("html_url");
-        return userRepository.findById(userId).orElseGet(
-            () -> userRepository.save(User.of(userId, username, avatarUrl, githubUrl)));
+        User user = userRepository.findByGithubPk(githubPk).orElseGet(
+            () -> userRepository.save(User.of(githubPk, githubId, avatarUrl, githubUrl)));
+        user.updateGithubInfo(githubId, avatarUrl, githubUrl);
+        return user;
     }
 
 }
