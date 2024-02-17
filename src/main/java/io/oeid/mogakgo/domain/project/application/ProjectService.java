@@ -28,16 +28,18 @@ public class ProjectService {
     private final GeoService geoService;
 
     @Transactional
-    public Long create(ProjectCreateReq request) {
+    public Long create(Long userId, ProjectCreateReq request) {
         // 유저 존재 여부 체크
-        User user = getUser(request.getCreatorId());
+        User tokenUser = getUser(userId);
+        // 프로젝트 카드 생성자와 토큰 유저가 다르면 예외를 발생.
+        validateProjectCardCreator(tokenUser, request.getCreatorId());
 
         // 프로젝트 카드에 올라온 미팅 장소와 유저의 리전 정보가 일치하지 않으면 예외를 발생.
         //TODO: project 안에서 할지 고민
-        validateMeetLocation(request.getMeetLat(), request.getMeetLng(), user.getRegion());
+        validateMeetLocation(request.getMeetLat(), request.getMeetLng(), tokenUser.getRegion());
 
         // 프로젝트 생성
-        Project project = request.toEntity(user);
+        Project project = request.toEntity(tokenUser);
         projectJpaRepository.save(project);
 
         return project.getId();
