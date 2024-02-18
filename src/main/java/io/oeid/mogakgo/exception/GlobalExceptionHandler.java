@@ -48,8 +48,9 @@ public class GlobalExceptionHandler {
             builder.append(" 입력된 값: [");
             builder.append(fieldError.getRejectedValue());
             builder.append("]");
-            builder.append("\n");
+            builder.append(", ");
         }
+        log.info(builder.toString());
 
         return ErrorResponse.ofWithErrorMessage(INVALID_INPUT_VALUE, builder.toString());
     }
