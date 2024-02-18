@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.cert.presentation;
 
 import io.oeid.mogakgo.common.annotation.UserId;
+import io.oeid.mogakgo.common.swagger.template.CertSwagger;
 import io.oeid.mogakgo.domain.cert.application.CertService;
 import io.oeid.mogakgo.domain.cert.presentation.dto.req.UserRegionCertAPIReq;
 import io.oeid.mogakgo.domain.cert.presentation.dto.req.UserRegionInfoAPIReq;
@@ -18,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/v1/cert")
 @RestController
 @RequiredArgsConstructor
-public class CertController {
+public class CertController implements CertSwagger {
 
     private final CertService certService;
     private final GeoService geoService;
 
     @PostMapping("/areacode")
-    public ResponseEntity<UserRegionInfoAPIRes> getUseRegionInfoByGPS(
+    public ResponseEntity<UserRegionInfoAPIRes> getUserRegionInfoByGPS(
         @UserId Long userId, @Valid @RequestBody UserRegionInfoAPIReq request
     ) {
         int areaCode = geoService.getUserRegionInfoAboutCoordinates(
