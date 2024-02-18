@@ -68,6 +68,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleException(
         Exception e, HttpServletRequest request
     ) {
+        log.error("error", e);
         return ErrorResponse.from(INTERNAL_SERVER_ERROR);
     }
 }
