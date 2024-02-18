@@ -23,14 +23,15 @@ public class AuthController {
         String accessToken = oAuth2User.getAttributes().get("accessToken").toString();
         String refreshToken = oAuth2User.getAttributes().get("refreshToken").toString();
         int refreshTokenExpireTime = (int) oAuth2User.getAttributes().get("refreshTokenExpireTime");
+        boolean signUpComplete = (boolean) oAuth2User.getAttributes().get("signUpComplete");
         setCookie(refreshToken, refreshTokenExpireTime, response);
-        return ResponseEntity.ok(AuthAccessTokenResponse.from(accessToken));
+        return ResponseEntity.ok(AuthAccessTokenResponse.of(accessToken, signUpComplete));
     }
 
     @GetMapping("/login")
     public ResponseEntity<AuthLoginUrlResponse> login() {
         return ResponseEntity.ok(
-            AuthLoginUrlResponse.from("http://127.0.0.1:8080/oauth2/authorization/github"));
+            AuthLoginUrlResponse.from("x"));
     }
 
     private void setCookie(String refreshToken, int refreshTokenExpireTime, HttpServletResponse response) {
