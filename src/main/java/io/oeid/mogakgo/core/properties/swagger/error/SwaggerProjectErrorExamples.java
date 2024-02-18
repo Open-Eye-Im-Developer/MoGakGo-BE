@@ -11,6 +11,7 @@ public class SwaggerProjectErrorExamples {
     public static final String PROJECT_FORBIDDEN_OPERATION = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":403,\"code\":\"E030201\",\"message\":\"해당 프로젝트에 대한 권한이 없습니다.\"}";
     public static final String PROJECT_DELETION_NOT_ALLOWED = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":400,\"code\":\"E030106\",\"message\":\"매칭 중이거나 대기중인 프로젝트는 삭제할 수 없습니다.\"}";
     public static final String PROJECT_CANCEL_NOT_ALLOWED = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":400,\"code\":\"E030107\",\"message\":\"이미 취소 되었거나 종료된 프로젝트는 취소할 수 없습니다.\"}";
+    public static final String PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":403,\"code\":\"E050201\",\"message\":\"해당 프로젝트 요청에 대한 권한이 없습니다.\"}";
     private SwaggerProjectErrorExamples() {
     }
 

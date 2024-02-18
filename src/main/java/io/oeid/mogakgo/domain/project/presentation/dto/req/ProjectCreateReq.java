@@ -10,7 +10,6 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
@@ -53,7 +52,7 @@ public class ProjectCreateReq {
     @NotBlank
     private String meetDetail;
 
-    @Schema(description = "프로젝트 태그 목록", implementation = ProjectTagCreateReq.class,
+    @Schema(description = "프로젝트 태그 목록",
         example = "[{\"content\":\"인싸\"},{\"content\":\"말많은\"}]")
     @NotEmpty
     private List<@Valid ProjectTagCreateReq> tags;

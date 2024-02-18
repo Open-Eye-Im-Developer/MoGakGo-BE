@@ -1,12 +1,16 @@
 package io.oeid.mogakgo.common.swagger.template;
 
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -106,5 +110,33 @@ public interface ProjectSwagger {
     ResponseEntity<ProjectIdRes> cancel(
         @Parameter(hidden = true) Long userId,
         @Parameter(description = "프로젝트 ID", required = true) Long id
+    );
+
+    @Operation(summary = "프로젝트 카드 참가 요청 조회", description = "회원이 프로젝트 카드의 참가 요청을 조회할 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "프로젝트 카드 참가 요청 조회 성공"),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E030301", value = SwaggerProjectErrorExamples.PROJECT_NOT_FOUND),
+                    @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
+                })),
+        @ApiResponse(responseCode = "403", description = "본인의 프로젝트 카드만 조회 할 수 있음.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E050201", value = SwaggerProjectErrorExamples.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION)))
+    })
+    @Parameters({
+        @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),
+        @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
+        @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
+    })
+    ResponseEntity<CursorPaginationResult<projectJoinRequestRes>> getJoinRequest(
+        @Parameter(hidden = true) Long userId,
+        @Parameter(description = "프로젝트 ID", required = true) Long id,
+        @Parameter(hidden = true) CursorPaginationInfoReq pageable
     );
 }
