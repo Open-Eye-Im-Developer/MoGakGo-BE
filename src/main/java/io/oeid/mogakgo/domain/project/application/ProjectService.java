@@ -11,6 +11,7 @@ import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
+import io.oeid.mogakgo.domain.project_join_req.infrastruture.ProjectJoinRequestJpaRepository;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
@@ -26,6 +27,7 @@ public class ProjectService {
     private final UserJpaRepository userJpaRepository;
     private final ProjectJpaRepository projectJpaRepository;
     private final GeoService geoService;
+    private final ProjectJoinRequestJpaRepository projectJoinRequestJpaRepository;
 
     @Transactional
     public Long create(Long userId, ProjectCreateReq request) {
@@ -55,6 +57,20 @@ public class ProjectService {
 
         // 프로젝트 삭제
         project.delete(user);
+    }
+
+    public void cancel(Long userId, Long projectId) {
+        // 유저 존재 여부 체크
+        User user = getUser(userId);
+
+        // 프로젝트 존재 여부 체크
+        Project project = getProject(projectId);
+
+        // 매칭이 되었거나, 매칭 준비중이지만 요청이 있을때는 잔디력 감소를 위한 변수
+        boolean projectHasReq = projectJoinRequestJpaRepository.existsByProjectId(projectId);
+
+        // 프로젝트 취소
+        project.cancel(user, projectHasReq);
     }
 
     private User getUser(Long userId) {
