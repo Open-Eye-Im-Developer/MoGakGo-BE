@@ -15,4 +15,4 @@ COPY --from=builder application/application/ ./
 
 # 어플리케이션 .jar 파일의 압축 해제로, JarLauncher를 통해 어플리케이션 실행
 ENV TZ=Asia/Seoul
-ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "org.springframework.boot.loader.JarLauncher"]
