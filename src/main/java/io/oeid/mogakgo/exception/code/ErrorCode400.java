@@ -18,7 +18,7 @@ public enum ErrorCode400 implements ErrorCode {
     INVALID_PROJECT_NULL_DATA("E030104", "프로젝트를 생성하기 위해 null 이여서는 안되는 데이터가 null 입니다."),
     NOT_MATCH_MEET_LOCATION("E030105", "프로젝트 만남 장소가 유저가 동네인증 한 구역이 아닙니다."),
     PROJECT_DELETION_NOT_ALLOWED("E030106", "매칭 중이거나 대기중인 프로젝트는 삭제할 수 없습니다."),
-    INVALID_SERVICE_REGION("E030107", "해당 지역은 서비스 지역이 아닙니다."),
+    INVALID_SERVICE_REGION("E080101", "해당 지역은 서비스 지역이 아닙니다."),
     USER_DEVELOP_LANGUAGE_BAD_REQUEST("E020101", "개발 언어는 3개까지만 등록 가능합니다."),
     USER_WANTED_JOB_BAD_REQUEST("E020102", "희망 직무는 3개까지만 등록 가능합니다."),
     USERNAME_SHOULD_BE_NOT_EMPTY("E020103", "유저 이름은 비어있을 수 없습니다."),
