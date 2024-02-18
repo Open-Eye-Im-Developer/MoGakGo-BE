@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.user.application;
 
 import io.oeid.mogakgo.domain.user.application.dto.req.UserSignUpRequest;
+import io.oeid.mogakgo.domain.user.application.dto.res.UserProfileResponse;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserSignUpResponse;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
@@ -12,12 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserCommonService userCommonService;
     private final UserWantedJobTagJpaRepository userWantedJobTagRepository;
 
+    @Transactional
     public UserSignUpResponse userSignUp(UserSignUpRequest userSignUpRequest) {
         User user = userCommonService.getUserById(userSignUpRequest.getUserId());
         user.updateUsername(userSignUpRequest.getUsername());
@@ -31,6 +33,12 @@ public class UserService {
         return UserSignUpResponse.from(user);
     }
 
+    public UserProfileResponse getUserProfile(Long userId){
+        User user = userCommonService.getUserById(userId);
+        return UserProfileResponse.from(user);
+    }
+
+    @Transactional
     public void deleteUser(Long userId) {
         User user = userCommonService.getUserById(userId);
         user.delete();
