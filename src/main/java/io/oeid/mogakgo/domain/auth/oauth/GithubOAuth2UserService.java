@@ -34,7 +34,7 @@ public class GithubOAuth2UserService extends DefaultOAuth2UserService {
     private OAuth2User generateOAuth2User(String nameAttributeKey, long id, User user) {
         Map<String, Object> attributes = Map.of(
             nameAttributeKey, id,
-            "user", user
+            "signupComplete", user.getSignupYn()
         );
         return new DefaultOAuth2User(user.getAuthorities(), attributes, nameAttributeKey);
     }

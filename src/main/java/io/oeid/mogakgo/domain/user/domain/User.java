@@ -94,6 +94,8 @@ public class User {
     @Column(name = "available_like_count")
     private int availableLikeCount;
 
+    @Column(name = "signup_yn")
+    private Boolean signupYn;
 
     private User(Long githubPk, String githubId, String avatarUrl, String githubUrl) {
         this.githubPk = githubPk;
@@ -103,6 +105,7 @@ public class User {
         this.githubUrl = githubUrl;
         this.role = Role.ROLE_USER;
         this.jandiRate = 0d;
+        this.signupYn = false;
     }
 
     public static User of(long githubPk, String username, String avatarUrl, String githubUrl) {
@@ -144,4 +147,15 @@ public class User {
         this.deletedAt = LocalDateTime.now();
     }
 
+    public void signUpComplete(){
+        this.signupYn = true;
+    }
+
+    public void updateRegion(Region region) {
+        if(region == null){
+            throw new UserException(ErrorCode400.USER_REGION_SHOULD_BE_NOT_EMPTY);
+        }
+        this.region = region;
+        this.regionAuthenticationAt = LocalDateTime.now();
+    }
 }
