@@ -2,6 +2,8 @@ package io.oeid.mogakgo.domain.user.domain;
 
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
+import io.oeid.mogakgo.domain.user.exception.UserException;
+import io.oeid.mogakgo.exception.code.ErrorCode400;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -109,16 +111,14 @@ public class User {
 
     public void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
         if (userDevelopLanguageTags.size() + 1 > MAX_TAG_SIZE) {
-            // TODO: 2024-02-15 Custom Exception 생성시 변경
-            throw new IllegalArgumentException("개발 언어는 3개까지만 등록 가능합니다.");
+            throw new UserException(ErrorCode400.USER_DEVELOP_LANGUAGE_BAD_REQUEST);
         }
         userDevelopLanguageTags.add(userDevelopLanguageTag);
     }
 
     public void addWantedJob(UserWantedJobTag userWantedJobTag) {
         if (userWantedJobTags.size() + 1 > MAX_TAG_SIZE) {
-            // TODO: 2024-02-15 Custom Exception 생성시 변경
-            throw new IllegalArgumentException("원하는 직무는 3개까지만 등록 가능합니다.");
+            throw new UserException(ErrorCode400.USER_DEVELOP_LANGUAGE_BAD_REQUEST);
         }
         userWantedJobTags.add(userWantedJobTag);
     }
@@ -133,5 +133,15 @@ public class User {
         this.githubUrl = githubUrl;
     }
 
+    public void updateUsername(String username) {
+        if(username == null || username.isBlank()){
+            throw new UserException(ErrorCode400.USERNAME_SHOULD_BE_NOT_EMPTY);
+        }
+        this.username = username;
+    }
+
+    public void delete(){
+        this.deletedAt = LocalDateTime.now();
+    }
 
 }
