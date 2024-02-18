@@ -58,8 +58,8 @@ public class MeetingInfo {
             meetEndTime.toLocalDate().equals(now.toLocalDate());
         // meetEndTime이 meetStartTime보다 뒤에 있는지 확인
         boolean isTimeOrderValid = meetEndTime.isAfter(meetStartTime);
-        // 시간 차이가 30분 단위인지 확인
-        boolean isTimeDiffValid = ChronoUnit.MINUTES.between(meetStartTime, meetEndTime) % 30 == 0;
+        // 시간 차이가 5분 단위인지 확인
+        boolean isTimeDiffValid = ChronoUnit.MINUTES.between(meetStartTime, meetEndTime) % 5 == 0;
 
         if (!isToday || !isTimeOrderValid || !isTimeDiffValid) {
             throw new ProjectException(INVALID_PROJECT_MEETING_TIME);
