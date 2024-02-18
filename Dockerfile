@@ -1,6 +1,6 @@
 # 어플리케이션 .jar 파일을 여러 레이어로 extracting
 FROM eclipse-temurin:17-jre AS builder
-WORKDIR applicatio
+WORKDIR application
 ARG JAR_FILE=build/libs/*SNAPSHOT.jar
 COPY ${JAR_FILE} application.jar
 RUN java -Djarmode=layertools -jar application.jar extract
