@@ -31,6 +31,6 @@ public interface AuthSwagger {
                 examples = @ExampleObject(name = "E010201", value = SwaggerAuthErrorExamples.AUTH_MISSING_CREDENTIALS)))
     })
     ResponseEntity<AuthAccessTokenResponse> reissue(
-        @Parameter(in = ParameterIn.HEADER) String accessToken,
+        @Parameter(in = ParameterIn.HEADER, hidden = true) String accessToken,
         @Parameter(in = ParameterIn.COOKIE) String refreshToken);
 }

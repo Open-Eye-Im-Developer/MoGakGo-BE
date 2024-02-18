@@ -20,6 +20,7 @@ public class AuthService {
     private final JwtHelper jwtHelper;
 
     public AuthReissueResponse reissue(String expiredAccessToken, String refreshToken) {
+        expiredAccessToken = expiredAccessToken.substring(7); // remove "Bearer " (7 characters)
         String verifyRefreshToken = jwtRedisDao.getRefreshTokenByAccessToken(expiredAccessToken);
         if (!refreshToken.equals(verifyRefreshToken)) {
             throw new AuthException(ErrorCode401.AUTH_MISSING_CREDENTIALS);
@@ -38,7 +39,7 @@ public class AuthService {
     }
 
     private int calculateRefreshTokenExpirySeconds(String refreshToken) {
-        Map<String, Claim> claims = jwtHelper.verify(refreshToken);
-        return (int) ((claims.get("exp").asLong() - System.currentTimeMillis()) / 1000);
+        Map<String, Claim> claims = jwtHelper.verifyRefreshToken(refreshToken);
+        return (int) (claims.get("exp").asLong() - System.currentTimeMillis() / 1000);
     }
 }

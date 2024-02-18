@@ -91,4 +91,8 @@ public class JwtHelper {
             .build();
         return verifier.verify(token).getClaims();
     }
+
+    public Map<String, Claim> verifyRefreshToken(String token){
+        return jwtVerifier.verify(token).getClaims();
+    }
 }
