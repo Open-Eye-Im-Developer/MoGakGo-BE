@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode401 implements ErrorCode{
 
     AUTH_MISSING_CREDENTIALS("E010201", "사용자의 인증 정보를 찾을 수 없습니다."),
+    CERT_INVALID_INFORMATION("E070201", "동네 인증을 수행할 권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
