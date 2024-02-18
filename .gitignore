@@ -38,3 +38,4 @@ out/
 
 ### application.yml ###
 application*.yml
+firebase*.json
