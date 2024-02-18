@@ -50,7 +50,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     }
 
     private BooleanExpression cursorIdEq(Long cursorId) {
-        return cursorId != null ? project.id.eq(cursorId) : null;
+        return cursorId != null ? project.id.gt(cursorId) : null;
     }
 
     private boolean checkLastPage(List<Project> projects, Pageable pageable) {
