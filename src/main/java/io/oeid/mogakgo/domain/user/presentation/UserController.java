@@ -28,7 +28,7 @@ public class UserController {
         return ResponseEntity.ok(UserSignUpApiResponse.from(response));
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<Void> userDeleteApi(@UserId Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.ok().build();

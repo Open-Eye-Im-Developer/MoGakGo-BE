@@ -22,8 +22,7 @@ public class UserService {
     private final UserWantedJobTagJpaRepository userWantedJobTagRepository;
 
     public UserSignUpResponse userSignUp(UserSignUpRequest userSignUpRequest) {
-        User user = userRepository.findById(userSignUpRequest.getUserId())
-            .orElseThrow(() -> new UserException(ErrorCode404.USER_NOT_FOUND));
+        User user = getUserById(userSignUpRequest.getUserId());
         user.updateUsername(userSignUpRequest.getUsername());
         for (WantedJob wantedJob : userSignUpRequest.getWantedJobs()) {
             userWantedJobTagRepository.save(UserWantedJobTag.builder()
@@ -34,9 +33,13 @@ public class UserService {
         return UserSignUpResponse.from(user);
     }
 
-    public void deleteUser(Long userId){
-        User user = userRepository.findById(userId)
-            .orElseThrow(() -> new UserException(ErrorCode404.USER_NOT_FOUND));
+    public void deleteUser(Long userId) {
+        User user = getUserById(userId);
         user.delete();
+    }
+
+    private User getUserById(Long userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new UserException(ErrorCode404.USER_NOT_FOUND));
     }
 }
