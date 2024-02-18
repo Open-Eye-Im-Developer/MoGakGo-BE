@@ -80,8 +80,13 @@ public class Project extends BaseTimeEntity {
     }
 
     public void delete(User tokenUser) {
-        validateCreator(tokenUser);
+        validateAvailableDelete(tokenUser);
         super.delete();
+    }
+
+    private void validateAvailableDelete(User tokenUser) {
+        validateCreator(tokenUser);
+        this.projectStatus.validateAvailableDelete();
     }
 
     private void validateCreator(User tokenUser) {

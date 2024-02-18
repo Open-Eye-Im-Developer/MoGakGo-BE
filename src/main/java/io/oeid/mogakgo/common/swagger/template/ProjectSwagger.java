@@ -55,6 +55,13 @@ public interface ProjectSwagger {
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "프로젝트 카드 삭제 성공"),
+        @ApiResponse(responseCode = "400", description = "프로젝트를 삭제 할 수 없습니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E030106", value = SwaggerProjectErrorExamples.PROJECT_DELETION_NOT_ALLOWED)
+                })),
         @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
             content = @Content(
                 mediaType = "application/json",
