@@ -8,7 +8,7 @@ import io.oeid.mogakgo.domain.cert.presentation.dto.res.UserRegionCertAPIRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +20,7 @@ public class CertController implements CertSwagger {
 
     private final CertService certService;
 
-    @PostMapping("/certificate")
+    @PatchMapping("/certificate")
     public ResponseEntity<UserRegionCertAPIRes> certificateNeighborhood(
         @UserId Long userId, @Valid @RequestBody UserRegionCertAPIReq request
     ) {

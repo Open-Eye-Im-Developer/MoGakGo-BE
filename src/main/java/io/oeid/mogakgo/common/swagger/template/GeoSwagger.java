@@ -2,7 +2,6 @@ package io.oeid.mogakgo.common.swagger.template;
 
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerGeoErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
-import io.oeid.mogakgo.domain.geo.presentation.dto.req.UserRegionInfoAPIReq;
 import io.oeid.mogakgo.domain.geo.presentation.dto.res.UserRegionInfoAPIRes;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +36,8 @@ public interface GeoSwagger {
     })
     ResponseEntity<UserRegionInfoAPIRes> getUserRegionInfoByGPS(
         @Parameter(hidden = true) Long userId,
-        UserRegionInfoAPIReq request
+        @Parameter(description = "사용자의 GPS 경도", required = true) Double longitude,
+        @Parameter(description = "사용자의 GPS 위도", required = true) Double latitude
     );
 
 }
