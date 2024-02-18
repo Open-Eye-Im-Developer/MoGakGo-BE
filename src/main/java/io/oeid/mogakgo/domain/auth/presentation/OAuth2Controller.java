@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.auth.presentation;
 
+import io.oeid.mogakgo.common.swagger.template.OAuth2Swagger;
 import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthAccessTokenResponse;
 import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthLoginUrlResponse;
 import jakarta.servlet.http.Cookie;
@@ -15,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/oauth")
-public class AuthController {
+@RequestMapping("/oauth2")
+public class OAuth2Controller implements OAuth2Swagger {
 
     private final String serverUrl;
 
-    public AuthController(@Value("${auth.server-url}") String serverUrl) {
+    public OAuth2Controller(@Value("${auth.server-url}") String serverUrl) {
         this.serverUrl = serverUrl;
     }
 
