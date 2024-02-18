@@ -2,7 +2,7 @@ package io.oeid.mogakgo.common.swagger.template;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples;
+import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.notification.presentation.dto.req.FCMTokenApiRequest;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,7 +24,7 @@ public interface NotificationSwagger {
         mediaType = APPLICATION_JSON_VALUE,
         schema = @Schema(implementation = ErrorResponse.class),
         examples = {
-            @ExampleObject(name = "E020301", value = SwaggerProjectErrorExamples.USER_NOT_FOUND)
+            @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
         })
     )
     ResponseEntity<Void> manageFCMToken(@Parameter(hidden = true) Long userId,

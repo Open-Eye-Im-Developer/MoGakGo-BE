@@ -10,7 +10,6 @@ public class SwaggerProjectErrorExamples {
     public static final String PROJECT_NOT_FOUND = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":404,\"code\":\"E030301\",\"message\":\"해당 프로젝트가 존재하지 않습니다.\"}";
     public static final String PROJECT_FORBIDDEN_OPERATION = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":403,\"code\":\"E030201\",\"message\":\"해당 프로젝트에 대한 권한이 없습니다.\"}";
     public static final String PROJECT_DELETION_NOT_ALLOWED = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":400,\"code\":\"E030106\",\"message\":\"매칭 중이거나 대기중인 프로젝트는 삭제할 수 없습니다.\"}";
-    public static final String USER_NOT_FOUND = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":404,\"code\":\"E020301\",\"message\":\"해당 유저가 존재하지 않습니다.\"}";
     private SwaggerProjectErrorExamples() {
     }
 
