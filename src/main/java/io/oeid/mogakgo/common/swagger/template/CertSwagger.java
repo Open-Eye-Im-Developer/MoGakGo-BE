@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.common.swagger.template;
 
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerCertErrorExamples;
+import io.oeid.mogakgo.core.properties.swagger.error.SwaggerGeoErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.cert.presentation.dto.req.UserRegionCertAPIReq;
 import io.oeid.mogakgo.domain.cert.presentation.dto.res.UserRegionCertAPIRes;
@@ -28,7 +29,7 @@ public interface CertSwagger {
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(name = "E080101", value = SwaggerCertErrorExamples.INVALID_CERT_REGION))),
+                examples = @ExampleObject(name = "E080101", value = SwaggerGeoErrorExamples.INVALID_SERVICE_REGION))),
         @ApiResponse(responseCode = "401", description = "동네 인증 권한이 없음",
             content = @Content(
                 mediaType = "application/json",

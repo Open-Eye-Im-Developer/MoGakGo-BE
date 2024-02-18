@@ -1,6 +1,6 @@
 package io.oeid.mogakgo.common.swagger.template;
 
-import io.oeid.mogakgo.core.properties.swagger.error.SwaggerCertErrorExamples;
+import io.oeid.mogakgo.core.properties.swagger.error.SwaggerGeoErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.geo.presentation.dto.req.UserRegionInfoAPIReq;
 import io.oeid.mogakgo.domain.geo.presentation.dto.res.UserRegionInfoAPIRes;
@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "Geo", description = "지역 관련 API")
+@SuppressWarnings("unused")
 public interface GeoSwagger {
 
     @Operation(summary = "GPS에 대한 법정구역코드 응답", description = "사용자의 GPS 좌표의 법정구역코드를 요청할 때 사용하는 API"
@@ -27,7 +28,7 @@ public interface GeoSwagger {
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(name = "E080101", value = SwaggerCertErrorExamples.INVALID_CERT_REGION))),
+                examples = @ExampleObject(name = "E080101", value = SwaggerGeoErrorExamples.INVALID_SERVICE_REGION))),
         @ApiResponse(responseCode = "404", description = "요청한 유저가 존재하지 않음",
             content = @Content(
                 mediaType = "application/json",
