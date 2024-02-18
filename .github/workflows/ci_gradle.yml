@@ -9,8 +9,6 @@ name: Java CI with Gradle in mogakGo
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
 
