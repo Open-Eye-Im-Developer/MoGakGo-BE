@@ -30,7 +30,7 @@ public interface CertSwagger {
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponse.class),
                 examples = @ExampleObject(name = "E080101", value = SwaggerGeoErrorExamples.INVALID_SERVICE_REGION))),
-        @ApiResponse(responseCode = "401", description = "동네 인증 권한이 없음",
+        @ApiResponse(responseCode = "403", description = "동네 인증 권한이 없음",
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponse.class),

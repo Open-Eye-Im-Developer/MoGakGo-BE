@@ -1,7 +1,7 @@
 package io.oeid.mogakgo.domain.cert.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SERVICE_REGION;
-import static io.oeid.mogakgo.exception.code.ErrorCode401.CERT_INVALID_INFORMATION;
+import static io.oeid.mogakgo.exception.code.ErrorCode403.CERT_INVALID_INFORMATION;
 
 import io.oeid.mogakgo.domain.cert.exception.CertException;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
