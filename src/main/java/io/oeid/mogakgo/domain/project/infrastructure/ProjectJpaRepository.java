@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProjectJpaRepository extends JpaRepository<Project, Long> {
+public interface ProjectJpaRepository extends JpaRepository<Project, Long>, ProjectRepositoryCustom {
 
     @Query("select p from Project p where p.id = :id and p.deletedAt is null")
     @Override
