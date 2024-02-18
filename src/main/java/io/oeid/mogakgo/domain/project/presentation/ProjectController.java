@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,6 @@ public class ProjectController implements ProjectSwagger {
 
     private final ProjectService projectService;
 
-    @Override
     @PostMapping
     public ResponseEntity<ProjectIdRes> create(
         @UserId Long userId, @Valid @RequestBody ProjectCreateReq request
@@ -37,6 +37,14 @@ public class ProjectController implements ProjectSwagger {
     ) {
         projectService.delete(userId, id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<ProjectIdRes> cancel(
+        @UserId Long userId, @PathVariable Long id
+    ) {
+        projectService.cancel(userId, id);
+        return ResponseEntity.status(200).body(ProjectIdRes.from(id));
     }
 
 }

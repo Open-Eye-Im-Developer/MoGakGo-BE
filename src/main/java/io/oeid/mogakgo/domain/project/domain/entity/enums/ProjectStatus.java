@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.project.domain.entity.enums;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.PROJECT_CANCEL_NOT_ALLOWED;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.PROJECT_DELETION_NOT_ALLOWED;
 
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
@@ -21,6 +22,12 @@ public enum ProjectStatus {
     public void validateAvailableDelete() {
         if (this == PENDING || this == MATCHED) {
             throw new ProjectException(PROJECT_DELETION_NOT_ALLOWED);
+        }
+    }
+
+    public void validateAvailableCancel() {
+        if (this == CANCELED || this == FINISHED) {
+            throw new ProjectException(PROJECT_CANCEL_NOT_ALLOWED);
         }
     }
 }
