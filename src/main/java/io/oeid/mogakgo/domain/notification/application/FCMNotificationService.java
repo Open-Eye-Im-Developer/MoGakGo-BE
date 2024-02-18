@@ -7,8 +7,8 @@ import com.google.firebase.messaging.Notification;
 import io.oeid.mogakgo.domain.notification.domain.vo.FCMToken;
 import io.oeid.mogakgo.domain.notification.exception.NotificationException;
 import io.oeid.mogakgo.domain.notification.infrastructure.FCMTokenJpaRepository;
+import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,19 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class FCMNotificationService {
 
     private final FCMTokenJpaRepository fcmTokenRepository;
+    private final UserCommonService userCommonService;
     private final FirebaseMessaging firebaseMessaging;
 
     @Transactional
     public void manageToken(Long userId, String fcmToken) {
         log.info("manageToken Start");
-        FCMToken token = fcmTokenRepository.findById(userId)
+        FCMToken token = fcmTokenRepository.findById(userCommonService.getUserById(userId).getId())
             .orElseGet(() -> new FCMToken(userId, fcmToken));
         token.updateToken(fcmToken);
         fcmTokenRepository.save(token);
         log.info("manageToken End");
     }
 
-    public void sendNotification(Long userId, String title, String body, Map<String, String> data) {
+    public void sendNotification(Long userId, String title, String body) {
         log.info("sendNotification Start");
         String fcmToken = getFCMToken(userId);
         // send notification
@@ -41,7 +42,6 @@ public class FCMNotificationService {
                 .setTitle(title)
                 .setBody(body)
                 .build())
-            .putAllData(data)
             .setToken(fcmToken)
             .build();
         try {

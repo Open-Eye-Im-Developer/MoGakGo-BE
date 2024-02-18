@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.notification.presentation;
 
 import io.oeid.mogakgo.common.annotation.UserId;
+import io.oeid.mogakgo.common.swagger.template.NotificationSwagger;
 import io.oeid.mogakgo.domain.notification.application.FCMNotificationService;
 import io.oeid.mogakgo.domain.notification.presentation.dto.req.FCMTokenApiRequest;
 import jakarta.validation.Valid;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/notification")
 @RequiredArgsConstructor
-public class NotificationController {
+public class NotificationController implements NotificationSwagger {
 
     private final FCMNotificationService fcmNotificationService;
 
