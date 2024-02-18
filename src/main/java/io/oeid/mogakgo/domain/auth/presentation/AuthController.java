@@ -5,6 +5,7 @@ import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthLoginUrlResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -16,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/oauth")
 public class AuthController {
+
+    private final String serverUrl;
+
+    public AuthController(@Value("${auth.server-url}") String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
 
     @GetMapping("/login/success")
     public ResponseEntity<AuthAccessTokenResponse> loginSuccess(
@@ -31,10 +38,11 @@ public class AuthController {
     @GetMapping("/login")
     public ResponseEntity<AuthLoginUrlResponse> login() {
         return ResponseEntity.ok(
-            AuthLoginUrlResponse.from("x"));
+            AuthLoginUrlResponse.from(serverUrl + "/oauth2/authorization/github"));
     }
 
-    private void setCookie(String refreshToken, int refreshTokenExpireTime, HttpServletResponse response) {
+    private void setCookie(String refreshToken, int refreshTokenExpireTime,
+        HttpServletResponse response) {
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setMaxAge(refreshTokenExpireTime);
         cookie.setPath("/");
