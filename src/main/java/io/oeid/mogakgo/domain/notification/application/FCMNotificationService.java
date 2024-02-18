@@ -1,26 +1,56 @@
 package io.oeid.mogakgo.domain.notification.application;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import io.oeid.mogakgo.domain.notification.domain.vo.FCMToken;
 import io.oeid.mogakgo.domain.notification.exception.NotificationException;
 import io.oeid.mogakgo.domain.notification.infrastructure.FCMTokenJpaRepository;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class FCMNotificationService {
 
     private final FCMTokenJpaRepository fcmTokenRepository;
+    private final FirebaseMessaging firebaseMessaging;
 
     @Transactional
     public void manageToken(Long userId, String fcmToken) {
+        log.info("manageToken Start");
         FCMToken token = fcmTokenRepository.findById(userId)
             .orElseGet(() -> new FCMToken(userId, fcmToken));
         token.updateToken(fcmToken);
         fcmTokenRepository.save(token);
+        log.info("manageToken End");
+    }
+
+    public void sendNotification(Long userId, String title, String body, Map<String, String> data) {
+        log.info("sendNotification Start");
+        String fcmToken = getFCMToken(userId);
+        // send notification
+        Message message = Message.builder()
+            .setNotification(Notification.builder()
+                .setTitle(title)
+                .setBody(body)
+                .build())
+            .putAllData(data)
+            .setToken(fcmToken)
+            .build();
+        try {
+            String response = firebaseMessaging.send(message);
+            log.info("Successfully sent message: " + response);
+        } catch (FirebaseMessagingException e) {
+            log.error("Error sending message: " + e.getMessage());
+        }
+        log.info("sendNotification End");
     }
 
     private String getFCMToken(Long userId) {
