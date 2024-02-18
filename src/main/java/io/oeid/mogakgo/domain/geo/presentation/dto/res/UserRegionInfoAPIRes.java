@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.cert.presentation.dto.res;
+package io.oeid.mogakgo.domain.geo.presentation.dto.res;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class UserRegionInfoAPIRes {
 
+    @Schema(description = "사용자의 법정구역코드", example = "11110", implementation = Integer.class)
     private final int areaCode;
 
     private UserRegionInfoAPIRes(int areaCode) {

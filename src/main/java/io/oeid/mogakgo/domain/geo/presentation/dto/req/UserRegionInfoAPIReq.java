@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.cert.presentation.dto.req;
+package io.oeid.mogakgo.domain.geo.presentation.dto.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMax;
@@ -14,13 +14,13 @@ public class UserRegionInfoAPIReq {
     @NotNull
     private final Long userId;
 
-    @Schema(description = "사용자의 GPS 기반 경도")
+    @Schema(description = "사용자의 GPS 기반 경도", example = "127.0783098757533", implementation = Double.class)
     @NotNull
     @DecimalMin("123.0")
     @DecimalMax("132.0")
     private final Double longitude;
 
-    @Schema(description = "사용자의 GPS 기반 위도")
+    @Schema(description = "사용자의 GPS 기반 위도", example = "37.63338336616322", implementation = Double.class)
     @NotNull
     @DecimalMin("32.0")
     @DecimalMax("39.0")

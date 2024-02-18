@@ -12,7 +12,7 @@ public class UserRegionCertAPIReq {
     @NotNull
     private final Long userId;
 
-    @Schema(description = "동네 인증을 요청하는 서비스 지역의 법정구역코드")
+    @Schema(description = "동네 인증을 요청하는 서비스 지역의 법정구역코드", example = "11110", implementation = Integer.class)
     @NotNull
     private final Integer areaCode;
 
