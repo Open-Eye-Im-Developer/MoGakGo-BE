@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -24,16 +25,16 @@ public class ProjectCreateReq {
     @NotNull
     private Long creatorId;
 
-    @Schema(description = "미팅 시작 시간. 30분 단위만 가능.", example = "2024-02-18T12:00:00",
+    @Schema(description = "미팅 시작 시간. 5분 단위만 가능.", example = "2024-02-18T12:00:00",
         pattern = "yyyy-MM-dd'T'HH:mm:ss", type = "string")
     @NotNull
-    @PastOrPresent
+    @FutureOrPresent
     private LocalDateTime meetStartTime;
 
-    @Schema(description = "미팅 종료 시간. 30분 단위만 가능.", example = "2024-02-18T12:30:00",
+    @Schema(description = "미팅 종료 시간. 5분 단위만 가능.", example = "2024-02-18T12:30:00",
         pattern = "yyyy-MM-dd'T'HH:mm:ss", type = "string")
     @NotNull
-    @PastOrPresent
+    @FutureOrPresent
     private LocalDateTime meetEndTime;
 
     @Schema(description = "미팅 장소의 위도", example = "37.63338336616322", implementation = Double.class)
