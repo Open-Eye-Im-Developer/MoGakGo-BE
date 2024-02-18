@@ -21,20 +21,6 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<Project> findPendingProjectsByRegion(Long cursorId, Region region, Pageable pageable) {
-        List<Project> result = jpaQueryFactory.selectFrom(project)
-            .where(
-                cursorIdEq(cursorId),
-                project.creatorInfo.region.eq(region),
-                project.projectStatus.eq(ProjectStatus.PENDING)
-            )
-            .limit(pageable.getPageSize() + 1)
-            .fetch();
-
-        return checkLastPage(result, pageable);
-    }
-
-    @Override
     public Slice<Project> findByCondition(
         Long cursorId, Long userId, Region region, ProjectStatus projectStatus, Pageable pageable
     ) {
@@ -47,8 +33,8 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
             )
             .limit(pageable.getPageSize() + 1)
             .fetch();
-
-        return checkLastPage(result, pageable);
+        boolean hasNext = checkLastPage(result, pageable);
+        return new SliceImpl<>(result, pageable, hasNext);
     }
 
     private BooleanExpression userIdEq(Long userId) {
@@ -67,12 +53,11 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
         return cursorId != null ? project.id.eq(cursorId) : null;
     }
 
-    private Slice<Project> checkLastPage(List<Project> projects, Pageable pageable) {
-        boolean hasNext = false;
+    private boolean checkLastPage(List<Project> projects, Pageable pageable) {
         if (projects.size() > pageable.getPageSize()) {
-            hasNext = true;
             projects.remove(pageable.getPageSize());
+            return true;
         }
-        return new SliceImpl<>(projects, pageable, hasNext);
+        return false;
     }
 }

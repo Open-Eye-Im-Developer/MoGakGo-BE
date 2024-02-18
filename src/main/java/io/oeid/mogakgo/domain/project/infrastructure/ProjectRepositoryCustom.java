@@ -8,9 +8,6 @@ import org.springframework.data.domain.Slice;
 
 public interface ProjectRepositoryCustom {
 
-    Slice<Project> findPendingProjectsByRegion(
-        Long cursorId, Region region, Pageable pageable
-    );
     Slice<Project> findByCondition(
         Long cursorId, Long userId, Region region, ProjectStatus projectStatus, Pageable pageable
     );
