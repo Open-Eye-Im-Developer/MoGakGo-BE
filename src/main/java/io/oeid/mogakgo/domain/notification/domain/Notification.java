@@ -1,7 +1,9 @@
 package io.oeid.mogakgo.domain.notification.domain;
 
 import io.oeid.mogakgo.domain.notification.domain.enums.NotificationTag;
+import io.oeid.mogakgo.domain.notification.exception.NotificationException;
 import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.exception.code.ErrorCode400;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,14 +37,8 @@ public class Notification {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "notification_tag")
+    @Column(name = "tag")
     private NotificationTag notificationTag;
-
-    @Column(name = "title")
-    private String title;
-
-    @Column(name = "body")
-    private String body;
 
     @Column(name = "detail_data")
     private String detailData;
@@ -51,52 +47,26 @@ public class Notification {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    private Notification(User user, NotificationTag notificationTag, String title, String body,
-        String detailData) {
-        this.user = validateUser(user);
+    private Notification(User user, NotificationTag notificationTag, String detailData) {
+        this.user = user;
         this.notificationTag = validateNotificationTag(notificationTag);
-        this.title = validateTitle(title);
-        this.body = validateBody(body);
         this.detailData = validateDetailData(detailData);
     }
 
-    public static Notification of(User user, NotificationTag notificationTag, String title,
-        String body,
-        String detailData) {
-        return new Notification(user, notificationTag, title, body, detailData);
-    }
-
-    private User validateUser(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("user must not be null");
-        }
-        return user;
+    public static Notification of(User user, NotificationTag notificationTag, String detail) {
+        return new Notification(user, notificationTag, detail);
     }
 
     private NotificationTag validateNotificationTag(NotificationTag notificationTag) {
         if (notificationTag == null) {
-            throw new IllegalArgumentException("notificationTag must not be null");
+            throw new NotificationException(ErrorCode400.NOTIFICATION_TAG_NOT_NULL);
         }
         return notificationTag;
     }
 
-    private String validateTitle(String title) {
-        if (title == null || title.isEmpty()) {
-            throw new IllegalArgumentException("title must not be null or empty");
-        }
-        return title;
-    }
-
-    private String validateBody(String body) {
-        if (body == null || body.isEmpty()) {
-            throw new IllegalArgumentException("body must not be null or empty");
-        }
-        return body;
-    }
-
     private String validateDetailData(String detailData) {
         if (detailData == null || detailData.isEmpty()) {
-            throw new IllegalArgumentException("detailData must not be null or empty");
+            throw new NotificationException(ErrorCode400.NOTIFICATION_DETAIL_DATA_NOT_NULL);
         }
         return detailData;
     }
