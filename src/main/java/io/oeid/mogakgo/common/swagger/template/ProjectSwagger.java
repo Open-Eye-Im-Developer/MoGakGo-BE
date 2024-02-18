@@ -19,8 +19,7 @@ import org.springframework.http.ResponseEntity;
 @SuppressWarnings("unused")
 public interface ProjectSwagger {
 
-    @Operation(summary = "프로젝트 카드 생성", description = "회원이 프로젝트 카드를 생성할 때 사용하는 API"
-    )
+    @Operation(summary = "프로젝트 카드 생성", description = "회원이 프로젝트 카드를 생성할 때 사용하는 API")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "프로젝트 카드 생성 성공",
             content = @Content(schema = @Schema(implementation = ProjectIdRes.class))),
@@ -51,8 +50,7 @@ public interface ProjectSwagger {
         ProjectCreateReq request
     );
 
-    @Operation(summary = "프로젝트 카드 삭제", description = "회원이 프로젝트 카드를 삭제할 때 사용하는 API"
-    )
+    @Operation(summary = "프로젝트 카드 삭제", description = "회원이 프로젝트 카드를 삭제할 때 사용하는 API")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "프로젝트 카드 삭제 성공"),
         @ApiResponse(responseCode = "400", description = "프로젝트를 삭제 할 수 없습니다.",
@@ -77,6 +75,35 @@ public interface ProjectSwagger {
                 examples = @ExampleObject(name = "E030201", value = SwaggerProjectErrorExamples.PROJECT_FORBIDDEN_OPERATION)))
     })
     ResponseEntity<Void> delete(
+        @Parameter(hidden = true) Long userId,
+        @Parameter(description = "프로젝트 ID", required = true) Long id
+    );
+
+    @Operation(summary = "프로젝트 카드 취소", description = "회원이 프로젝트 카드를 임의로 취소 할때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "프로젝트 카드 취소 성공"),
+        @ApiResponse(responseCode = "400", description = "프로젝트를 취소 할 수 없습니다.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E030107", value = SwaggerProjectErrorExamples.PROJECT_CANCEL_NOT_ALLOWED)
+                })),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E030301", value = SwaggerProjectErrorExamples.PROJECT_NOT_FOUND),
+                    @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
+                })),
+        @ApiResponse(responseCode = "403", description = "프로젝트 카드 취소 권한이 없음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E030201", value = SwaggerProjectErrorExamples.PROJECT_FORBIDDEN_OPERATION)))
+    })
+    ResponseEntity<ProjectIdRes> cancel(
         @Parameter(hidden = true) Long userId,
         @Parameter(description = "프로젝트 ID", required = true) Long id
     );
