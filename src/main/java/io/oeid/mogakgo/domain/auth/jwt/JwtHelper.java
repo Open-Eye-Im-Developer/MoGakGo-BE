@@ -3,11 +3,11 @@ package io.oeid.mogakgo.domain.auth.jwt;
 import static com.auth0.jwt.JWT.create;
 import static com.auth0.jwt.JWT.require;
 
-import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.JWTVerifier;
 import io.oeid.mogakgo.core.properties.JwtProperties;
 import java.util.Date;
 import java.util.Map;
@@ -61,6 +61,19 @@ public class JwtHelper {
             (int) refreshTokenExpirySeconds / 1000);
     }
 
+    public JwtToken sign(long userId, String[] roles, String refreshToken) {
+        Date now = new Date();
+        String accessToken = create()
+            .withIssuer(issuer)
+            .withIssuedAt(now)
+            .withExpiresAt(calculateExpirySeconds(now, accessTokenExpirySeconds))
+            .withClaim(USER_ID_STR, userId)
+            .withArrayClaim(ROLES_STR, roles)
+            .sign(algorithm);
+        return JwtToken.of(userId, accessToken, refreshToken,
+            (int) refreshTokenExpirySeconds / 1000);
+    }
+
     public Map<String, Claim> verify(String token)
         throws JWTVerificationException {
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
@@ -71,5 +84,11 @@ public class JwtHelper {
             throw new JWTVerificationException("Invalid token");
         }
         return claims;
+    }
+
+    public Map<String, Claim> verifyWithoutExpiry(String token) {
+        JWTVerifier verifier = require(algorithm).acceptExpiresAt(refreshTokenExpirySeconds)
+            .build();
+        return verifier.verify(token).getClaims();
     }
 }

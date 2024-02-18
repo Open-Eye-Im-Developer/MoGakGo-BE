@@ -13,7 +13,7 @@ public class AuthAccessTokenResponse {
         this.signUpComplete = signUpComplete;
     }
 
-    public static AuthAccessTokenResponse of(String accessToken, boolean signUpComplete) {
+    public static AuthAccessTokenResponse of(String accessToken, Boolean signUpComplete) {
         return new AuthAccessTokenResponse(accessToken, signUpComplete);
     }
 }
