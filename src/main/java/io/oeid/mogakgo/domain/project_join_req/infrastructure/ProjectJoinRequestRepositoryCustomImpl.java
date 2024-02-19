@@ -8,7 +8,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
-import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

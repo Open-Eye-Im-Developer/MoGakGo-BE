@@ -91,4 +91,5 @@ public class ProjectJoinRequest {
         if (!sender.getId().equals(user.getId())) {
             throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION);
         }
+    }
 }

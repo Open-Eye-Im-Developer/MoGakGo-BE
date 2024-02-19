@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.project_join_req.presentation;
+package io.oeid.mogakgo.domain.project_join_req.presentation.dto.res;
 
 import lombok.Getter;
 

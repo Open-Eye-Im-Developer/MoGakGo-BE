@@ -9,7 +9,7 @@ import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
-import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

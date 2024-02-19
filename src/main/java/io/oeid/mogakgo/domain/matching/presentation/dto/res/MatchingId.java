@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.matching.presentation;
+package io.oeid.mogakgo.domain.matching.presentation.dto.res;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

@@ -23,7 +23,7 @@ import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequestJpaRepository;
-import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
