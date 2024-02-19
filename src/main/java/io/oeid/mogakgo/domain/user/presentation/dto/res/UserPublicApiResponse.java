@@ -10,7 +10,7 @@ import lombok.Getter;
 @Schema(description = "회원 프로필 조회 응답")
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserProfileCardApiResponse {
+public class UserPublicApiResponse {
     @Schema(description = "회원 식별자", example = "1")
     private final long id;
     @Schema(description = "회원명", example = "거루")
@@ -32,8 +32,8 @@ public class UserProfileCardApiResponse {
     @Schema(description = "원하는 직군", example = "[\"BACKEND\", \"FRONTEND\"]")
     private final List<String> wantedJobs;
 
-    public static UserProfileCardApiResponse from(UserProfileResponse response) {
-        return new UserProfileCardApiResponse(
+    public static UserPublicApiResponse from(UserProfileResponse response) {
+        return new UserPublicApiResponse(
             response.getId(),
             response.getUsername(),
             response.getGithubId(),

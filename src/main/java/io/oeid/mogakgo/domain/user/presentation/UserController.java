@@ -4,7 +4,7 @@ import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.swagger.template.UserSwagger;
 import io.oeid.mogakgo.domain.user.application.UserService;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiRequest;
-import io.oeid.mogakgo.domain.user.presentation.dto.res.UserProfileCardApiResponse;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserSignUpApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +24,9 @@ public class UserController implements UserSwagger {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<UserProfileCardApiResponse> userGetApi(@UserId Long userId) {
+    public ResponseEntity<UserPublicApiResponse> userGetApi(@UserId Long userId) {
         var response = userService.getUserProfile(userId);
-        return ResponseEntity.ok(UserProfileCardApiResponse.from(response));
+        return ResponseEntity.ok(UserPublicApiResponse.from(response));
     }
 
     @PatchMapping("/sign")
