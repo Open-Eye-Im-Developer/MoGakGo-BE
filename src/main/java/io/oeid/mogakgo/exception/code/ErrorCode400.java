@@ -26,9 +26,8 @@ public enum ErrorCode400 implements ErrorCode {
     USERNAME_SHOULD_BE_NOT_EMPTY("E020103", "유저 이름은 비어있을 수 없습니다."),
     USER_REGION_SHOULD_BE_NOT_EMPTY("E020104", "유저 지역은 비어있을 수 없습니다."),
     USER_ID_NOT_NULL("E020001", "유저 아이디는 필수값입니다."),
-    INVALID_PROJECT_JOIN_REQUEST("E090101", "프로젝트 생성자는 프로젝트 매칭 요청을 생성할 수 없습니다."),
-    PROJECT_JOIN_REQUEST_ALREADY_EXIST("E090102", "이미 매칭 요청을 전송한 프로젝트에 매칭 요청을 생성할 수 없습니다."),
-    INVALID_PROJECT_JOIN_REQUEST_REGION("E090103", "동네 인증한 구역에서만 프로젝트 매칭 요청을 생성할 수 있습니다."),
+    PROJECT_JOIN_REQUEST_ALREADY_EXIST("E090101", "이미 매칭 요청을 전송한 프로젝트에 매칭 요청을 생성할 수 없습니다."),
+    INVALID_PROJECT_JOIN_REQUEST_REGION("E090102", "동네 인증한 구역에서만 프로젝트 매칭 요청을 생성할 수 있습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
