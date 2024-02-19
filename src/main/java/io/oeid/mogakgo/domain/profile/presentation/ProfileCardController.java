@@ -29,7 +29,6 @@ public class ProfileCardController implements ProfileCardSwagger {
         @Valid @ModelAttribute CursorPaginationInfoReq pageable
     ) {
         return ResponseEntity.ok().body(
-            profileCardService.getRandomOrderedProfileCardsByRegion(userId, region, pageable)
-        );
+            profileCardService.getRandomOrderedProfileCardsByRegion(userId, region, pageable));
     }
 }
