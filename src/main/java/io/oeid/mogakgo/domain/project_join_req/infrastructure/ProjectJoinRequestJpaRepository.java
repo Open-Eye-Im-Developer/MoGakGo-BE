@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.project_join_req.infrastruture;
+package io.oeid.mogakgo.domain.project_join_req.infrastructure;
 
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
