@@ -71,6 +71,7 @@ public class SecurityConfig {
     private void configureCommonSecuritySettings(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
             .httpBasic(AbstractHttpConfigurer::disable)
+            .cors(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .rememberMe(AbstractHttpConfigurer::disable)
