@@ -92,8 +92,8 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .rememberMe(AbstractHttpConfigurer::disable)
-            .logout(AbstractHttpConfigurer::disable)
-            .headers(AbstractHttpConfigurer::disable);
+            .logout(AbstractHttpConfigurer::disable);
+//            .headers(AbstractHttpConfigurer::disable);
     }
 
 }
