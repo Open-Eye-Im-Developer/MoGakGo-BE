@@ -9,7 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
-import io.oeid.mogakgo.domain.user.application.dto.res.UserProfileResponse;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -21,12 +21,12 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public CursorPaginationResult<UserProfileResponse> findByConditionWithPagination(
+    public CursorPaginationResult<UserPublicApiResponse> findByConditionWithPagination(
         Long userId, Region region, CursorPaginationInfoReq pageable
     ) {
-        List<UserProfileResponse> result = jpaQueryFactory.select(
+        List<UserPublicApiResponse> result = jpaQueryFactory.select(
                 Projections.constructor(
-                    UserProfileResponse.class,
+                    UserPublicApiResponse.class,
                     profileCard.user.id,
                     profileCard.user.username,
                     profileCard.user.githubId,
