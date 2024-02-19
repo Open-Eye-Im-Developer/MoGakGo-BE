@@ -2,14 +2,10 @@ package io.oeid.mogakgo.domain.project_join_req.infrastructure;
 
 import static io.oeid.mogakgo.domain.project_join_req.domain.entity.QProjectJoinRequest.projectJoinRequest;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
-import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
-import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
-import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPreviewRes;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
 import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
