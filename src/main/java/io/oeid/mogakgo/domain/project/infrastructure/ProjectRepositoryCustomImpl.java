@@ -2,16 +2,16 @@ package io.oeid.mogakgo.domain.project.infrastructure;
 
 import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
-import io.oeid.mogakgo.domain.project.domain.entity.Project;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
-import org.springframework.data.domain.Pageable;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -21,20 +21,44 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<Project> findByCondition(
-        Long cursorId, Long userId, Region region, ProjectStatus projectStatus, Pageable pageable
+    public CursorPaginationResult<ProjectDetailAPIRes> findByConditionWithPagination(
+        Long userId, Region region, ProjectStatus projectStatus, CursorPaginationInfoReq pageable
     ) {
-        List<Project> result = jpaQueryFactory.selectFrom(project)
+        List<ProjectDetailAPIRes> result = jpaQueryFactory.select(
+                Projections.constructor(
+                    ProjectDetailAPIRes.class,
+                    project.id,
+                    project.creator.username,
+                    project.creator.githubId,
+                    project.creator.avatarUrl,
+                    project.creator.githubUrl,
+                    project.creator.bio,
+                    project.creator.jandiRate,
+                    project.creator.userDevelopLanguageTags,
+                    project.creator.userWantedJobTags,
+                    project.projectTags,
+                    project.meetingInfo.meetStartTime,
+                    project.meetingInfo.meetEndTime,
+                    project.meetingInfo.meetDetail
+                )
+            )
+            .from(project)
             .where(
-                cursorIdEq(cursorId),
+                cursorIdCondition(pageable.getCursorId()),
                 userIdEq(userId),
                 regionEq(region),
                 projectStatusEq(projectStatus)
             )
             .limit(pageable.getPageSize() + 1)
             .fetch();
-        boolean hasNext = checkLastPage(result, pageable);
-        return new SliceImpl<>(result, pageable, hasNext);
+
+        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(
+            result, pageable.getPageSize()
+        );
+    }
+
+    private BooleanExpression cursorIdCondition(Long cursorId) {
+        return cursorId != null ? project.id.gt(cursorId) : null;
     }
 
     private BooleanExpression userIdEq(Long userId) {
@@ -47,17 +71,5 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 
     private BooleanExpression projectStatusEq(ProjectStatus projectStatus) {
         return projectStatus != null ? project.projectStatus.eq(projectStatus) : null;
-    }
-
-    private BooleanExpression cursorIdEq(Long cursorId) {
-        return cursorId != null ? project.id.gt(cursorId) : null;
-    }
-
-    private boolean checkLastPage(List<Project> projects, Pageable pageable) {
-        if (projects.size() > pageable.getPageSize()) {
-            projects.remove(pageable.getPageSize());
-            return true;
-        }
-        return false;
     }
 }
