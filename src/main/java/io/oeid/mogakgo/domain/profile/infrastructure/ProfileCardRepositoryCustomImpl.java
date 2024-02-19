@@ -1,16 +1,17 @@
 package io.oeid.mogakgo.domain.profile.infrastructure;
 
 import static io.oeid.mogakgo.domain.profile.domain.entity.QProfileCard.profileCard;
+import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
-import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCard;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -20,19 +21,35 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<ProfileCard> findByCondition(
-        Long cursorId, Long userId, Region region, Pageable pageable
+    public CursorPaginationResult<UserPublicApiResponse> findByConditionWithPagination(
+        Long userId, Region region, CursorPaginationInfoReq pageable
     ) {
-        List<ProfileCard> result = jpaQueryFactory.selectFrom(profileCard)
+        List<UserPublicApiResponse> result = jpaQueryFactory.select(
+                Projections.constructor(
+                    UserPublicApiResponse.class,
+                    profileCard.user.id,
+                    profileCard.user.username,
+                    profileCard.user.githubId,
+                    profileCard.user.avatarUrl,
+                    profileCard.user.bio,
+                    profileCard.user.jandiRate,
+                    profileCard.user.achievement.title,
+                    profileCard.user.userDevelopLanguageTags,
+                    profileCard.user.userWantedJobTags
+                )
+            )
+            .from(profileCard)
             .where(
-                cursorIdEq(cursorId),
+                cursorIdCondition(pageable.getCursorId()),
                 userIdEq(userId),
                 regionEq(region)
             )
             .limit(pageable.getPageSize() + 1)
             .fetch();
-        boolean hasNext = checkLastPage(result, pageable);
-        return new SliceImpl<>(result, pageable, hasNext);
+
+        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(
+            result, pageable.getPageSize()
+        );
     }
 
     private BooleanExpression regionEq(Region region) {
@@ -43,15 +60,7 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
         return userId != null ? profileCard.user.id.eq(userId) : null;
     }
 
-    private BooleanExpression cursorIdEq(Long cursorId) {
-        return cursorId != null ? profileCard.id.gt(cursorId) : null;
-    }
-
-    private boolean checkLastPage(List<ProfileCard> profileCards, Pageable pageable) {
-        if (profileCards.size() > pageable.getPageSize()) {
-            profileCards.remove(pageable.getPageSize());
-            return true;
-        }
-        return false;
+    private BooleanExpression cursorIdCondition(Long cursorId) {
+        return cursorId != null ? project.id.gt(cursorId) : null;
     }
 }

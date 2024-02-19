@@ -2,6 +2,7 @@ package io.oeid.mogakgo.domain.project.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.ALREADY_EXIST_PROGRESS_PROJECT;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_MATCHING_USER_TO_CREATE_PROJECT;
+import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SERVICE_REGION;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.NOT_MATCH_MEET_LOCATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_FORBIDDEN_OPERATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION;
@@ -13,7 +14,10 @@ import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.application.GeoService;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
+import io.oeid.mogakgo.domain.geo.exception.GeoException;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
+import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
@@ -23,6 +27,7 @@ import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRe
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -122,6 +127,26 @@ public class ProjectService {
             null, projectId, null, pageable);
     }
 
+    // 선택한 구역에 대한 프로젝트 카드 리스트 랜덤 조회
+    public CursorPaginationResult<ProjectDetailAPIRes> getRandomOrderedProjectsByRegion(
+        Long userId, Region region, CursorPaginationInfoReq pageable
+    ) {
+        getUser(userId);
+
+        // 선택한 구역의 서비스 지역 여부 체크
+        validateRegionCoverage(region);
+
+        // 선택한 구역에 대해 Pending 상태인 프로젝트 리스트를 조회할 수 있음
+        CursorPaginationResult<ProjectDetailAPIRes> projects = projectJpaRepository
+            .findByConditionWithPagination(
+                null, region, ProjectStatus.PENDING, pageable
+        );
+
+        // 요청할 때마다 랜덤 정렬
+        Collections.shuffle(projects.getData());
+        return projects;
+    }
+
     private User getUser(Long userId) {
         return userJpaRepository.findById(userId)
             .orElseThrow(() -> new UserException(USER_NOT_FOUND));
@@ -148,4 +173,9 @@ public class ProjectService {
         }
     }
 
+    private void validateRegionCoverage(Region region) {
+        if (Region.getByAreaCode(region.getAreaCode()) == null) {
+            throw new GeoException(INVALID_SERVICE_REGION);
+        }
+    }
 }

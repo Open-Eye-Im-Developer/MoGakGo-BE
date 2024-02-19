@@ -12,5 +12,4 @@ public interface ProjectJoinRequestRepositoryCustom {
     );
 
     boolean existsByProjectId(Long projectId);
-
 }

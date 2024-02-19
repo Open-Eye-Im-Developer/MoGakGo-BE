@@ -20,6 +20,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -52,6 +53,17 @@ public class ProjectJoinRequest {
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+  
+    @Builder
+    private ProjectJoinRequest(User sender, Project project) {
+        this.sender = sender;
+        this.project = project;
+        this.requestStatus = RequestStatus.PENDING;
+    }
+
+    public static ProjectJoinRequest of(User sender, Project project) {
+        return new ProjectJoinRequest(sender, project);
+    }
 
     public void cancel(User user) {
         validateAvailableCancel(user);
@@ -79,5 +91,4 @@ public class ProjectJoinRequest {
         if (!sender.getId().equals(user.getId())) {
             throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION);
         }
-    }
 }

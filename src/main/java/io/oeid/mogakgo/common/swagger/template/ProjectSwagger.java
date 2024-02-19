@@ -2,8 +2,11 @@ package io.oeid.mogakgo.common.swagger.template;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.core.properties.swagger.error.SwaggerGeoErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
+import io.oeid.mogakgo.domain.geo.domain.enums.Region;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
 import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
@@ -112,6 +115,33 @@ public interface ProjectSwagger {
     ResponseEntity<ProjectIdRes> cancel(
         @Parameter(hidden = true) Long userId,
         @Parameter(description = "프로젝트 ID", required = true) Long id
+    );
+
+    @Operation(summary = "선택한 서비스 지역에 대한 랜덤 순서의 프로젝트 리스트 조회", description = "사용자가 서비스 지역의 프로젝트 리스트를 조회할 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "프로젝트 리스트 조회 성공"),
+        @ApiResponse(responseCode = "400", description = "요청한 데이터가 유효하지 않음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E080101", value = SwaggerGeoErrorExamples.INVALID_SERVICE_REGION)
+            )),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
+            )),
+    })
+    @Parameters({
+        @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),
+        @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
+        @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
+    })
+    ResponseEntity<CursorPaginationResult<ProjectDetailAPIRes>> getRandomOrderedProjectsByRegion(
+        @Parameter(hidden = true) Long userId,
+        @Parameter(description = "조회하려는 서비스 지역", required = true) Region region,
+        @Parameter(hidden = true) CursorPaginationInfoReq pageable
     );
 
     @Operation(summary = "프로젝트 카드 참가 요청 조회", description = "회원이 프로젝트 카드의 참가 요청을 조회할 때 사용하는 API")
