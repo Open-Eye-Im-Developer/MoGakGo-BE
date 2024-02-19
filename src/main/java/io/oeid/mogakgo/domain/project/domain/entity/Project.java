@@ -93,6 +93,12 @@ public class Project extends BaseTimeEntity {
         this.projectStatus = ProjectStatus.CANCELED;
     }
 
+    public void validateCreator(User tokenUser) {
+        if (tokenUser == null || !this.creator.getId().equals(tokenUser.getId())) {
+            throw new ProjectException(PROJECT_FORBIDDEN_OPERATION);
+        }
+    }
+
     private void validateAvailableCancel(User tokenUser) {
         validateCreator(tokenUser);
         this.projectStatus.validateAvailableCancel();
@@ -101,12 +107,6 @@ public class Project extends BaseTimeEntity {
     private void validateAvailableDelete(User tokenUser) {
         validateCreator(tokenUser);
         this.projectStatus.validateAvailableDelete();
-    }
-
-    private void validateCreator(User tokenUser) {
-        if (tokenUser == null || !this.creator.getId().equals(tokenUser.getId())) {
-            throw new ProjectException(PROJECT_FORBIDDEN_OPERATION);
-        }
     }
 
     private void addProjectTagsWithValidation(List<ProjectTagCreateReq> projectTags) {
