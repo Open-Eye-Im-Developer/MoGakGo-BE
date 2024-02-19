@@ -2,8 +2,10 @@ package io.oeid.mogakgo.domain.project.domain.entity.enums;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.PROJECT_CANCEL_NOT_ALLOWED;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.PROJECT_DELETION_NOT_ALLOWED;
+import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_PROJECT_STATUS_TO_ACCEPT;
 
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
+import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import lombok.Getter;
 
 @Getter
@@ -28,6 +30,12 @@ public enum ProjectStatus {
     public void validateAvailableCancel() {
         if (this == CANCELED || this == FINISHED) {
             throw new ProjectException(PROJECT_CANCEL_NOT_ALLOWED);
+        }
+    }
+
+    public void validateAvailableMatched() {
+        if (this != PENDING) {
+            throw new ProjectJoinRequestException(INVALID_PROJECT_STATUS_TO_ACCEPT);
         }
     }
 }

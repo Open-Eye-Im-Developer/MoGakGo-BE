@@ -37,6 +37,8 @@ public interface ProjectSwagger {
                     @ExampleObject(name = "E030103", value = SwaggerProjectErrorExamples.INVALID_PROJECT_TAG_CONTENT_LENGTH),
                     @ExampleObject(name = "E030104", value = SwaggerProjectErrorExamples.INVALID_PROJECT_NULL_DATA),
                     @ExampleObject(name = "E030105", value = SwaggerProjectErrorExamples.INVALID_PROJECT_MEET_LOCATION),
+                    @ExampleObject(name = "E030108", value = SwaggerProjectErrorExamples.INVALID_MATCHING_USER_TO_CREATE_PROJECT),
+                    @ExampleObject(name = "E030109", value = SwaggerProjectErrorExamples.ALREADY_EXIST_PROGRESS_PROJECT)
                 })),
         @ApiResponse(responseCode = "403", description = "프로젝트 카드 생성 권한이 없음",
             content = @Content(

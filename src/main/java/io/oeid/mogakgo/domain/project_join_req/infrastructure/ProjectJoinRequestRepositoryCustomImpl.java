@@ -66,6 +66,14 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
             pageable.getPageSize());
     }
 
+    @Override
+    public boolean existsByProjectId(Long projectId) {
+        return jpaQueryFactory.selectOne()
+            .from(projectJoinRequest)
+            .where(projectIdEq(projectId))
+            .fetchFirst() != null;
+    }
+
     private BooleanExpression senderIdEq(Long senderId) {
         return senderId != null ? projectJoinRequest.sender.id.eq(senderId) : null;
     }

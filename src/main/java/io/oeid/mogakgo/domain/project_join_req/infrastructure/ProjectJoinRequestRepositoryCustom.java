@@ -11,4 +11,6 @@ public interface ProjectJoinRequestRepositoryCustom {
         Long senderId, Long projectId, RequestStatus requestStatus, CursorPaginationInfoReq pageable
     );
 
+    boolean existsByProjectId(Long projectId);
+
 }

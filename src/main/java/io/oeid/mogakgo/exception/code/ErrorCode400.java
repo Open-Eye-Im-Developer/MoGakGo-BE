@@ -29,6 +29,13 @@ public enum ErrorCode400 implements ErrorCode {
     USERNAME_SHOULD_BE_NOT_EMPTY("E020103", "유저 이름은 비어있을 수 없습니다."),
     USER_REGION_SHOULD_BE_NOT_EMPTY("E020104", "유저 지역은 비어있을 수 없습니다."),
     USER_ID_NOT_NULL("E020001", "유저 아이디는 필수값입니다."),
+
+    INVALID_PROJECT_STATUS_TO_ACCEPT("E050101", "프로젝트가 대기중이 아니여서 참여 요청을 수락할 수 없습니다."),
+    INVALID_PROJECT_REQ_STATUS_TO_ACCEPT("E050102", "프로젝트 참여 요청이 대기중이 아니여서 참여 요청을 수락할 수 없습니다."),
+    INVALID_MATCHING_USER_TO_ACCEPT("E050103", "매칭이 진행 중인 유저는 프로젝트 참여 요청을 수락할 수 없습니다."),
+    INVALID_SENDER_TO_ACCEPT("E050104", "요청 보낸 상대가 이미 매칭중이기 때문에 프로젝트 참여 요청을 수락할 수 없습니다."),
+    INVALID_PROJECT_REQ_STATUS_TO_CANCEL("E050105", "프로젝트 참여 요청이 대기중이 아니여서 참여 요청을 취소할 수 없습니다."),
+
     ;
 
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
