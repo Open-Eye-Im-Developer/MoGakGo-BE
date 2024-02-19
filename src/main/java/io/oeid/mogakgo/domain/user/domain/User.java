@@ -158,4 +158,9 @@ public class User {
         this.region = region;
         this.regionAuthenticationAt = LocalDateTime.now();
     }
+
+    //TODO : 추후 구현 필요
+    public void decreaseJandiRate() {
+        return;
+    }
 }

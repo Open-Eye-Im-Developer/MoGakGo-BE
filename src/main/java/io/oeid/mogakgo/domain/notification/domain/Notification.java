@@ -43,6 +43,9 @@ public class Notification {
     @Column(name = "detail_data")
     private String detailData;
 
+    @Column(name = "checked_yn")
+    private Boolean checkedYn;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -51,6 +54,7 @@ public class Notification {
         this.user = user;
         this.notificationTag = validateNotificationTag(notificationTag);
         this.detailData = validateDetailData(detailData);
+        this.checkedYn = false;
     }
 
     public static Notification of(User user, NotificationTag notificationTag, String detail) {
