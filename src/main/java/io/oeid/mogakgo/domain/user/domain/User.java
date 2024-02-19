@@ -102,7 +102,7 @@ public class User {
     @Column(name = "signup_yn")
     private Boolean signupYn;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "achievement_id")
     private Achievement achievement;
 
