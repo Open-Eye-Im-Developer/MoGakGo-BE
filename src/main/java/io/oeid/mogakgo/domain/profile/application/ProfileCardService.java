@@ -1,16 +1,14 @@
 package io.oeid.mogakgo.domain.profile.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SERVICE_REGION;
-import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.geo.exception.GeoException;
 import io.oeid.mogakgo.domain.profile.infrastructure.ProfileCardJpaRepository;
+import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
-import io.oeid.mogakgo.domain.user.exception.UserException;
-import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +19,12 @@ import org.springframework.stereotype.Service;
 public class ProfileCardService {
 
     private final ProfileCardJpaRepository profileCardRepository;
-    private final UserJpaRepository userRepository;
+    private final UserCommonService userCommonService;
 
     public CursorPaginationResult<UserPublicApiResponse> getRandomOrderedProfileCardsByRegion(
         Long userId, Region region, CursorPaginationInfoReq pageable
     ) {
-        getUser(userId);
+        validateToken(userId);
         validateRegionCoverage(region);
 
         CursorPaginationResult<UserPublicApiResponse> projects = profileCardRepository
@@ -37,9 +35,8 @@ public class ProfileCardService {
         return projects;
     }
 
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-            .orElseThrow(() -> new UserException(USER_NOT_FOUND));
+    private User validateToken(Long userId) {
+        return userCommonService.getUserById(userId);
     }
 
     private void validateRegionCoverage(Region region) {
