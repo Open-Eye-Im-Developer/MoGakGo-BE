@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.user.domain;
 
+import io.oeid.mogakgo.domain.achievement.domain.Achievement;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
 import io.oeid.mogakgo.domain.user.exception.UserException;
@@ -13,6 +14,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -57,6 +60,8 @@ public class User {
     @Column(name = "github_url")
     private String githubUrl;
 
+
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("byteSize ASC")
     private final List<UserDevelopLanguageTag> userDevelopLanguageTags = new ArrayList<>();
@@ -96,6 +101,10 @@ public class User {
 
     @Column(name = "signup_yn")
     private Boolean signupYn;
+
+    @ManyToOne
+    @JoinColumn(name = "achievement_id")
+    private Achievement achievement;
 
     private User(Long githubPk, String githubId, String avatarUrl, String githubUrl) {
         this.githubPk = githubPk;
