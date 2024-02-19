@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.project.infrastructure;
 
 import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
+import static io.oeid.mogakgo.domain.project.domain.entity.QProjectTag.projectTag;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -41,7 +42,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                         project.creator.userDevelopLanguageTags,
                         project.creator.userWantedJobTags
                     ),
-                    project.projectTags,
+                    projectTag.content,
                     Projections.constructor(
                         MeetingInfoResponse.class,
                         project.meetingInfo.meetStartTime,
@@ -51,6 +52,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                 )
             )
             .from(project)
+            .innerJoin(projectTag).on(project.id.eq(projectTag.project.id))
             .where(
                 cursorIdCondition(pageable.getCursorId()),
                 userIdEq(userId),

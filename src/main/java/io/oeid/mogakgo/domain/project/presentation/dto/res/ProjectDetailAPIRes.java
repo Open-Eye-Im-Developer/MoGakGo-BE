@@ -1,6 +1,5 @@
 package io.oeid.mogakgo.domain.project.presentation.dto.res;
 
-import io.oeid.mogakgo.domain.project.domain.entity.ProjectTag;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -23,7 +22,7 @@ public class ProjectDetailAPIRes {
     private final MeetingInfoResponse meetingInfo;
 
 
-    private ProjectDetailAPIRes(Long projectId, UserPublicApiResponse creator,
+    public ProjectDetailAPIRes(Long projectId, UserPublicApiResponse creator,
         List<String> projectTags, MeetingInfoResponse meetingInfo
     ) {
         this.projectId = projectId;
@@ -33,11 +32,11 @@ public class ProjectDetailAPIRes {
     }
 
     public static ProjectDetailAPIRes of(Long projectId, UserPublicApiResponse creator,
-        List<ProjectTag> projectTags, MeetingInfoResponse meetingInfo) {
+        List<String> projectTags, MeetingInfoResponse meetingInfo) {
         return new ProjectDetailAPIRes(
             projectId,
             creator,
-            projectTags.stream().map(ProjectTag::getContent).toList(),
+            projectTags,
             meetingInfo
         );
     }
