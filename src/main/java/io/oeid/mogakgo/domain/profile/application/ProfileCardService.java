@@ -31,7 +31,7 @@ public class ProfileCardService {
 
         CursorPaginationResult<UserPublicApiResponse> projects = profileCardRepository
             .findByConditionWithPagination(
-            null, region, null
+            null, region, pageable
         );
         Collections.shuffle(projects.getData());
         return projects;

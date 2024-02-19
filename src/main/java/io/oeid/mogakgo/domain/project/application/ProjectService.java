@@ -117,7 +117,7 @@ public class ProjectService {
         // 선택한 구역에 대해 Pending 상태인 프로젝트 리스트를 조회할 수 있음
         CursorPaginationResult<ProjectDetailAPIRes> projects = projectJpaRepository
             .findByConditionWithPagination(
-                null, region, ProjectStatus.PENDING, null
+                null, region, ProjectStatus.PENDING, pageable
         );
 
         // 요청할 때마다 랜덤 정렬
