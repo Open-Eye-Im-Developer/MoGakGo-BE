@@ -1,7 +1,7 @@
 package io.oeid.mogakgo.domain.cert.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SERVICE_REGION;
-import static io.oeid.mogakgo.exception.code.ErrorCode403.CERT_INVALID_INFORMATION;
+import static io.oeid.mogakgo.exception.code.ErrorCode403.INVALID_CERT_INFORMATION;
 
 import io.oeid.mogakgo.domain.cert.exception.CertException;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
@@ -41,7 +41,7 @@ public class CertService {
 
     private void validateCertificator(User tokenUser, Long userId) {
         if (!tokenUser.getId().equals(userId)) {
-            throw new CertException(CERT_INVALID_INFORMATION);
+            throw new CertException(INVALID_CERT_INFORMATION);
         }
     }
 

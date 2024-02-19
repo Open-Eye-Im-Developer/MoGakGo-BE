@@ -10,5 +10,4 @@ public interface ProjectJoinRequestRepositoryCustom {
     CursorPaginationResult<projectJoinRequestRes> findByConditionWithPagination(
         Long senderId, Long projectId, RequestStatus requestStatus, CursorPaginationInfoReq pageable
     );
-
 }
