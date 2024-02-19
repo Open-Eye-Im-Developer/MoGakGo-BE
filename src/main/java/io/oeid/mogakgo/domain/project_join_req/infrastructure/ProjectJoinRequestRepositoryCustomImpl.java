@@ -1,13 +1,17 @@
 package io.oeid.mogakgo.domain.project_join_req.infrastructure;
 
 import static io.oeid.mogakgo.domain.project_join_req.domain.entity.QProjectJoinRequest.projectJoinRequest;
+import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.MeetingInfoResponse;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestDetailAPIRes;
 import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +68,38 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
 
         return CursorPaginationResult.fromDataWithExtraItemForNextCheck(result,
             pageable.getPageSize());
+    }
+
+    @Override
+    public CursorPaginationResult<ProjectJoinRequestDetailAPIRes> getBySenderIdWithPagination(
+        Long senderId, Long projectId, RequestStatus requestStatus, CursorPaginationInfoReq pageable
+    ) {
+        List<ProjectJoinRequestDetailAPIRes> result = jpaQueryFactory.select(
+            Projections.constructor(
+                ProjectJoinRequestDetailAPIRes.class,
+                projectJoinRequest.project.id,
+                projectJoinRequest.project.creator.avatarUrl,
+                Projections.constructor(
+                    MeetingInfoResponse.class,
+                    projectJoinRequest.project.meetingInfo.meetStartTime,
+                    projectJoinRequest.project.meetingInfo.meetEndTime,
+                    projectJoinRequest.project.meetingInfo.meetDetail
+                ))
+            )
+            .from(projectJoinRequest)
+            .innerJoin(project).on(projectJoinRequest.project.id.eq(projectId))
+            .where(
+                cursorIdCondition(pageable.getCursorId()),
+                senderIdEq(senderId),
+                projectIdEq(projectId),
+                requestStatusEq(requestStatus)
+            )
+            .limit(pageable.getPageSize() + 1)
+            .fetch();
+
+        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(
+            result, pageable.getPageSize()
+        );
     }
 
     private BooleanExpression senderIdEq(Long senderId) {
