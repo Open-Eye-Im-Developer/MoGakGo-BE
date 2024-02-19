@@ -20,6 +20,9 @@ public enum ErrorCode400 implements ErrorCode {
     NOT_MATCH_MEET_LOCATION("E030105", "프로젝트 만남 장소가 유저가 동네인증 한 구역이 아닙니다."),
     PROJECT_DELETION_NOT_ALLOWED("E030106", "매칭 중이거나 대기중인 프로젝트는 삭제할 수 없습니다."),
     PROJECT_CANCEL_NOT_ALLOWED("E030107", "이미 취소 되었거나 종료된 프로젝트는 취소할 수 없습니다."),
+    INVALID_MATCHING_USER_TO_CREATE_PROJECT("E030108", "매칭이 진행 중인 유저는 프로젝트 생성을 할 수 없습니다."),
+    ALREADY_EXIST_PROGRESS_PROJECT("E030109", "종료되지 않은 프로젝트 카드가 있으면 프로젝트 생성을 할 수 없습니다."),
+
     INVALID_SERVICE_REGION("E080101", "해당 지역은 서비스 지역이 아닙니다."),
     USER_DEVELOP_LANGUAGE_BAD_REQUEST("E020101", "개발 언어는 3개까지만 등록 가능합니다."),
     USER_WANTED_JOB_BAD_REQUEST("E020102", "희망 직무는 3개까지만 등록 가능합니다."),

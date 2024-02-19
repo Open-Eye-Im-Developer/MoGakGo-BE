@@ -1,5 +1,7 @@
 package io.oeid.mogakgo.domain.project.application;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.ALREADY_EXIST_PROGRESS_PROJECT;
+import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_MATCHING_USER_TO_CREATE_PROJECT;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.NOT_MATCH_MEET_LOCATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_FORBIDDEN_OPERATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION;
@@ -10,11 +12,11 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.application.GeoService;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
+import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
-import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequestJpaRepository;
 import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
@@ -22,6 +24,7 @@ import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +37,23 @@ public class ProjectService {
     private final ProjectJpaRepository projectJpaRepository;
     private final GeoService geoService;
     private final ProjectJoinRequestJpaRepository projectJoinRequestJpaRepository;
+    private final UserMatchingService userMatchingService;
 
     @Transactional
     public Long create(Long userId, ProjectCreateReq request) {
         // 유저 존재 여부 체크
         User tokenUser = getUser(userId);
+
+        // 종료 되지 않은 (PENDING,MATCHED) 프로젝트 카드가 있으면 예외를 발생.
+        if (isExistsNotEndProjectCard(tokenUser)) {
+            throw new ProjectException(ALREADY_EXIST_PROGRESS_PROJECT);
+        }
+
+        // 매칭 중인 프로젝트가 있으면 예외를 발생.
+        if (userMatchingService.hasProgressMatching(tokenUser.getId())) {
+            throw new ProjectException(INVALID_MATCHING_USER_TO_CREATE_PROJECT);
+        }
+
         // 프로젝트 카드 생성자와 토큰 유저가 다르면 예외를 발생.
         validateProjectCardCreator(tokenUser, request.getCreatorId());
 
@@ -51,6 +66,11 @@ public class ProjectService {
         projectJpaRepository.save(project);
 
         return project.getId();
+    }
+
+    private boolean isExistsNotEndProjectCard(User tokenUser) {
+        return !projectJpaRepository.findNotEndProjectOneByCreatorId(tokenUser.getId(),
+            PageRequest.of(0, 1)).isEmpty();
     }
 
     @Transactional
