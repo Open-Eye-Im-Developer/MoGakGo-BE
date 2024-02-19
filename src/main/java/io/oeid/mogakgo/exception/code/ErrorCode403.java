@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode403 implements ErrorCode {
     PROJECT_FORBIDDEN_OPERATION("E030201", "해당 프로젝트에 대한 권한이 없습니다."),
     PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION("E050201", "해당 프로젝트 요청에 대한 권한이 없습니다."),
+    CERT_INVALID_INFORMATION("E070201", "동네 인증을 수행할 권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.FORBIDDEN;
