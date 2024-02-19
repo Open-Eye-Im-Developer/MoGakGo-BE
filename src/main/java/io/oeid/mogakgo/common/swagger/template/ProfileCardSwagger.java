@@ -5,7 +5,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerGeoErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
-import io.oeid.mogakgo.domain.user.application.dto.res.UserProfileResponse;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,7 +42,7 @@ public interface ProfileCardSwagger {
         @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
         @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
     })
-    ResponseEntity<CursorPaginationResult<UserProfileResponse>> getRandomOrderedProfileCardsByRegion(
+    ResponseEntity<CursorPaginationResult<UserPublicApiResponse>> getRandomOrderedProfileCardsByRegion(
         @Parameter(hidden = true) Long userId,
         @Parameter(description = "조회하려는 서비스 지역", required = true) Region region,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable
