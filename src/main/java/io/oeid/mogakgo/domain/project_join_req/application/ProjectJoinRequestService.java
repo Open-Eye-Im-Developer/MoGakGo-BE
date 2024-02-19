@@ -32,14 +32,14 @@ public class ProjectJoinRequestService {
         validateSender(tokenUser, request.getSenderId());
         Project project = validateProjectExist(request.getProjectId());
         validateProjectCreator(project, userId);
-        validateUserRegion(project, tokenUser);
+        validateUserCertRegion(project, tokenUser);
         validateAlreadyExistRequest(userId, project.getId());
 
         // 프로젝트 매칭 요청 생성
-        ProjectJoinRequest projectJoinRequest = ProjectJoinRequest.of(tokenUser, project);
-        projectJoinRequestRepository.save(projectJoinRequest);
+        ProjectJoinRequest joinRequest = request.toEntity(tokenUser, project);
+        projectJoinRequestRepository.save(joinRequest);
 
-        return projectJoinRequest.getId();
+        return joinRequest.getId();
     }
 
     private User validateToken(Long userId) {
@@ -64,14 +64,13 @@ public class ProjectJoinRequestService {
         }
     }
 
-    private ProjectJoinRequest validateAlreadyExistRequest(Long userId, Long projectId) {
-        return projectJoinRequestRepository.findAlreadyExists(userId, projectId)
-            .orElseGet(() -> {
-                throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_ALREADY_EXIST);
-            });
+    private void validateAlreadyExistRequest(Long userId, Long projectId) {
+        if (projectJoinRequestRepository.findAlreadyExists(userId, projectId).isPresent()) {
+            throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_ALREADY_EXIST);
+        }
     }
 
-    private void validateUserRegion(Project project, User tokenUser) {
+    private void validateUserCertRegion(Project project, User tokenUser) {
         if (!tokenUser.getRegion().equals(project.getCreatorInfo().getRegion())) {
             throw new ProjectJoinRequestException(INVALID_PROJECT_JOIN_REQUEST_REGION);
         }
