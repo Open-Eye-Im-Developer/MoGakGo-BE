@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/project-join-request")
+@RequestMapping("/api/v1/projects/join-request")
 @RequiredArgsConstructor
 public class ProjectJoinRequestController implements ProjectJoinRequestSwagger {
 
