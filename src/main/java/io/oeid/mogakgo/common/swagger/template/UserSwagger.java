@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiRequest;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserSignUpApiResponse;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,4 +52,16 @@ public interface UserSwagger {
                 examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND))),
     })
     ResponseEntity<Void> userDeleteApi(@Parameter(hidden = true) Long userId);
+
+    @Operation(summary = "회원 조회 [회원 가입]", description = "회원 가입시 회원 정보를 조회할 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "회원 조회 성공",
+            content = @Content(schema = @Schema(implementation = UserPublicApiResponse.class))),
+        @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않음",
+            content = @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND))),
+    })
+    ResponseEntity<UserPublicApiResponse> userGetApi(@Parameter(hidden = true) Long userId);
 }

@@ -21,7 +21,7 @@ public class UserSignUpApiRequest {
     @NotBlank(message = "username은 필수입니다.")
     private String username;
 
-    @Schema(description = "원하는 직군", example = "[\"BACKEND\", \"FRONTEND\"]", implementation = List.class, minLength = 1, maxLength = 3)
+    @Schema(description = "원하는 직군", example = "[\"BACKEND\", \"FRONTEND\"]", minLength = 1, maxLength = 3)
     @Size(min = 1, max = 3, message = "wantedJobs는 1개 이상 3개 이하로 선택해야 합니다.")
     private List<String> wantedJobs;
 
