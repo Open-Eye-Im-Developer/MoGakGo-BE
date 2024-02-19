@@ -12,4 +12,7 @@ public interface ProjectJoinRequestJpaRepository extends JpaRepository<ProjectJo
 
     @Query("select pjr from ProjectJoinRequest pjr where pjr.sender.id = :userId and pjr.project.id = :projectId")
     Optional<ProjectJoinRequest> findAlreadyExists(Long userId, Long projectId);
+
+    @Query("select pjr from ProjectJoinRequest pjr where pjr.sender.id = :userId")
+    Optional<ProjectJoinRequest> findAlreadyExistsAnotherJoinReq(Long userId);
 }

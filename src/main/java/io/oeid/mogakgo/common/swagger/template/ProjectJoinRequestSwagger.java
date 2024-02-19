@@ -31,7 +31,9 @@ public interface ProjectJoinRequestSwagger {
                     @ExampleObject(name = "E090101",
                         value = SwaggerProjectJoinRequestErrorExamples.PROJECT_JOIN_REQUEST_ALREADY_EXIST),
                     @ExampleObject(name = "E090102",
-                        value = SwaggerProjectJoinRequestErrorExamples.PROJECT_JOIN_REQUEST_INVALID_REGION)
+                        value = SwaggerProjectJoinRequestErrorExamples.PROJECT_JOIN_REQUEST_INVALID_REGION),
+                    @ExampleObject(name = "E090103",
+                        value = SwaggerProjectJoinRequestErrorExamples.ANOTHER_PROJECT_JOIN_REQUEST_ALREADY_EXIST)
                 })),
         @ApiResponse(responseCode = "403", description = "프로젝트 매칭 요청 권한이 없음",
             content = @Content(
