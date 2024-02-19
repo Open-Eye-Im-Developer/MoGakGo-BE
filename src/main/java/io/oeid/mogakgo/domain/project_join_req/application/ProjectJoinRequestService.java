@@ -64,8 +64,8 @@ public class ProjectJoinRequestService {
         }
     }
 
-    private void validateAlreadyExistRequest(Long userId, Long projectId) {
-        projectJoinRequestRepository.findAlreadyExists(userId, projectId)
+    private ProjectJoinRequest validateAlreadyExistRequest(Long userId, Long projectId) {
+        return projectJoinRequestRepository.findAlreadyExists(userId, projectId)
             .orElseGet(() -> {
                 throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_ALREADY_EXIST);
             });
