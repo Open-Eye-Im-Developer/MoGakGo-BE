@@ -21,6 +21,7 @@ public class UserProfileResponse {
     private final String githubUrl;
     private final String bio;
     private final double jandiRate;
+    private final String achievementTitle;
     private final List<DevelopLanguage> developLanguages;
     private final List<WantedJob> wantedJobs;
 
@@ -33,6 +34,7 @@ public class UserProfileResponse {
             user.getGithubUrl(),
             user.getBio(),
             user.getJandiRate(),
+            user.getAchievement().getTitle(),
             user.getUserDevelopLanguageTags().stream().map(
                 UserDevelopLanguageTag::getDevelopLanguage).toList(),
             user.getUserWantedJobTags().stream().map(
