@@ -56,13 +56,21 @@ jobs:
         shell: bash
 
       ## create firebase_service_key.json
-      - name: make firebase_service_key.json
-        run: touch ./src/main/resources/firebase_service_key.json
-        shell: bash
+      - name: create-json
+        id: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "firebase_service_key.json"
+          json: ${{ secrets.FIREBASE_SERVICE }}
+          dir: ./src/main/resources/
 
-      - name: save firebase_service_key.json from secrets
-        run: echo "${{ secrets.FIREBASE_SERVICE }}" > ./src/main/resources/firebase_service_key.json
-        shell: bash
+#      - name: make firebase_service_key.json
+#        run: touch ./src/main/resources/firebase_service_key.json
+#        shell: bash
+#
+#      - name: save firebase_service_key.json from secrets
+#        run: echo "${{ secrets.FIREBASE_SERVICE }}" > ./src/main/resources/firebase_service_key.json
+#        shell: bash
 
       ## create test_ddl.sql for test
   
