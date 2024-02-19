@@ -4,6 +4,7 @@ import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProjectJoinRequestJpaRepository extends JpaRepository<ProjectJoinRequest, Long>,
     ProjectJoinRequestRepositoryCustom {
