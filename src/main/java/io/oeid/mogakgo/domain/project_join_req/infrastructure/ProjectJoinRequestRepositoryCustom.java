@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.project_join_req.infrastruture;
+package io.oeid.mogakgo.domain.project_join_req.infrastructure;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
