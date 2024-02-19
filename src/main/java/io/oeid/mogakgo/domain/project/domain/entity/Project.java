@@ -80,14 +80,33 @@ public class Project extends BaseTimeEntity {
     }
 
     public void delete(User tokenUser) {
-        validateCreator(tokenUser);
+        validateAvailableDelete(tokenUser);
         super.delete();
     }
 
-    private void validateCreator(User tokenUser) {
+    public void cancel(User tokenUser, boolean projectHasReq) {
+        validateAvailableCancel(tokenUser);
+        // 매칭이 되었거나, 매칭 준비중이지만 요청이 있을때는 잔디력 감소
+        if (projectHasReq) {
+            this.creator.decreaseJandiRate();
+        }
+        this.projectStatus = ProjectStatus.CANCELED;
+    }
+
+    public void validateCreator(User tokenUser) {
         if (tokenUser == null || !this.creator.getId().equals(tokenUser.getId())) {
             throw new ProjectException(PROJECT_FORBIDDEN_OPERATION);
         }
+    }
+
+    private void validateAvailableCancel(User tokenUser) {
+        validateCreator(tokenUser);
+        this.projectStatus.validateAvailableCancel();
+    }
+
+    private void validateAvailableDelete(User tokenUser) {
+        validateCreator(tokenUser);
+        this.projectStatus.validateAvailableDelete();
     }
 
     private void addProjectTagsWithValidation(List<ProjectTagCreateReq> projectTags) {

@@ -2,15 +2,21 @@ package io.oeid.mogakgo.domain.project.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.NOT_MATCH_MEET_LOCATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_FORBIDDEN_OPERATION;
+import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_NOT_FOUND;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
 
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.application.GeoService;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
+import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
+import io.oeid.mogakgo.domain.project_join_req.infrastruture.ProjectJoinRequestJpaRepository;
+import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
@@ -26,6 +32,7 @@ public class ProjectService {
     private final UserJpaRepository userJpaRepository;
     private final ProjectJpaRepository projectJpaRepository;
     private final GeoService geoService;
+    private final ProjectJoinRequestJpaRepository projectJoinRequestJpaRepository;
 
     @Transactional
     public Long create(Long userId, ProjectCreateReq request) {
@@ -55,6 +62,42 @@ public class ProjectService {
 
         // 프로젝트 삭제
         project.delete(user);
+    }
+
+    public void cancel(Long userId, Long projectId) {
+        // 유저 존재 여부 체크
+        User user = getUser(userId);
+
+        // 프로젝트 존재 여부 체크
+        Project project = getProject(projectId);
+
+        // 매칭이 되었거나, 매칭 준비중이지만 요청이 있을때는 잔디력 감소를 위한 변수
+        boolean projectHasReq = projectJoinRequestJpaRepository.existsByProjectId(projectId);
+
+        // 프로젝트 취소
+        project.cancel(user, projectHasReq);
+    }
+
+    public CursorPaginationResult<projectJoinRequestRes> getJoinRequest(
+        Long userId, Long projectId, CursorPaginationInfoReq pageable
+    ) {
+        // 유저 존재 여부 체크
+        User user = getUser(userId);
+
+        // 프로젝트 존재 여부 체크
+        Project project = getProject(projectId);
+
+        // 본인만 본인의 프로젝트 참가 요청을 조회할 수 있음
+        // TODO : project exception 인지 project join request exception 인지 확인
+        try {
+            project.validateCreator(user);
+        } catch (ProjectException e) {
+            throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION);
+        }
+
+        // 프로젝트 참가 요청 조회
+        return projectJoinRequestJpaRepository.findByConditionWithPagination(
+            null, projectId, null, null);
     }
 
     private User getUser(Long userId) {

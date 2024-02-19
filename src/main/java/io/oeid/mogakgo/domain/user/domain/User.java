@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.user.domain;
 
+import io.oeid.mogakgo.domain.achievement.domain.Achievement;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
 import io.oeid.mogakgo.domain.user.exception.UserException;
@@ -13,6 +14,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -57,6 +60,8 @@ public class User {
     @Column(name = "github_url")
     private String githubUrl;
 
+
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("byteSize ASC")
     private final List<UserDevelopLanguageTag> userDevelopLanguageTags = new ArrayList<>();
@@ -94,6 +99,12 @@ public class User {
     @Column(name = "available_like_count")
     private int availableLikeCount;
 
+    @Column(name = "signup_yn")
+    private Boolean signupYn;
+
+    @ManyToOne
+    @JoinColumn(name = "achievement_id")
+    private Achievement achievement;
 
     private User(Long githubPk, String githubId, String avatarUrl, String githubUrl) {
         this.githubPk = githubPk;
@@ -103,6 +114,7 @@ public class User {
         this.githubUrl = githubUrl;
         this.role = Role.ROLE_USER;
         this.jandiRate = 0d;
+        this.signupYn = false;
     }
 
     public static User of(long githubPk, String username, String avatarUrl, String githubUrl) {
@@ -144,4 +156,20 @@ public class User {
         this.deletedAt = LocalDateTime.now();
     }
 
+    public void signUpComplete(){
+        this.signupYn = true;
+    }
+
+    public void updateRegion(Region region) {
+        if(region == null){
+            throw new UserException(ErrorCode400.USER_REGION_SHOULD_BE_NOT_EMPTY);
+        }
+        this.region = region;
+        this.regionAuthenticationAt = LocalDateTime.now();
+    }
+
+    //TODO : 추후 구현 필요
+    public void decreaseJandiRate() {
+        return;
+    }
 }

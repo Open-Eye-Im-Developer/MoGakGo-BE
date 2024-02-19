@@ -54,7 +54,16 @@ jobs:
       - name: save test_application.yml for secrets
         run: echo "${{ secrets.APPLICATION_TEST }}" > ./src/test/resources/application.yml
         shell: bash
-  
+
+      ## create firebase_service_key.json
+      - name: make firebase_service_key.json
+        run: touch ./src/main/resources/firebase_service_key.json
+        shell: bash
+
+      - name: save firebase_service_key.json from secrets
+        run: echo "${{ secrets.FIREBASE_SERVICE }}" > ./src/main/resources/firebase_service_key.json
+        shell: bash
+
       ## create test_ddl.sql for test
   
       ## execute Gradle test
