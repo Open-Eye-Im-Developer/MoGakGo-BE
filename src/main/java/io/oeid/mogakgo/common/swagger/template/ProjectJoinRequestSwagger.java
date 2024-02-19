@@ -37,7 +37,7 @@ public interface ProjectJoinRequestSwagger {
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(name = "E090201",
+                examples = @ExampleObject(name = "E050201",
                     value = SwaggerProjectJoinRequestErrorExamples.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION))),
         @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
             content = @Content(
