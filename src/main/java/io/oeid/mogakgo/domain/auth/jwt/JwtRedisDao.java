@@ -1,6 +1,8 @@
 package io.oeid.mogakgo.domain.auth.jwt;
 
 import io.oeid.mogakgo.core.properties.JwtProperties;
+import io.oeid.mogakgo.domain.auth.exception.AuthException;
+import io.oeid.mogakgo.exception.code.ErrorCode401;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,10 +27,15 @@ public class JwtRedisDao {
             .set(accessToken, refreshToken, refreshExpireHour, TimeUnit.HOURS);
     }
 
+    @Transactional
+    public void saveTokens(String accessToken, String refreshToken, int expireHour) {
+        redisTemplate.opsForValue()
+            .set(accessToken, refreshToken, expireHour, TimeUnit.SECONDS);
+    }
+
     @Transactional(readOnly = true)
-    // TODO: 2024-02-15 if null then what should I do?
     public String getRefreshTokenByAccessToken(String accessToken) {
         var result = Optional.ofNullable(redisTemplate.opsForValue().get(accessToken));
-        return result.orElseThrow();
+        return result.orElseThrow(() -> new AuthException(ErrorCode401.AUTH_MISSING_CREDENTIALS));
     }
 }
