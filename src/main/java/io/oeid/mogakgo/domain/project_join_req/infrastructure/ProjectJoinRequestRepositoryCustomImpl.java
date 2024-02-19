@@ -2,14 +2,13 @@ package io.oeid.mogakgo.domain.project_join_req.infrastructure;
 
 import static io.oeid.mogakgo.domain.project_join_req.domain.entity.QProjectJoinRequest.projectJoinRequest;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
 import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
-import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPreviewRes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -24,21 +23,28 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
     public CursorPaginationResult<projectJoinRequestRes> findByConditionWithPagination(
         Long senderId, Long projectId, RequestStatus requestStatus, CursorPaginationInfoReq pageable
     ) {
-        List<projectJoinRequestRes> result = jpaQueryFactory.select(
-                Projections.constructor(
-                    projectJoinRequestRes.class,
-                    projectJoinRequest.id,
-                    Projections.constructor(
-                        UserPreviewRes.class,
-                        projectJoinRequest.sender.id,
-                        projectJoinRequest.sender.username,
-                        projectJoinRequest.sender.avatarUrl
-                    ),
-                    projectJoinRequest.requestStatus
-                )
-            )
-            .from(projectJoinRequest)
-            .join(projectJoinRequest.sender)
+//        List<projectJoinRequestRes> result = jpaQueryFactory.select(
+//                Projections.constructor(
+//                    projectJoinRequestRes.class,
+//                    projectJoinRequest.id,
+//                    projectJoinRequest.sender,
+//                    projectJoinRequest.requestStatus
+//                )
+//            )
+//            .from(projectJoinRequest)
+//            .join(projectJoinRequest.sender)
+//            .where(
+//                cursorIdCondition(pageable.getCursorId()),
+//                senderIdEq(senderId),
+//                projectIdEq(projectId),
+//                requestStatusEq(requestStatus)
+//            )
+//            .limit(pageable.getPageSize() + 1)
+//            .fetch();
+
+        List<ProjectJoinRequest> entities = jpaQueryFactory.selectFrom(projectJoinRequest)
+            .join(projectJoinRequest.sender).fetchJoin()
+            .leftJoin(projectJoinRequest.sender.achievement).fetchJoin()
             .where(
                 cursorIdCondition(pageable.getCursorId()),
                 senderIdEq(senderId),
@@ -47,6 +53,14 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
             )
             .limit(pageable.getPageSize() + 1)
             .fetch();
+
+        List<projectJoinRequestRes> result = entities.stream().map(
+            projectJoinRequest -> new projectJoinRequestRes(
+                projectJoinRequest.getId(),
+                projectJoinRequest.getSender(),
+                projectJoinRequest.getRequestStatus()
+            )
+        ).toList();
 
         return CursorPaginationResult.fromDataWithExtraItemForNextCheck(result,
             pageable.getPageSize());

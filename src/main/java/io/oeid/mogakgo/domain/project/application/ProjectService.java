@@ -14,6 +14,7 @@ import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
+import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequestJpaRepository;
 import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
@@ -96,8 +97,9 @@ public class ProjectService {
         }
 
         // 프로젝트 참가 요청 조회
+
         return projectJoinRequestJpaRepository.findByConditionWithPagination(
-            null, projectId, null, null);
+            null, projectId, null, pageable);
     }
 
     private User getUser(Long userId) {

@@ -1,6 +1,9 @@
 package io.oeid.mogakgo.domain.user.presentation.dto.res;
 
 import io.oeid.mogakgo.domain.user.application.dto.res.UserProfileResponse;
+import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
+import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AccessLevel;
@@ -32,7 +35,7 @@ public class UserPublicApiResponse {
     @Schema(description = "원하는 직군", example = "[\"BACKEND\", \"FRONTEND\"]")
     private final List<String> wantedJobs;
 
-    public static UserPublicApiResponse from(UserProfileResponse response) {
+    public static UserPublicApiResponse fromByUserProfile(UserProfileResponse response) {
         return new UserPublicApiResponse(
             response.getId(),
             response.getUsername(),
@@ -46,4 +49,23 @@ public class UserPublicApiResponse {
             response.getWantedJobs().stream().map(Enum::name).toList()
         );
     }
+
+    public static UserPublicApiResponse from(User user) {
+        return new UserPublicApiResponse(
+            user.getId(),
+            user.getUsername(),
+            user.getGithubId(),
+            user.getAvatarUrl(),
+            user.getGithubUrl(),
+            user.getBio(),
+            user.getJandiRate(),
+            user.getAchievement() != null ? user.getAchievement().getTitle() : null,
+            user.getUserDevelopLanguageTags().stream()
+                .map(UserDevelopLanguageTag::getDevelopLanguage).map(Enum::name).toList(),
+            user.getUserWantedJobTags().stream()
+                .map(UserWantedJobTag::getWantedJob).map(Enum::name)
+                .toList()
+        );
+    }
+
 }
