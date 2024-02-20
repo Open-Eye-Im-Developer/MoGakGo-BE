@@ -28,6 +28,7 @@ import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinR
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
