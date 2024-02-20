@@ -28,7 +28,6 @@ import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinR
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -77,11 +76,6 @@ public class ProjectService {
         return project.getId();
     }
 
-    private boolean isExistsNotEndProjectCard(User tokenUser) {
-        return !projectJpaRepository.findNotEndProjectOneByCreatorId(tokenUser.getId(),
-            PageRequest.of(0, 1)).isEmpty();
-    }
-
     @Transactional
     public void delete(Long userId, Long projectId) {
         // 유저 존재 여부 체크
@@ -94,6 +88,7 @@ public class ProjectService {
         project.delete(user);
     }
 
+    @Transactional
     public void cancel(Long userId, Long projectId) {
         // 유저 존재 여부 체크
         User user = getUser(userId);
@@ -106,6 +101,9 @@ public class ProjectService {
 
         // 프로젝트 취소
         project.cancel(user, projectHasReq);
+
+        // 프로젝트가 받은 모든 요청 거절
+        projectJoinRequestJpaRepository.rejectAllByProjectId(projectId);
     }
 
     public CursorPaginationResult<projectJoinRequestRes> getJoinRequest(
@@ -158,6 +156,11 @@ public class ProjectService {
         fillWithDefaultRegionsIfNecessary(regionRankList);
 
         return new ProjectDensityRankRes(regionRankList);
+    }
+
+    private boolean isExistsNotEndProjectCard(User tokenUser) {
+        return !projectJpaRepository.findNotEndProjectOneByCreatorId(tokenUser.getId(),
+            PageRequest.of(0, 1)).isEmpty();
     }
 
     private void fillWithDefaultRegionsIfNecessary(List<Region> regionRankList) {
