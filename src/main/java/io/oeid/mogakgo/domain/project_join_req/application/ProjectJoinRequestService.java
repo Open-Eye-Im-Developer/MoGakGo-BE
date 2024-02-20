@@ -4,6 +4,7 @@ import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_MATCHING_USER_
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_PROJECT_JOIN_REQUEST_REGION;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SENDER_TO_ACCEPT;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.PROJECT_JOIN_REQUEST_ALREADY_EXIST;
+import static io.oeid.mogakgo.exception.code.ErrorCode400.PROJECT_JOIN_REQUEST_SHOULD_BE_ONLY_ONE;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_JOIN_REQUEST_NOT_FOUND;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_NOT_FOUND;
@@ -47,6 +48,7 @@ public class ProjectJoinRequestService {
         validateProjectCreator(project, userId);
         validateUserCertRegion(project, tokenUser);
         validateAlreadyExistRequest(userId, project.getId());
+        validateUserAnotherRequestExists(userId);
 
         // 프로젝트 매칭 요청 생성
         ProjectJoinRequest joinRequest = request.toEntity(tokenUser, project);
@@ -133,6 +135,12 @@ public class ProjectJoinRequestService {
     private void validateUserCertRegion(Project project, User tokenUser) {
         if (!tokenUser.getRegion().equals(project.getCreatorInfo().getRegion())) {
             throw new ProjectJoinRequestException(INVALID_PROJECT_JOIN_REQUEST_REGION);
+        }
+    }
+
+    private void validateUserAnotherRequestExists(Long userId) {
+        if (projectJoinRequestRepository.findAlreadyExistsAnotherJoinReq(userId).isPresent()) {
+            throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_SHOULD_BE_ONLY_ONE);
         }
     }
 }
