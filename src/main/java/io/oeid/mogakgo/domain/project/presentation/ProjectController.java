@@ -9,7 +9,7 @@ import io.oeid.mogakgo.domain.project.application.ProjectService;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
-import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
