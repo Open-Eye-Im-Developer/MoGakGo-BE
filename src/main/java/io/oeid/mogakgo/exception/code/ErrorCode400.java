@@ -40,6 +40,7 @@ public enum ErrorCode400 implements ErrorCode {
     PROJECT_JOIN_REQUEST_ALREADY_EXIST("E090101", "이미 매칭 요청을 전송한 프로젝트에 매칭 요청을 생성할 수 없습니다."),
     INVALID_PROJECT_JOIN_REQUEST_REGION("E090102", "동네 인증한 구역에서만 프로젝트 매칭 요청을 생성할 수 있습니다."),
     PROJECT_JOIN_REQUEST_SHOULD_BE_ONLY_ONE("E090103", "프로젝트 매칭 요청은 한 번에 한 개만 전송할 수 있습니다."),
+    INVALID_CREATOR_PROJECT_JOIN_REQUEST("E090104", "프로젝트 생성자는 해당 프로젝트에 매칭 요청을 전송할 수 없습니다."),
 
     MATCHING_CANCEL_NOT_ALLOWED("E090101", "이미 종료되거나 취소된 매칭은 취소할 수 없습니다."),
 
