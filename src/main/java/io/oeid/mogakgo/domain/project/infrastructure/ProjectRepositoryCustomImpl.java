@@ -72,6 +72,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
         return jpaQueryFactory.select(project.creatorInfo.region)
             .from(project)
             .groupBy(project.creatorInfo.region)
+            .having(project.creatorInfo.region.count().gt(0L))
             .orderBy(project.creatorInfo.region.count().desc())
             .limit(limit)
             .fetch();
