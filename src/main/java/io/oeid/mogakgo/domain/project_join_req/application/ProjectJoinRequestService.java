@@ -10,6 +10,8 @@ import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_JOIN_REQUEST_N
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_NOT_FOUND;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
 
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
@@ -20,6 +22,7 @@ import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequestJpaRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestDetailAPIRes;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
@@ -102,6 +105,18 @@ public class ProjectJoinRequestService {
     private ProjectJoinRequest getProjectJoinRequestWithProject(Long projectRequestId) {
         return projectJoinRequestRepository.findByIdWithProject(projectRequestId)
             .orElseThrow(() -> new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_NOT_FOUND));
+    }
+
+    public CursorPaginationResult<ProjectJoinRequestDetailAPIRes> getBySenderIdWithPagination(
+        Long userId, Long senderId, CursorPaginationInfoReq pageable
+    ) {
+        User tokenUser = validateToken(userId);
+        validateSender(tokenUser, senderId);
+
+        // 사용자가 보낸 프로젝트 매칭 요청 리스트
+        return projectJoinRequestRepository.getBySenderIdWithPagination(
+            senderId, null, null, pageable
+        );
     }
 
     private User validateToken(Long userId) {
