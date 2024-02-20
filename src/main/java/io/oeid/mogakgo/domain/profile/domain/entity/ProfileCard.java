@@ -25,7 +25,7 @@ public class ProfileCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "profile_card_id")
+    @Column(name = "id")
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
