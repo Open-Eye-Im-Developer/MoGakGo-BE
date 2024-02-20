@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.common.base;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 
@@ -18,19 +19,19 @@ public class CursorPaginationResult<T> {
     private Integer size;
 
     private CursorPaginationResult(List<T> data, Integer size) {
-        this.data = data;
         this.size = size;
         if (data.size() > size) {
             this.hasNext = true;
-            this.data.remove(data.size() - 1);
+            this.data = new ArrayList<>(data.subList(0, size));
         } else {
             this.hasNext = false;
+            this.data = new ArrayList<>(data);
         }
         this.numberOfElements = data.size();
     }
 
     private CursorPaginationResult(List<T> data, Integer size, boolean hasNext) {
-        this.data = data;
+        this.data = new ArrayList<>(data);
         this.numberOfElements = data.size();
         this.hasNext = hasNext;
         this.size = size;

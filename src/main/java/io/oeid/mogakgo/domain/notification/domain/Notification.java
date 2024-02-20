@@ -33,8 +33,12 @@ public class Notification {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "sender_id")
+    private User sender;
+
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tag")
@@ -50,15 +54,18 @@ public class Notification {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    private Notification(User user, NotificationTag notificationTag, String detailData) {
-        this.user = user;
+    private Notification(User sender, User receiver, NotificationTag notificationTag,
+        String detailData) {
+        this.sender = sender;
+        this.receiver = receiver;
         this.notificationTag = validateNotificationTag(notificationTag);
         this.detailData = validateDetailData(detailData);
         this.checkedYn = false;
     }
 
-    public static Notification of(User user, NotificationTag notificationTag, String detail) {
-        return new Notification(user, notificationTag, detail);
+    public static Notification of(User sender, User receiver, NotificationTag notificationTag,
+        String detail) {
+        return new Notification(sender, receiver, notificationTag, detail);
     }
 
     private NotificationTag validateNotificationTag(NotificationTag notificationTag) {

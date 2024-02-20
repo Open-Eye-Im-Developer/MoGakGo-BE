@@ -29,12 +29,13 @@ public class ProfileCardService {
         validateToken(userId);
         validateRegionCoverage(region);
 
-        CursorPaginationResult<UserPublicApiResponse> projects = profileCardRepository
+        CursorPaginationResult<UserPublicApiResponse> profiles = profileCardRepository
             .findByConditionWithPagination(
             null, region, pageable
         );
-        Collections.shuffle(projects.getData());
-        return projects;
+
+        Collections.shuffle(profiles.getData());
+        return profiles;
     }
 
     private User validateToken(Long userId) {

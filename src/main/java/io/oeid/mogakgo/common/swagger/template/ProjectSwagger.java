@@ -1,11 +1,13 @@
 package io.oeid.mogakgo.common.swagger.template;
 
+import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerGeoErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDensityRankRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
@@ -20,7 +22,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Tag(name = "Project Card", description = "프로젝트 카드 관련 API")
 @SuppressWarnings("unused")
@@ -171,4 +175,11 @@ public interface ProjectSwagger {
         @Parameter(description = "프로젝트 ID", required = true) Long id,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable
     );
+
+    @Operation(summary = "지역별 프로젝트 밀도 순위 조회", description = "지역별 프로젝트 밀도 순위를 조회할 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "지역별 프로젝트 밀도 순위 조회 성공",
+            content = @Content(schema = @Schema(implementation = ProjectDensityRankRes.class))),
+    })
+    ResponseEntity<ProjectDensityRankRes> getDensityRankProjects();
 }
