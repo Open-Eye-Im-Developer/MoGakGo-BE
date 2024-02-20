@@ -4,7 +4,7 @@ import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.common.swagger.template.ProjectJoinReqSwagger;
-import io.oeid.mogakgo.domain.matching.presentation.dto.res.MatchingId;
+import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingId;
 import io.oeid.mogakgo.domain.project_join_req.application.ProjectJoinRequestService;
 import io.oeid.mogakgo.domain.project_join_req.application.dto.req.ProjectJoinCreateReq;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestAPIRes;
