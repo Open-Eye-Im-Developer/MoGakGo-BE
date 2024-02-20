@@ -29,6 +29,8 @@ public enum ErrorCode400 implements ErrorCode {
     USER_WANTED_JOB_BAD_REQUEST("E020102", "희망 직무는 3개까지만 등록 가능합니다."),
     USERNAME_SHOULD_BE_NOT_EMPTY("E020103", "유저 이름은 비어있을 수 없습니다."),
     USER_REGION_SHOULD_BE_NOT_EMPTY("E020104", "유저 지역은 비어있을 수 없습니다."),
+    USER_WANTED_JOB_DUPLICATE("E020105", "중복된 희망 직무가 있습니다."),
+    USER_DEVELOP_LANGUAGE_DUPLICATE("E020106", "중복된 개발 언어가 있습니다."),
     USER_ID_NOT_NULL("E020001", "유저 아이디는 필수값입니다."),
 
     INVALID_PROJECT_STATUS_TO_ACCEPT("E050101", "프로젝트가 대기중이 아니여서 참여 요청을 수락할 수 없습니다."),
