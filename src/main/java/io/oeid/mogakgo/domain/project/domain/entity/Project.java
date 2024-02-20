@@ -3,8 +3,8 @@ package io.oeid.mogakgo.domain.project.domain.entity;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_PROJECT_TAG_COUNT;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_FORBIDDEN_OPERATION;
 
-import io.oeid.mogakgo.common.base.BaseTimeEntity;
 import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
+import io.oeid.mogakgo.common.base.BaseTimeEntity;
 import io.oeid.mogakgo.domain.project.domain.entity.vo.CreatorInfo;
 import io.oeid.mogakgo.domain.project.domain.entity.vo.MeetingInfo;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
@@ -77,6 +77,12 @@ public class Project extends BaseTimeEntity {
             meetDetail);
         this.projectStatus = ProjectStatus.PENDING;
         addProjectTagsWithValidation(projectTags);
+    }
+
+    public void match(User tokenUser) {
+        validateCreator(tokenUser);
+        projectStatus.validateAvailableMatched();
+        this.projectStatus = ProjectStatus.MATCHED;
     }
 
     public void delete(User tokenUser) {

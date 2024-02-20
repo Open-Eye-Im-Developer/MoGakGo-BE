@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.project_join_req.presentation;
+package io.oeid.mogakgo.domain.project_join_req.presentation.dto.res;
 
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
 import io.oeid.mogakgo.domain.user.domain.User;

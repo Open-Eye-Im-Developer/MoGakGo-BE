@@ -1,7 +1,10 @@
 package io.oeid.mogakgo.domain.project_join_req.domain.entity;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION;
+
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
+import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,7 +53,7 @@ public class ProjectJoinRequest {
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
+  
     @Builder
     private ProjectJoinRequest(User sender, Project project) {
         this.sender = sender;
@@ -60,5 +63,33 @@ public class ProjectJoinRequest {
 
     public static ProjectJoinRequest of(User sender, Project project) {
         return new ProjectJoinRequest(sender, project);
+    }
+
+    public void cancel(User user) {
+        validateAvailableCancel(user);
+        requestStatus = RequestStatus.CANCELED;
+    }
+
+    // TODO: 매칭 생성과 요청 수락이 동시에 일어날것이란 보장
+    public void accept(User user) {
+        validateAvailableAccept();
+        project.match(user);
+        requestStatus = RequestStatus.ACCEPTED;
+    }
+
+    private void validateAvailableAccept() {
+        // 프로젝트 요청 상태 유효성 검증
+        requestStatus.validateAvailableAccept();
+    }
+
+    private void validateAvailableCancel(User user) {
+        validateSender(user);
+        requestStatus.validateAvailableCancel();
+    }
+
+    private void validateSender(User user) {
+        if (!sender.getId().equals(user.getId())) {
+            throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION);
+        }
     }
 }
