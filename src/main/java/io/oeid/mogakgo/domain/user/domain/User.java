@@ -1,5 +1,7 @@
 package io.oeid.mogakgo.domain.user.domain;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_COUNT_IS_ZERO;
+
 import io.oeid.mogakgo.domain.achievement.domain.Achievement;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
@@ -150,6 +152,13 @@ public class User {
             throw new UserException(ErrorCode400.USERNAME_SHOULD_BE_NOT_EMPTY);
         }
         this.username = username;
+    }
+
+    public void decreaseAvailableLikeCount() {
+        if (this.availableLikeCount <= 0) {
+            throw new UserException(USER_AVAILABLE_LIKE_COUNT_IS_ZERO);
+        }
+        this.availableLikeCount -= 1;
     }
 
     public void delete(){
