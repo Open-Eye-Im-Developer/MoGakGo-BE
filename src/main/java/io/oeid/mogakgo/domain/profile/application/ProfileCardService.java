@@ -10,9 +10,7 @@ import io.oeid.mogakgo.domain.profile.infrastructure.ProfileCardJpaRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,10 +34,7 @@ public class ProfileCardService {
             null, region, pageable
         );
 
-        List<UserPublicApiResponse> shuffledData = new ArrayList<>(profiles.getData());
-        Collections.shuffle(shuffledData);
-
-        profiles.setData(shuffledData);
+        Collections.shuffle(profiles.getData());
         return profiles;
     }
 

@@ -147,10 +147,7 @@ public class ProjectService {
         );
 
         // 요청할 때마다 랜덤 정렬
-        List<ProjectDetailAPIRes> shuffledData = new ArrayList<>(projects.getData());
-        Collections.shuffle(shuffledData);
-
-        projects.setData(shuffledData);
+        Collections.shuffle(projects.getData());
         return projects;
     }
 
