@@ -20,13 +20,9 @@ public class ProjectJoinCreateReq {
     @NotNull
     private final Long projectId;
 
-    @Schema(description = "프로젝트 매칭 요청 상태", example = "PENDING", implementation = RequestStatus.class)
-    private final RequestStatus requestStatus;
-
-    private ProjectJoinCreateReq(Long senderId, Long projectId) {
+    public ProjectJoinCreateReq(Long senderId, Long projectId) {
         this.senderId = senderId;
         this.projectId = projectId;
-        this.requestStatus = RequestStatus.PENDING;
     }
 
     public ProjectJoinRequest toEntity(User sender, Project project) {
