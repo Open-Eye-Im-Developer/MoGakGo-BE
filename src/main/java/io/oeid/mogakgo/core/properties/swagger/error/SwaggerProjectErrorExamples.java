@@ -14,6 +14,7 @@ public class SwaggerProjectErrorExamples {
     public static final String PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":403,\"code\":\"E050201\",\"message\":\"해당 프로젝트 요청에 대한 권한이 없습니다.\"}";
     public static final String INVALID_MATCHING_USER_TO_CREATE_PROJECT = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":400,\"code\":\"E030108\",\"message\":\"매칭이 진행 중인 유저는 프로젝트 생성을 할 수 없습니다.\"}";
     public static final String ALREADY_EXIST_PROGRESS_PROJECT = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":400,\"code\":\"E030109\",\"message\":\"종료되지 않은 프로젝트 카드가 있으면 프로젝트 생성을 할 수 없습니다.\"}";
+    public static final String INVALID_PROJECT_STATUS_TO_FINISH = "{\"timestamp\":\"2024-02-17T10:07:31.404Z\",\"statusCode\":400,\"code\":\"E030110\",\"message\":\"매칭이 진행 중인 프로젝트가 아니여서 프로젝트를 종료할 수 없습니다.\"}";
 
     private SwaggerProjectErrorExamples() {
     }

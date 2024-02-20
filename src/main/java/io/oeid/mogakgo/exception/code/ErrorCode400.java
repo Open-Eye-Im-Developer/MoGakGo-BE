@@ -22,6 +22,7 @@ public enum ErrorCode400 implements ErrorCode {
     PROJECT_CANCEL_NOT_ALLOWED("E030107", "이미 취소 되었거나 종료된 프로젝트는 취소할 수 없습니다."),
     INVALID_MATCHING_USER_TO_CREATE_PROJECT("E030108", "매칭이 진행 중인 유저는 프로젝트 생성을 할 수 없습니다."),
     ALREADY_EXIST_PROGRESS_PROJECT("E030109", "종료되지 않은 프로젝트 카드가 있으면 프로젝트 생성을 할 수 없습니다."),
+    INVALID_PROJECT_STATUS_TO_FINISH("E030110", "매칭이 진행 중인 프로젝트가 아니여서 프로젝트를 종료할 수 없습니다."),
 
     INVALID_SERVICE_REGION("E080101", "해당 지역은 서비스 지역이 아닙니다."),
     USER_DEVELOP_LANGUAGE_BAD_REQUEST("E020101", "개발 언어는 3개까지만 등록 가능합니다."),
@@ -39,6 +40,8 @@ public enum ErrorCode400 implements ErrorCode {
     PROJECT_JOIN_REQUEST_ALREADY_EXIST("E090101", "이미 매칭 요청을 전송한 프로젝트에 매칭 요청을 생성할 수 없습니다."),
     INVALID_PROJECT_JOIN_REQUEST_REGION("E090102", "동네 인증한 구역에서만 프로젝트 매칭 요청을 생성할 수 있습니다."),
     PROJECT_JOIN_REQUEST_SHOULD_BE_ONLY_ONE("E090103", "프로젝트 매칭 요청은 한 번에 한 개만 전송할 수 있습니다."),
+
+    MATCHING_CANCEL_NOT_ALLOWED("E090101", "이미 종료되거나 취소된 매칭은 취소할 수 없습니다."),
 
     ;
 

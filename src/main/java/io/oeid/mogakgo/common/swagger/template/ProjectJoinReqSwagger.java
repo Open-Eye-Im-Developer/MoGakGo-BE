@@ -6,7 +6,7 @@ import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectJoinReqErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectJoinRequestErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
-import io.oeid.mogakgo.domain.matching.presentation.dto.res.MatchingId;
+import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingId;
 import io.oeid.mogakgo.domain.project_join_req.application.dto.req.ProjectJoinCreateReq;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestAPIRes;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestDetailAPIRes;
