@@ -6,13 +6,12 @@ import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Schema(description = "회원 프로필 조회 응답")
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class UserPublicApiResponse {
     @Schema(description = "회원 식별자", example = "1")
     private final long id;

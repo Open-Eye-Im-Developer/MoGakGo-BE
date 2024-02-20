@@ -4,10 +4,12 @@ import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.common.swagger.template.ProjectSwagger;
+import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.project.application.ProjectService;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
-import io.oeid.mogakgo.domain.project_join_req.presentation.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +60,16 @@ public class ProjectController implements ProjectSwagger {
         @Valid @ModelAttribute CursorPaginationInfoReq pageable
     ) {
         return ResponseEntity.ok().body(projectService.getJoinRequest(userId, id, pageable));
+    }
+
+    @GetMapping("/{region}")
+    public ResponseEntity<CursorPaginationResult<ProjectDetailAPIRes>> getRandomOrderedProjectsByRegion(
+        @UserId Long userId, @PathVariable Region region,
+        @Valid @ModelAttribute CursorPaginationInfoReq pageable
+    ) {
+        return ResponseEntity.ok().body(
+            projectService.getRandomOrderedProjectsByRegion(userId, region, pageable)
+        );
     }
 
 }
