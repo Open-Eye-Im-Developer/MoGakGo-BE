@@ -12,7 +12,8 @@ import lombok.Getter;
 public class NotificationCreateResponse {
 
     private final Long id;
-    private final Long userId;
+    private final Long senderId;
+    private final Long receiverId;
     private final NotificationTag notificationTag;
     private final String detailData;
     private final LocalDateTime createdAt;
@@ -21,7 +22,8 @@ public class NotificationCreateResponse {
     public static NotificationCreateResponse from(Notification notification) {
         return new NotificationCreateResponse(
             notification.getId(),
-            notification.getUser().getId(),
+            notification.getSender().getId(),
+            notification.getReceiver().getId(),
             notification.getNotificationTag(),
             notification.getDetailData(),
             notification.getCreatedAt(),

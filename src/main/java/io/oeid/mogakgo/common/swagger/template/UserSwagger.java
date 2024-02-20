@@ -31,6 +31,7 @@ public interface UserSwagger {
                 schema = @Schema(implementation = ErrorResponse.class),
                 examples = {
                     @ExampleObject(name = "E020103", value = SwaggerUserErrorExamples.INVALID_USER_NAME),
+                    @ExampleObject(name = "E020105", value = SwaggerUserErrorExamples.USER_WANTED_JOB_DUPLICATE)
                 })),
         @ApiResponse(responseCode = "404", description = "OAuth2 정보가 존재하지 않음",
             content = @Content(

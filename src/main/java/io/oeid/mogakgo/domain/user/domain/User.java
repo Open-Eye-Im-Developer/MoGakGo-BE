@@ -63,7 +63,6 @@ public class User {
     private String githubUrl;
 
 
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("byteSize ASC")
     private final List<UserDevelopLanguageTag> userDevelopLanguageTags = new ArrayList<>();
@@ -148,7 +147,7 @@ public class User {
     }
 
     public void updateUsername(String username) {
-        if(username == null || username.isBlank()){
+        if (username == null || username.isBlank()) {
             throw new UserException(ErrorCode400.USERNAME_SHOULD_BE_NOT_EMPTY);
         }
         this.username = username;
@@ -161,16 +160,24 @@ public class User {
         this.availableLikeCount -= 1;
     }
 
-    public void delete(){
+    public void delete() {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void signUpComplete(){
+    public void deleteAllWantJobTags() {
+        this.userWantedJobTags.clear();
+    }
+
+    public void deleteAllDevelopLanguageTags() {
+        this.userDevelopLanguageTags.clear();
+    }
+
+    public void signUpComplete() {
         this.signupYn = true;
     }
 
     public void updateRegion(Region region) {
-        if(region == null){
+        if (region == null) {
             throw new UserException(ErrorCode400.USER_REGION_SHOULD_BE_NOT_EMPTY);
         }
         this.region = region;

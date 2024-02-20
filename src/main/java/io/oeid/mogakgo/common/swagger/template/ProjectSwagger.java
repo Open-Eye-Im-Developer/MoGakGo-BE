@@ -6,6 +6,7 @@ import io.oeid.mogakgo.core.properties.swagger.error.SwaggerGeoErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDensityRankRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
@@ -171,4 +172,11 @@ public interface ProjectSwagger {
         @Parameter(description = "프로젝트 ID", required = true) Long id,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable
     );
+
+    @Operation(summary = "지역별 프로젝트 밀도 순위 조회", description = "지역별 프로젝트 밀도 순위를 조회할 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "지역별 프로젝트 밀도 순위 조회 성공",
+            content = @Content(schema = @Schema(implementation = ProjectDensityRankRes.class))),
+    })
+    ResponseEntity<ProjectDensityRankRes> getDensityRankProjects();
 }
