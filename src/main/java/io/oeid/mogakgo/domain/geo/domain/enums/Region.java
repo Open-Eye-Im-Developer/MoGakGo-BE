@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.geo.domain.enums;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -45,6 +46,14 @@ public enum Region {
             }
         }
         return null;
+    }
+
+    public static List<Region> getDefaultDensityRank() {
+        return List.of(
+            JONGRO, JUNG, YONGSAN, SEONGDONG, KWANGJIN, DONGDAEMUN, JUNGRANG, SEONGBUK, KANGBUK,
+            DOBONG, NOWON, EUNPYEONG, SEODAEMUN, MAPO, YANGCHUN, KANGSEO, GURO, GEUMCHUN,
+            YOUNGDEUNGPO, DONGJAK, KWANAK, SEOCHO, KANGNAM, SONGPA, KANGDONG
+        );
     }
 
 }

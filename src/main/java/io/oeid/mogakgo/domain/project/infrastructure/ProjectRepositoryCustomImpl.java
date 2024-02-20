@@ -10,9 +10,9 @@ import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.domain.entity.ProjectTag;
+import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.MeetingInfoResponse;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
-import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
@@ -72,6 +72,17 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
         return CursorPaginationResult.fromDataWithExtraItemForNextCheck(
             result, pageable.getPageSize()
         );
+    }
+
+    @Override
+    public List<Region> getDensityRankProjectsByRegion(int limit) {
+        return jpaQueryFactory.select(project.creatorInfo.region)
+            .from(project)
+            .groupBy(project.creatorInfo.region)
+            .having(project.creatorInfo.region.count().gt(0L))
+            .orderBy(project.creatorInfo.region.count().desc())
+            .limit(limit)
+            .fetch();
     }
 
     private BooleanExpression cursorIdCondition(Long cursorId) {
