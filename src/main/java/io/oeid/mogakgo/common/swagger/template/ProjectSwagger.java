@@ -159,7 +159,7 @@ public interface ProjectSwagger {
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(name = "E050201", value = SwaggerProjectErrorExamples.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION)))
+                examples = @ExampleObject(name = "E030101", value = SwaggerProjectErrorExamples.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION)))
     })
     @Parameters({
         @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),
