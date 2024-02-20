@@ -2,8 +2,11 @@ package io.oeid.mogakgo.common.swagger.template;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.notification.presentation.dto.req.FCMTokenApiRequest;
+import io.oeid.mogakgo.domain.notification.presentation.dto.res.NotificationPublicApiRes;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,4 +32,18 @@ public interface NotificationSwagger {
     )
     ResponseEntity<Void> manageFCMToken(@Parameter(hidden = true) Long userId,
         FCMTokenApiRequest request);
+
+    @Operation(summary = "알림 조회", description = "회원의 알림을 조회할 때 사용하는 API")
+    @ApiResponse(responseCode = "200", description = "알림 조회 성공",
+        content = @Content(schema = @Schema(implementation = NotificationPublicApiRes.class)))
+    @ApiResponse(responseCode = "404", description = "요청한 유저가 존재하지 않음", content = @Content(
+        mediaType = APPLICATION_JSON_VALUE,
+        schema = @Schema(implementation = ErrorResponse.class),
+        examples = {
+            @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
+        })
+    )
+    ResponseEntity<CursorPaginationResult<NotificationPublicApiRes>> getByUserId(
+        @Parameter(hidden = true) Long id,
+        CursorPaginationInfoReq pageable);
 }

@@ -43,6 +43,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         authentication = new JwtAuthenticationToken(oAuth2User, null,
             oAuth2User.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        response.sendRedirect("/oauth/login/success");
+        response.sendRedirect("/oauth2/login/success");
     }
 }
