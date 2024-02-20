@@ -26,7 +26,7 @@ public interface ProfileCardLikeSwagger {
     @Operation(summary = "관심 있는 프로필 카드에 대해 찔러보기 요청 생성", description = "사용자가 관심 있는 프로필 카드에 찔러보기 요청을 보낼 때 사용하는 API")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "찔러보기 요청 생성 성공",
-            content = @Content(schema = @Schema(implementation = UserProfileLikeCreateAPIReq.class))),
+            content = @Content(schema = @Schema(implementation = UserProfileLikeCreateAPIRes.class))),
         @ApiResponse(responseCode = "400", description = "요청한 데이터가 유효하지 않음",
             content = @Content(
                 mediaType = "application/json",
@@ -57,7 +57,7 @@ public interface ProfileCardLikeSwagger {
     @Operation(summary = "사용자가 받은 찔러보기 요청 수 조회", description = "사용자가 자신이 받은 찔러보기 요청 수를 조회할 때 사용하는 API")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "찔러보기 요청 수 조회 성공",
-            content = @Content(schema = @Schema(implementation = UserProfileLikeInfoAPIRes.class))),
+            content = @Content(schema = @Schema(implementation = UserProfileLikeAPIRes.class))),
         @ApiResponse(responseCode = "403", description = "본인이 아닌 프로필 카드에 대한 찔러보기 요청 권한이 없음",
             content = @Content(
                 mediaType = "application/json",
