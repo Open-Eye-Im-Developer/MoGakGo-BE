@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class OAuth2Controller implements OAuth2Swagger {
 
     private final String serverUrl;
-    private final String loginRedirectUrl;
+    private final String clientUrl;
 
     public OAuth2Controller(@Value("${auth.server-url}") String serverUrl,
-        @Value("${auth.login-redirect-url}") String loginRedirectUrl) {
+        @Value("${auth.client-url}") String clientUrl) {
         this.serverUrl = serverUrl;
-        this.loginRedirectUrl = loginRedirectUrl;
+        this.clientUrl = clientUrl;
     }
 
     @GetMapping("/login/success")
@@ -36,8 +36,8 @@ public class OAuth2Controller implements OAuth2Swagger {
         String refreshToken = oAuth2User.getAttributes().get("refreshToken").toString();
         int refreshTokenExpireTime = (int) oAuth2User.getAttributes().get("refreshTokenExpireTime");
         setCookie(refreshToken, refreshTokenExpireTime, response);
-        response.sendRedirect(
-            loginRedirectUrl + "?accessToken=" + accessToken + "&signUpComplete=" + signUpComplete);
+        String redirectUrl = signUpComplete ? clientUrl : clientUrl + "/signup";
+        response.sendRedirect(redirectUrl + "?accessToken=" + accessToken);
     }
 
     @GetMapping("/login")
