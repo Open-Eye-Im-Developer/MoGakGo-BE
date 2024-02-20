@@ -36,6 +36,10 @@ public class CursorPaginationResult<T> {
         this.size = size;
     }
 
+    public void setData(List<T> data) {
+        this.data = data;
+    }
+
     public static <T> CursorPaginationResult<T> fromDataWithExtraItemForNextCheck(
         List<T> data, Integer size
     ) {
