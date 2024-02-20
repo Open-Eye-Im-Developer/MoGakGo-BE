@@ -13,14 +13,15 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.application.GeoService;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
-import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.geo.exception.GeoException;
-import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
+import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDensityRankRes;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequestJpaRepository;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
@@ -28,6 +29,7 @@ import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
 import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class ProjectService {
+    private static final int DENSITY_RANK_LIMIT = 3;
 
     private final UserJpaRepository userJpaRepository;
     private final ProjectJpaRepository projectJpaRepository;
@@ -145,6 +148,27 @@ public class ProjectService {
         // 요청할 때마다 랜덤 정렬
         Collections.shuffle(projects.getData());
         return projects;
+    }
+
+    public ProjectDensityRankRes getDensityRankProjects() {
+        List<Region> regionRankList = projectJpaRepository.getDensityRankProjectsByRegion(DENSITY_RANK_LIMIT);
+
+        // 필요한 경우 기본 지역 순위 목록으로 채움
+        fillWithDefaultRegionsIfNecessary(regionRankList);
+
+        return new ProjectDensityRankRes(regionRankList);
+    }
+
+    private void fillWithDefaultRegionsIfNecessary(List<Region> regionRankList) {
+        if (regionRankList.size() < DENSITY_RANK_LIMIT) {
+            // 기본 지역 순위에서 이미 리스트에 있는 지역을 제외하고 남은 지역을 추가
+            List<Region> defaultRegionsToAdd = Region.getDefaultDensityRank().stream()
+                .filter(region -> !regionRankList.contains(region))
+                .limit(DENSITY_RANK_LIMIT - regionRankList.size())
+                .toList();
+
+            regionRankList.addAll(defaultRegionsToAdd);
+        }
     }
 
     private User getUser(Long userId) {
