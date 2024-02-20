@@ -44,7 +44,7 @@ public class ProfileCardLikeService {
     }
 
     // 나의 찔러보기 요청 수 조회
-    public Long getLikeCountSenderProfileCard(Long userId, Long id) {
+    public Long getReceivedLikeCountForProfileCard(Long userId, Long id) {
         User tokenUser = validateToken(userId);
         validateSendor(tokenUser, userId);
 
@@ -52,7 +52,7 @@ public class ProfileCardLikeService {
     }
 
     // 내가 보낸 찔러보기 요청 수 조회
-    public Long getLikeCountReceiverProfileCard(Long userId, Long id) {
+    public Long getSentLikeCountForProfileCard(Long userId, Long id) {
         User tokenUser = validateToken(userId);
         validateSendor(tokenUser, userId);
 

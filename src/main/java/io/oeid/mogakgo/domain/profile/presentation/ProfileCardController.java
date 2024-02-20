@@ -3,6 +3,7 @@ package io.oeid.mogakgo.domain.profile.presentation;
 import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.common.swagger.template.ProfileCardLikeSwagger;
 import io.oeid.mogakgo.common.swagger.template.ProfileCardSwagger;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.profile.application.ProfileCardLikeService;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/profiles")
 @RequiredArgsConstructor
-public class ProfileCardController implements ProfileCardSwagger {
+public class ProfileCardController implements ProfileCardSwagger, ProfileCardLikeSwagger {
 
     private final ProfileCardService profileCardService;
     private final ProfileCardLikeService profileCardLikeService;
@@ -49,20 +50,20 @@ public class ProfileCardController implements ProfileCardSwagger {
     }
 
     // 사용자가 받은 '찔러보기' 요청 수 조회 API
-    @GetMapping("/{id}/like")
+    @GetMapping("/{id}/receive/like")
     public ResponseEntity<UserProfileLikeAPIRes> getProfileLikeCountByReceiver(
         @UserId Long userId, @PathVariable Long id
     ) {
-        Long likeCount = profileCardLikeService.getLikeCountSenderProfileCard(userId, id);
+        Long likeCount = profileCardLikeService.getReceivedLikeCountForProfileCard(userId, id);
         return ResponseEntity.ok().body(UserProfileLikeAPIRes.from(id, likeCount));
     }
 
     // 사용자가 보낸 '찔러보기' 요청 수 조회 API
-    @GetMapping("/{id}/likes")
+    @GetMapping("/{id}/send/like")
     public ResponseEntity<UserProfileLikeAPIRes> getProfileLikeCountBySender(
         @UserId Long userId, @PathVariable Long id
     ) {
-        Long likeCount = profileCardLikeService.getLikeCountReceiverProfileCard(userId, id);
+        Long likeCount = profileCardLikeService.getSentLikeCountForProfileCard(userId, id);
         return ResponseEntity.ok().body(UserProfileLikeAPIRes.from(id, likeCount));
     }
 
