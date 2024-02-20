@@ -9,6 +9,7 @@ public enum ErrorCode404 implements ErrorCode {
     PROJECT_NOT_FOUND("E030301", "해당 프로젝트가 존재하지 않습니다."),
     NOTIFICATION_FCM_TOKEN_NOT_FOUND("E060301", "해당 유저의 FCM 토큰이 존재하지 않습니다."),
     PROJECT_JOIN_REQUEST_NOT_FOUND("E050301", "해당 프로젝트 참여 요청이 존재하지 않습니다."),
+    MATCHING_NOT_FOUND("E090301", "해당 매칭이 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.NOT_FOUND;
