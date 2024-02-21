@@ -1,10 +1,10 @@
 package io.oeid.mogakgo.domain.auth.oauth;
 
+import io.oeid.mogakgo.domain.auth.application.AuthUserService;
 import io.oeid.mogakgo.domain.auth.jwt.JwtAuthenticationToken;
 import io.oeid.mogakgo.domain.auth.jwt.JwtHelper;
 import io.oeid.mogakgo.domain.auth.jwt.JwtRedisDao;
 import io.oeid.mogakgo.domain.auth.jwt.JwtToken;
-import io.oeid.mogakgo.domain.user.application.UserOAuth2Service;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserOAuth2Response;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +29,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final JwtHelper jwtHelper;
     private final JwtRedisDao jwtRedisDao;
-    private final UserOAuth2Service userOAuth2Service;
+    private final AuthUserService authUserService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -56,7 +56,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         String avatarUrl = oAuth2User.getAttribute("avatar_url");
         String githubUrl = oAuth2User.getAttribute("html_url");
         String repositoryUrl = oAuth2User.getAttribute("repos_url");
-        return userOAuth2Service.manageOAuth2User(githubPk, githubId, avatarUrl, githubUrl,
+        return authUserService.manageOAuth2User(githubPk, githubId, avatarUrl, githubUrl,
             repositoryUrl);
     }
 

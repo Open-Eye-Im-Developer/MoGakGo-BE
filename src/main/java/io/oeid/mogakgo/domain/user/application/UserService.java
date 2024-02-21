@@ -4,11 +4,14 @@ import io.oeid.mogakgo.domain.user.application.dto.req.UserSignUpRequest;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserProfileResponse;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserSignUpResponse;
 import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
 import io.oeid.mogakgo.domain.user.domain.enums.DevelopLanguage;
 import io.oeid.mogakgo.domain.user.domain.enums.WantedJob;
 import io.oeid.mogakgo.domain.user.exception.UserException;
+import io.oeid.mogakgo.domain.user.infrastructure.UserDevelopLanguageTagJpaRepository;
 import io.oeid.mogakgo.domain.user.infrastructure.UserWantedJobTagJpaRepository;
+import io.oeid.mogakgo.domain.user.util.UserGithubUtil;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import java.util.HashSet;
 import java.util.List;
@@ -24,6 +27,8 @@ public class UserService {
 
     private final UserCommonService userCommonService;
     private final UserWantedJobTagJpaRepository userWantedJobTagRepository;
+    private final UserDevelopLanguageTagJpaRepository userDevelopLanguageTagRepository;
+    private final UserGithubUtil userGithubUtil;
 
     @Transactional
     public UserSignUpResponse userSignUp(UserSignUpRequest userSignUpRequest) {
@@ -38,6 +43,21 @@ public class UserService {
         }
         user.signUpComplete();
         return UserSignUpResponse.from(user);
+    }
+
+    @Transactional
+    public void updateUserDevelopLanguages(long userId) {
+        User user = userCommonService.getUserById(userId);
+        user.deleteAllDevelopLanguageTags();
+        var languages = userGithubUtil.updateUserDevelopLanguage(user.getRepositoryUrl());
+        languages.forEach((key, value) -> {
+            UserDevelopLanguageTag developLanguageTag = UserDevelopLanguageTag.builder()
+                .user(user)
+                .developLanguage(DevelopLanguage.of(key))
+                .byteSize(value)
+                .build();
+            userDevelopLanguageTagRepository.save(developLanguageTag);
+        });
     }
 
     public UserProfileResponse getUserProfile(Long userId) {
