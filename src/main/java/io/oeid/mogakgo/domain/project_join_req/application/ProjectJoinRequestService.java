@@ -22,8 +22,8 @@ import io.oeid.mogakgo.domain.project_join_req.application.dto.req.ProjectJoinCr
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequestJpaRepository;
-import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestDetailAPIRes;
+import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
@@ -86,6 +86,11 @@ public class ProjectJoinRequestService {
         // 매칭 생성
         Long matchingId = matchingService.create(projectJoinRequest);
         //----
+
+        // 프로젝트에 대한 요청들 수락 되지 않은 것들 다 거절 처리
+        // 비동기 가능
+        projectJoinRequestRepository.rejectNoAcceptedByProjectId(
+            projectJoinRequest.getProject().getId(), projectJoinRequest.getId());
 
         // 내가 보낸 대기 중 요청이 있으면 취소 처리
         // 여기서 나는 에러는 클라와 상관이 없으므로 에러가 발생해도 넘어갈 수 있게 처리.

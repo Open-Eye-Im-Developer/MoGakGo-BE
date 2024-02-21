@@ -14,7 +14,6 @@ public interface ProjectJoinRequestJpaRepository extends JpaRepository<ProjectJo
     @Query("select pjr from ProjectJoinRequest pjr where pjr.id = :id")
     Optional<ProjectJoinRequest> findByIdWithProject(Long id);
 
-
     @Query("select pjr from ProjectJoinRequest pjr where pjr.sender.id = :senderId and pjr.requestStatus = 'PENDING'")
     Optional<ProjectJoinRequest> findPendingBySenderId(Long senderId);
 
@@ -25,7 +24,13 @@ public interface ProjectJoinRequestJpaRepository extends JpaRepository<ProjectJo
     Optional<ProjectJoinRequest> findAlreadyExistsAnotherJoinReq(Long userId);
 
     @Modifying
+    @Query("update ProjectJoinRequest pjr set pjr.requestStatus = 'REJECTED' "
+        + "where pjr.project.id = :projectId and pjr.id != :acceptedRequestId and pjr.requestStatus = 'PENDING'")
+    int rejectNoAcceptedByProjectId(Long projectId, Long acceptedRequestId);
+
+    @Modifying
     @Query("update ProjectJoinRequest pjr set pjr.requestStatus = 'REJECTED' where pjr.project.id = :projectId and pjr.requestStatus = 'PENDING'")
     int rejectAllByProjectId(Long projectId);
+
 
 }
