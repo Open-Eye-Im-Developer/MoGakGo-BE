@@ -51,7 +51,7 @@ public class ProjectJoinRequestService {
         User tokenUser = validateToken(userId);
         validateSender(tokenUser, request.getSenderId());
         Project project = validateProjectExist(request.getProjectId());
-        validateProjectStatus(project.getProjectStatus());
+        validateProjectStatus(project.getProjectStatus()); // 요청을 보내려는 프로젝트가 대기중이 맞는지 검사
         validateProjectCreator(project, userId);
         validateUserCertRegion(project, tokenUser);
         validateAlreadyExistRequest(userId, project.getId());
