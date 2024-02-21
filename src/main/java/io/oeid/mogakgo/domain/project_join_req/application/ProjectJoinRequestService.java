@@ -27,6 +27,7 @@ import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -154,7 +155,7 @@ public class ProjectJoinRequestService {
     }
 
     private void validateUserCertRegion(Project project, User tokenUser) {
-        if (!tokenUser.getRegion().equals(project.getCreatorInfo().getRegion())) {
+        if (!Objects.equals(project.getCreatorInfo().getRegion(), tokenUser.getRegion())) {
             throw new ProjectJoinRequestException(INVALID_PROJECT_JOIN_REQUEST_REGION);
         }
     }
