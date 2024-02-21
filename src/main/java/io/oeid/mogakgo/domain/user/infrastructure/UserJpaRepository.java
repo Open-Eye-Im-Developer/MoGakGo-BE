@@ -14,5 +14,6 @@ public interface UserJpaRepository extends JpaRepository<User, Long> {
     @Query("select u from User u where u.id = :id and u.deletedAt is null")
     Optional<User> findById(Long id);
 
+    @Query("select u from User u where u.githubPk = :githubPk and u.deletedAt is null")
     Optional<User> findByGithubPk(Long githubPk);
 }
