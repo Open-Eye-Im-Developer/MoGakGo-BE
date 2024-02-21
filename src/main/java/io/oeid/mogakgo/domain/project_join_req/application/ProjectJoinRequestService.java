@@ -10,12 +10,14 @@ import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_JOIN_REQUEST_F
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_JOIN_REQUEST_NOT_FOUND;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_NOT_FOUND;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
+import io.oeid.mogakgo.exception.code.ErrorCode400;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
+import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project_join_req.application.dto.req.ProjectJoinCreateReq;
@@ -50,6 +52,7 @@ public class ProjectJoinRequestService {
         User tokenUser = validateToken(userId);
         validateSender(tokenUser, request.getSenderId());
         Project project = validateProjectExist(request.getProjectId());
+        validateProjectStatus(project.getProjectStatus()); // 요청을 보내려는 프로젝트가 대기중이 맞는지 검사
         validateProjectCreator(project, userId);
         validateUserCertRegion(project, tokenUser);
         validateAlreadyExistRequest(userId, project.getId());
@@ -140,6 +143,12 @@ public class ProjectJoinRequestService {
     private Project validateProjectExist(Long projectId) {
         return projectRepository.findById(projectId)
             .orElseThrow(() -> new ProjectException(PROJECT_NOT_FOUND));
+    }
+
+    private void validateProjectStatus(ProjectStatus projectStatus) {
+        if (!projectStatus.equals(ProjectStatus.PENDING)) {
+            throw new ProjectJoinRequestException(ErrorCode400.INVALID_PROJECT_STATUS_TO_ACCEPT);
+        }
     }
 
     private void validateProjectCreator(Project project, Long userId) {
