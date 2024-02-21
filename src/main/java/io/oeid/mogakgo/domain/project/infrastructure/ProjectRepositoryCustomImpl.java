@@ -16,6 +16,7 @@ import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -30,6 +31,8 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     public CursorPaginationResult<ProjectDetailAPIRes> findByConditionWithPagination(
         Long userId, Region region, ProjectStatus projectStatus, CursorPaginationInfoReq pageable
     ) {
+        LocalDate today = LocalDate.now();
+
         List<Project> entities = jpaQueryFactory.selectFrom(project)
             .innerJoin(project.creator, user)
             .on(project.creator.id.eq(user.id))
@@ -38,7 +41,8 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                 cursorIdCondition(pageable.getCursorId()),
                 userIdEq(userId),
                 regionEq(region),
-                projectStatusEq(projectStatus)
+                projectStatusEq(projectStatus),
+                createdAtEq(today)
             )
             .limit(pageable.getPageSize() + 1)
             .fetch();
@@ -99,5 +103,11 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
 
     private BooleanExpression projectStatusEq(ProjectStatus projectStatus) {
         return projectStatus != null ? project.projectStatus.eq(projectStatus) : null;
+    }
+
+    private BooleanExpression createdAtEq(LocalDate today) {
+        return project.createdAt.year().eq(today.getYear())
+            .and(project.createdAt.month().eq(today.getMonthValue()))
+            .and(project.createdAt.dayOfMonth().eq(today.getDayOfMonth()));
     }
 }
