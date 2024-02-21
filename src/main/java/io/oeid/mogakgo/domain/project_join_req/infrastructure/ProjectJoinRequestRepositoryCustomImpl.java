@@ -1,9 +1,7 @@
 package io.oeid.mogakgo.domain.project_join_req.infrastructure;
 
-import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
 import static io.oeid.mogakgo.domain.project_join_req.domain.entity.QProjectJoinRequest.projectJoinRequest;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
@@ -82,20 +80,7 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
     public CursorPaginationResult<ProjectJoinRequestDetailAPIRes> getBySenderIdWithPagination(
         Long senderId, Long projectId, RequestStatus requestStatus, CursorPaginationInfoReq pageable
     ) {
-        List<ProjectJoinRequestDetailAPIRes> result = jpaQueryFactory.select(
-                Projections.constructor(
-                    ProjectJoinRequestDetailAPIRes.class,
-                    projectJoinRequest.project.id,
-                    projectJoinRequest.project.creator.avatarUrl,
-                    Projections.constructor(
-                        MeetingInfoResponse.class,
-                        projectJoinRequest.project.meetingInfo.meetStartTime,
-                        projectJoinRequest.project.meetingInfo.meetEndTime,
-                        projectJoinRequest.project.meetingInfo.meetDetail
-                    ))
-            )
-            .from(projectJoinRequest)
-            .innerJoin(project).on(projectJoinRequest.project.id.eq(projectId))
+        List<ProjectJoinRequest> entities = jpaQueryFactory.selectFrom(projectJoinRequest)
             .where(
                 cursorIdCondition(pageable.getCursorId()),
                 senderIdEq(senderId),
@@ -104,6 +89,19 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
             )
             .limit(pageable.getPageSize() + 1)
             .fetch();
+
+        List<ProjectJoinRequestDetailAPIRes> result = entities.stream().map(
+            projectJoinRequest -> new ProjectJoinRequestDetailAPIRes(
+                    projectJoinRequest.getProject().getId(),
+                    projectJoinRequest.getProject().getProjectStatus(),
+                    projectJoinRequest.getProject().getCreator().getAvatarUrl(),
+                    new MeetingInfoResponse(
+                        projectJoinRequest.getProject().getMeetingInfo().getMeetStartTime(),
+                        projectJoinRequest.getProject().getMeetingInfo().getMeetEndTime(),
+                        projectJoinRequest.getProject().getMeetingInfo().getMeetDetail()
+                    )
+                )
+        ).toList();
 
         return CursorPaginationResult.fromDataWithExtraItemForNextCheck(
             result, pageable.getPageSize()
