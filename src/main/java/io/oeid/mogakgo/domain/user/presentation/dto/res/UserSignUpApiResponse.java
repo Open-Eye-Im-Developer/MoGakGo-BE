@@ -22,8 +22,6 @@ public class UserSignUpApiResponse {
     private String avatarUrl;
     @Schema(description = "깃허브 URL", example = "https://github.com/tidavid1")
     private String githubUrl;
-    @Schema(description = "개발 언어", example = "[\"JAVA\", \"KOTLIN\"]")
-    private List<String> developLanguages;
     @Schema(description = "희망 직무", example = "[\"BACKEND\", \"FRONTEND\"]")
     private List<String> wantedJobs;
 
@@ -34,7 +32,6 @@ public class UserSignUpApiResponse {
             response.getGithubId(),
             response.getAvatarUrl(),
             response.getGithubUrl(),
-            response.getDevelopLanguages().stream().map(Enum::name).toList(),
             response.getWantedJobs().stream().map(Enum::name).toList()
         );
     }

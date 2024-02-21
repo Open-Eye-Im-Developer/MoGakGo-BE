@@ -66,7 +66,7 @@ public class User {
     private String repositoryUrl;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @OrderBy("byteSize ASC")
+    @OrderBy("byteSize DESC")
     private final List<UserDevelopLanguageTag> userDevelopLanguageTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

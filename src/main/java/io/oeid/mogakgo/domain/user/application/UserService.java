@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.user.application;
 
 import io.oeid.mogakgo.domain.user.application.dto.req.UserSignUpRequest;
+import io.oeid.mogakgo.domain.user.application.dto.res.UserDevelopLanguageRes;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserProfileResponse;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserSignUpResponse;
 import io.oeid.mogakgo.domain.user.domain.User;
@@ -13,6 +14,7 @@ import io.oeid.mogakgo.domain.user.infrastructure.UserDevelopLanguageTagJpaRepos
 import io.oeid.mogakgo.domain.user.infrastructure.UserWantedJobTagJpaRepository;
 import io.oeid.mogakgo.domain.user.util.UserGithubUtil;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +48,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserDevelopLanguages(long userId) {
+    public List<UserDevelopLanguageRes> updateUserDevelopLanguages(long userId) {
         User user = userCommonService.getUserById(userId);
         user.deleteAllDevelopLanguageTags();
         var languages = userGithubUtil.updateUserDevelopLanguage(user.getRepositoryUrl());
@@ -58,6 +60,11 @@ public class UserService {
                 .build();
             userDevelopLanguageTagRepository.save(developLanguageTag);
         });
+        List<UserDevelopLanguageRes> response = new ArrayList<>();
+        for (var developLanguage : user.getUserDevelopLanguageTags()) {
+            response.add(UserDevelopLanguageRes.from(developLanguage));
+        }
+        return response;
     }
 
     public UserProfileResponse getUserProfile(Long userId) {
