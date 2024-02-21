@@ -6,7 +6,6 @@ import io.oeid.mogakgo.domain.auth.jwt.JwtAuthenticationFilter;
 import io.oeid.mogakgo.domain.auth.oauth.GithubOAuth2UserService;
 import io.oeid.mogakgo.domain.auth.oauth.OAuth2AuthenticationSuccessHandler;
 import java.util.Arrays;
-import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
