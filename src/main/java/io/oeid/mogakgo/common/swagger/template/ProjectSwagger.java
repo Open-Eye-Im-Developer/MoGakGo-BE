@@ -1,6 +1,5 @@
 package io.oeid.mogakgo.common.swagger.template;
 
-import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerGeoErrorExamples;
@@ -22,9 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Tag(name = "Project Card", description = "프로젝트 카드 관련 API")
 @SuppressWarnings("unused")
@@ -163,7 +160,7 @@ public interface ProjectSwagger {
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponse.class),
-                examples = @ExampleObject(name = "E050201", value = SwaggerProjectErrorExamples.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION)))
+                examples = @ExampleObject(name = "E030101", value = SwaggerProjectErrorExamples.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION)))
     })
     @Parameters({
         @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),

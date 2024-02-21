@@ -2,7 +2,6 @@ package io.oeid.mogakgo.domain.project_join_req.application.dto.req;
 
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
-import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

@@ -35,6 +35,10 @@ public class ProfileCard {
     @Column(name = "total_like_amount", nullable = false)
     private Long totalLikeAmount;
 
+    public void addLike() {
+        this.totalLikeAmount += 1;
+    }
+
     @Builder
     private ProfileCard(User user) {
         this.user = user;

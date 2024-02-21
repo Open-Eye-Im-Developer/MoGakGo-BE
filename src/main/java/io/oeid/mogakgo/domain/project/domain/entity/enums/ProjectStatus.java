@@ -7,7 +7,6 @@ import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_PROJECT_STATUS
 
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
-import io.oeid.mogakgo.exception.code.ErrorCode;
 import lombok.Getter;
 
 @Getter

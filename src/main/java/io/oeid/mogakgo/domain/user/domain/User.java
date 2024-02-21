@@ -1,5 +1,7 @@
 package io.oeid.mogakgo.domain.user.domain;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_COUNT_IS_ZERO;
+
 import io.oeid.mogakgo.domain.achievement.domain.Achievement;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
@@ -59,7 +61,6 @@ public class User {
 
     @Column(name = "github_url")
     private String githubUrl;
-
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -146,22 +147,37 @@ public class User {
     }
 
     public void updateUsername(String username) {
-        if(username == null || username.isBlank()){
+        if (username == null || username.isBlank()) {
             throw new UserException(ErrorCode400.USERNAME_SHOULD_BE_NOT_EMPTY);
         }
         this.username = username;
     }
 
-    public void delete(){
+    public void decreaseAvailableLikeCount() {
+        if (this.availableLikeCount <= 0) {
+            throw new UserException(USER_AVAILABLE_LIKE_COUNT_IS_ZERO);
+        }
+        this.availableLikeCount -= 1;
+    }
+
+    public void delete() {
         this.deletedAt = LocalDateTime.now();
     }
 
-    public void signUpComplete(){
+    public void deleteAllWantJobTags() {
+        this.userWantedJobTags.clear();
+    }
+
+    public void deleteAllDevelopLanguageTags() {
+        this.userDevelopLanguageTags.clear();
+    }
+
+    public void signUpComplete() {
         this.signupYn = true;
     }
 
     public void updateRegion(Region region) {
-        if(region == null){
+        if (region == null) {
             throw new UserException(ErrorCode400.USER_REGION_SHOULD_BE_NOT_EMPTY);
         }
         this.region = region;
