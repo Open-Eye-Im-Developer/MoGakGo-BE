@@ -13,6 +13,7 @@ import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinR
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -95,8 +96,7 @@ public interface ProjectJoinReqSwagger {
 
     @Operation(summary = "사용자의 프로젝트 요청 리스트 조회", description = "회원이 자신이 보낸 프로젝트 요청 리스트를 조회할 때 사용하는 API")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "프로젝트 요청 리스트 조회 성공",
-            content = @Content(schema = @Schema(implementation = ProjectJoinRequestDetailAPIRes.class))),
+        @ApiResponse(responseCode = "200", description = "프로젝트 요청 리스트 조회 성공"),
         @ApiResponse(responseCode = "403", description = "본인의 프로젝트 요청만 조회할 수 있음",
             content = @Content(
                 mediaType = "application/json",
@@ -108,6 +108,11 @@ public interface ProjectJoinReqSwagger {
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponse.class),
                 examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)))
+    })
+    @Parameters({
+        @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),
+        @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
+        @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
     })
     ResponseEntity<CursorPaginationResult<ProjectJoinRequestDetailAPIRes>> getBySenderIdWithPagination(
         @Parameter(hidden = true) Long userId,
