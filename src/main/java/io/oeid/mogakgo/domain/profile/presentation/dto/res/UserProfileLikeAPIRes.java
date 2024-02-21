@@ -8,11 +8,11 @@ import lombok.Getter;
 @Getter
 public class UserProfileLikeAPIRes {
 
-    @Schema
+    @Schema(description = "'찔러보기' 요청을 보내는 사용자 ID")
     @NotNull
     private final Long userId;
 
-    @Schema
+    @Schema(description = "사용자가 받은 '찔러보기' 요청 수")
     @NotNull
     private final Long likeCount;
 
