@@ -29,6 +29,8 @@ public enum ErrorCode400 implements ErrorCode {
     USER_WANTED_JOB_BAD_REQUEST("E020102", "희망 직무는 3개까지만 등록 가능합니다."),
     USERNAME_SHOULD_BE_NOT_EMPTY("E020103", "유저 이름은 비어있을 수 없습니다."),
     USER_REGION_SHOULD_BE_NOT_EMPTY("E020104", "유저 지역은 비어있을 수 없습니다."),
+    USER_WANTED_JOB_DUPLICATE("E020105", "중복된 희망 직무가 있습니다."),
+    USER_DEVELOP_LANGUAGE_DUPLICATE("E020106", "중복된 개발 언어가 있습니다."),
     USER_ID_NOT_NULL("E020001", "유저 아이디는 필수값입니다."),
 
     INVALID_PROJECT_STATUS_TO_ACCEPT("E050101", "프로젝트가 대기중이 아니여서 참여 요청을 수락할 수 없습니다."),
@@ -40,6 +42,7 @@ public enum ErrorCode400 implements ErrorCode {
     PROJECT_JOIN_REQUEST_ALREADY_EXIST("E090101", "이미 매칭 요청을 전송한 프로젝트에 매칭 요청을 생성할 수 없습니다."),
     INVALID_PROJECT_JOIN_REQUEST_REGION("E090102", "동네 인증한 구역에서만 프로젝트 매칭 요청을 생성할 수 있습니다."),
     PROJECT_JOIN_REQUEST_SHOULD_BE_ONLY_ONE("E090103", "프로젝트 매칭 요청은 한 번에 한 개만 전송할 수 있습니다."),
+    INVALID_CREATOR_PROJECT_JOIN_REQUEST("E090104", "프로젝트 생성자는 해당 프로젝트에 매칭 요청을 전송할 수 없습니다."),
 
     MATCHING_CANCEL_NOT_ALLOWED("E090101", "이미 종료되거나 취소된 매칭은 취소할 수 없습니다."),
 

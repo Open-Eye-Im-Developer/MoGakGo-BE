@@ -28,4 +28,9 @@ public interface ProjectJoinRequestJpaRepository extends JpaRepository<ProjectJo
         + "where pjr.project.id = :projectId and pjr.id != :acceptedRequestId and pjr.requestStatus = 'PENDING'")
     int rejectNoAcceptedByProjectId(Long projectId, Long acceptedRequestId);
 
+    @Modifying
+    @Query("update ProjectJoinRequest pjr set pjr.requestStatus = 'REJECTED' where pjr.project.id = :projectId and pjr.requestStatus = 'PENDING'")
+    int rejectAllByProjectId(Long projectId);
+
+
 }

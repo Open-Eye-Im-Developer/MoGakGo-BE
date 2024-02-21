@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.project_join_req.application;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_CREATOR_PROJECT_JOIN_REQUEST;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_MATCHING_USER_TO_ACCEPT;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_PROJECT_JOIN_REQUEST_REGION;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SENDER_TO_ACCEPT;
@@ -142,7 +143,7 @@ public class ProjectJoinRequestService {
 
     private void validateProjectCreator(Project project, Long userId) {
         if (project.getCreator().getId().equals(userId)) {
-            throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION);
+            throw new ProjectJoinRequestException(INVALID_CREATOR_PROJECT_JOIN_REQUEST);
         }
     }
 
