@@ -5,14 +5,23 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class UserGithubUtil {
 
+    private final String accessToken;
+
+    public UserGithubUtil(@Value("${auth.github-access-token}") String accessToken) {
+        this.accessToken = accessToken;
+    }
+
     public Map<String, Integer> updateUserDevelopLanguage(String repositoryUrl) {
-        WebClient webClient = WebClient.create(repositoryUrl);
+        WebClient webClient = WebClient.builder()
+            .defaultHeader("Authorization", "Bearer " + accessToken)
+            .baseUrl(repositoryUrl).build();
         Map<String, Integer> languageMap = new HashMap<>();
         List<Object> response = webClient.get().retrieve().bodyToMono(List.class).block();
         if (response == null) {
@@ -20,7 +29,9 @@ public class UserGithubUtil {
         }
         response.forEach(o -> {
             Map<String, Object> json = (Map<String, Object>) o;
-            var languageWebClient = WebClient.create((String) json.get("languages_url"));
+            var languageWebClient = WebClient.builder()
+                .defaultHeader("Authorization", "Bearer " + accessToken)
+                .baseUrl((String) json.get("languages_url")).build();
             Map<String, Integer> languages = languageWebClient.get().retrieve()
                 .bodyToMono(Map.class).block();
             if (languages == null) {
