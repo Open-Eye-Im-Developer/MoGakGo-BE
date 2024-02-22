@@ -2,7 +2,6 @@ package io.oeid.mogakgo.domain.auth.presentation;
 
 import io.oeid.mogakgo.common.swagger.template.OAuth2Swagger;
 import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthLoginUrlResponse;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +33,8 @@ public class OAuth2Controller implements OAuth2Swagger {
         String accessToken = oAuth2User.getAttributes().get("accessToken").toString();
         boolean signUpComplete = (boolean) oAuth2User.getAttributes().get("signUpComplete");
         String refreshToken = oAuth2User.getAttributes().get("refreshToken").toString();
-        int refreshTokenExpireTime = (int) oAuth2User.getAttributes().get("refreshTokenExpireTime");
-        setCookie(refreshToken, refreshTokenExpireTime, response);
         String redirectUrl = signUpComplete ? clientUrl : clientUrl + "/signup";
-        response.sendRedirect(redirectUrl + "?accessToken=" + accessToken);
+        response.sendRedirect(redirectUrl + "?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
     }
 
     @GetMapping("/login")
@@ -46,11 +43,4 @@ public class OAuth2Controller implements OAuth2Swagger {
             AuthLoginUrlResponse.from(serverUrl + "/oauth2/authorization/github"));
     }
 
-    private void setCookie(String refreshToken, int refreshTokenExpireTime,
-        HttpServletResponse response) {
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setMaxAge(refreshTokenExpireTime);
-        cookie.setPath("/");
-        response.addCookie(cookie);
-    }
 }
