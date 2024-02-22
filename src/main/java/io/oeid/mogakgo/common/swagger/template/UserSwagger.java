@@ -2,7 +2,6 @@ package io.oeid.mogakgo.common.swagger.template;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiRequest;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserDevelopLanguageApiRes;
@@ -72,8 +71,7 @@ public interface UserSwagger {
 
     @Operation(summary = "회원 개발 언어 조회", description = "회원의 주요 개발 언어를 조회할 때 사용하는 API")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "회원 개발 언어 조회 성공",
-            content = @Content(schema = @Schema(implementation = UserDevelopLanguageApiRes.class, type = "array"))),
+        @ApiResponse(responseCode = "200", description = "회원 개발 언어 조회 성공"),
         @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않음",
             content = @Content(
                 mediaType = APPLICATION_JSON_VALUE,
@@ -81,5 +79,5 @@ public interface UserSwagger {
                 examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND))),
     })
     ResponseEntity<List<UserDevelopLanguageApiRes>> userDevelopLanguageApi(
-        @UserId Long userId);
+        @Parameter(hidden = true) Long userId);
 }
