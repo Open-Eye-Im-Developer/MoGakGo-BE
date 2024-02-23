@@ -42,7 +42,8 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                 userIdEq(userId),
                 regionEq(region),
                 projectStatusEq(projectStatus),
-                createdAtEq(today)
+                createdAtEq(today),
+                deletedProjectEq()
             )
             .limit(pageable.getPageSize() + 1)
             .fetch();
@@ -109,5 +110,9 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
         return project.createdAt.year().eq(today.getYear())
             .and(project.createdAt.month().eq(today.getMonthValue()))
             .and(project.createdAt.dayOfMonth().eq(today.getDayOfMonth()));
+    }
+
+    private BooleanExpression deletedProjectEq() {
+        return project.deletedAt.isNull();
     }
 }
