@@ -32,7 +32,8 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
             .where(
                 cursorIdCondition(pageable.getCursorId()),
                 userIdEq(userId),
-                regionEq(region)
+                regionEq(region),
+                deletedProfileCardEq()
             )
             .limit(pageable.getPageSize() + 1)
             .fetch();
@@ -69,5 +70,9 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
 
     private BooleanExpression cursorIdCondition(Long cursorId) {
         return cursorId != null ? profileCard.id.gt(cursorId) : null;
+    }
+
+    private BooleanExpression deletedProfileCardEq() {
+        return profileCard.user.deletedAt.isNull();
     }
 }
