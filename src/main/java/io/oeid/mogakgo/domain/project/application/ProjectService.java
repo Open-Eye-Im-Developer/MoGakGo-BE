@@ -186,8 +186,7 @@ public class ProjectService {
     }
 
     private void validateMeetLocation(Double lat, Double lng, Region userRegion) {
-        Region reqArea = Region.getByAreaCode(
-            geoService.getAreaCodeAboutCoordinates(lng, lat));
+        Region reqArea = geoService.getRegionAboutCoordinates(lng, lat);
         if (userRegion != reqArea) {
             throw new ProjectException(NOT_MATCH_MEET_LOCATION);
         }
