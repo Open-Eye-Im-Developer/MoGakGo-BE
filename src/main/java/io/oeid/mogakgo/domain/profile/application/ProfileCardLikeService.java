@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.profile.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.PROFILE_CARD_LIKE_ALREADY_EXIST;
+import static io.oeid.mogakgo.exception.code.ErrorCode401.USER_ACCOUNT_DISABLED;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROFILE_CARD_LIKE_FORBIDDEN_OPERATION;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
@@ -13,6 +14,7 @@ import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileLikeInfoAP
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.application.UserProfileService;
 import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.domain.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +77,9 @@ public class ProfileCardLikeService {
     private void validateSendor(User tokenUser, Long userId) {
         if (!tokenUser.getId().equals(userId)) {
             throw new ProfileCardLikeException(PROFILE_CARD_LIKE_FORBIDDEN_OPERATION);
+        }
+        if (tokenUser.getDeletedAt() != null) {
+            throw new UserException(USER_ACCOUNT_DISABLED);
         }
     }
 
