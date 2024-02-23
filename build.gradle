@@ -54,6 +54,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux:3.1.8'
     // Spring Boot Data MongoDB
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb:3.1.8'
+    // Spring Boot WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket:3.1.8'
 
     // SpringBoot Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.8'
