@@ -41,6 +41,7 @@ public class ProfileCardService {
         return profiles;
     }
 
+    @Transactional
     public void increaseTotalLikeAmount(Long userId) {
         var profileCard = getProfileCard(userId);
         profileCard.addLike();
