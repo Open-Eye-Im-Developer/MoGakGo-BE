@@ -22,6 +22,7 @@ public class AuthController implements AuthSwagger {
     @PostMapping("/reissue")
     public ResponseEntity<AuthAccessTokenResponse> reissue(
         @RequestHeader("Authorization") String accessToken, @RequestBody AuthReissueRequest request) {
+        accessToken = accessToken.substring(7);
         var accessTokenDto = authService.reissue(accessToken, request.getRefreshToken());
         return ResponseEntity.ok(AuthAccessTokenResponse.of(accessTokenDto.getAccessToken(), null));
     }
