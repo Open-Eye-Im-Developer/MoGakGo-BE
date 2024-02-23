@@ -184,12 +184,19 @@ public class User {
         if (region == null) {
             throw new UserException(ErrorCode400.USER_REGION_SHOULD_BE_NOT_EMPTY);
         }
-        this.region = region;
-        this.regionAuthenticationAt = LocalDateTime.now();
+        // 사용자가 아직 동네 인증을 하지 않았거나, 새롭게 인증하려는 지역이 이미 인증된 지역과 다를 경우만 동네 인증 처리
+        if (validateAvailableRegionUpdate(region)) {
+            this.region = region;
+            this.regionAuthenticationAt = LocalDateTime.now();
+        }
     }
 
     //TODO : 추후 구현 필요
     public void decreaseJandiRate() {
         return;
+    }
+
+    private boolean validateAvailableRegionUpdate(Region region) {
+        return this.region == null || !this.region.equals(region);
     }
 }
