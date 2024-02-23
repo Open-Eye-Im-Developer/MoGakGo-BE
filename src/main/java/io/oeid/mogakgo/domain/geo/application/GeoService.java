@@ -5,15 +5,17 @@ import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SERVICE_REGION
 import io.oeid.mogakgo.core.properties.KakaoProperties;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.geo.exception.GeoException;
-import io.oeid.mogakgo.domain.geo.feign.KakaoFeignClient;
-import io.oeid.mogakgo.domain.geo.feign.dto.AddressDocument;
-import io.oeid.mogakgo.domain.geo.feign.dto.AddressInfoDto;
+import io.oeid.mogakgo.domain.geo.application.feign.KakaoFeignClient;
+import io.oeid.mogakgo.domain.geo.application.feign.dto.AddressDocument;
+import io.oeid.mogakgo.domain.geo.application.feign.dto.AddressInfoDto;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class GeoService {
 
@@ -39,6 +41,14 @@ public class GeoService {
         return response.getDocuments()[0];
     }
 
+    private String generateKey(KakaoProperties kakaoProperties) {
+        return kakaoProperties.getPrefix() + SEPERATOR + kakaoProperties.getRestApiKey();
+    }
+
+    private int extractAreaCode(AddressDocument document) {
+        return Integer.parseInt(document.getCode().substring(0, 5));
+    }
+
     private int validateCoordinatesCoverage(Double x, Double y) {
         int areaCode = getAreaCodeAboutCoordinates(x, y);
         validateCodeCoverage(areaCode);
@@ -49,14 +59,6 @@ public class GeoService {
         if (Region.getByAreaCode(areaCode) == null) {
             throw new GeoException(INVALID_SERVICE_REGION);
         }
-    }
-
-    private String generateKey(KakaoProperties kakaoProperties) {
-        return kakaoProperties.getPrefix() + SEPERATOR + kakaoProperties.getRestApiKey();
-    }
-
-    private int extractAreaCode(AddressDocument document) {
-        return Integer.parseInt(document.getCode().substring(0, 5));
     }
 
     private User validateToken(Long userId) {

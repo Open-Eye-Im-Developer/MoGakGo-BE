@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.geo.feign.dto;
+package io.oeid.mogakgo.domain.geo.application.feign.dto;
 
 import lombok.Getter;
 
