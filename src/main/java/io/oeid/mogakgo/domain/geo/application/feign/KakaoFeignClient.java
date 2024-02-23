@@ -1,6 +1,6 @@
-package io.oeid.mogakgo.domain.geo.feign;
+package io.oeid.mogakgo.domain.geo.application.feign;
 
-import io.oeid.mogakgo.domain.geo.feign.dto.AddressInfoDto;
+import io.oeid.mogakgo.domain.geo.application.feign.dto.AddressInfoDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
