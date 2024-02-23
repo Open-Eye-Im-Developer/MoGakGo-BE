@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.user.domain;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_AMOUNT_IS_FULL;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_COUNT_IS_ZERO;
 
 import io.oeid.mogakgo.domain.achievement.domain.Achievement;
@@ -41,6 +42,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class User {
 
     private static final int MAX_TAG_SIZE = 3;
+    private static final int MAX_AVAILABLE_LIKE_COUNT = 10;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -155,6 +157,13 @@ public class User {
             throw new UserException(ErrorCode400.USERNAME_SHOULD_BE_NOT_EMPTY);
         }
         this.username = username;
+    }
+
+    public void increaseAvailableLikeCount() {
+        if (this.availableLikeCount >= MAX_AVAILABLE_LIKE_COUNT) {
+            throw new UserException(USER_AVAILABLE_LIKE_AMOUNT_IS_FULL);
+        }
+        this.availableLikeCount += 1;
     }
 
     public void decreaseAvailableLikeCount() {
