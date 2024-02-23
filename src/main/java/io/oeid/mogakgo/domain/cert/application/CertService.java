@@ -11,14 +11,17 @@ import io.oeid.mogakgo.domain.user.application.UserGeoService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CertService {
 
     private final UserGeoService userGeoService;
     private final UserCommonService userCommonService;
 
+    @Transactional
     public Long certificate(Long tokenUserId, Long userId, int areaCode) {
         User tokenUser = validateToken(tokenUserId);
         validateCertificator(tokenUser, userId);
