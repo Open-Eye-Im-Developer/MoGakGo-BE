@@ -78,18 +78,23 @@ public class ProfileCardLikeService {
         if (!tokenUser.getId().equals(userId)) {
             throw new ProfileCardLikeException(PROFILE_CARD_LIKE_FORBIDDEN_OPERATION);
         }
-        if (tokenUser.getDeletedAt() != null) {
-            throw new UserException(USER_ACCOUNT_DISABLED);
-        }
+        validateDeletedUser(tokenUser);
     }
 
     private void validateReceiver(Long userId) {
-        userCommonService.getUserById(userId);
+        User receiver = userCommonService.getUserById(userId);
+        validateDeletedUser(receiver);
     }
 
     private void validateLikeAlreadyExist(Long userId, Long creatorId) {
         if (profileCardLikeRepository.findBySenderAndReceiver(userId, creatorId).isPresent()) {
             throw new ProfileCardLikeException(PROFILE_CARD_LIKE_ALREADY_EXIST);
+        }
+    }
+
+    private void validateDeletedUser(User user) {
+        if (user.getDeletedAt() != null) {
+            throw new UserException(USER_ACCOUNT_DISABLED);
         }
     }
 }
