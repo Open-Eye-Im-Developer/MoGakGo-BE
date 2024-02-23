@@ -1,7 +1,6 @@
 package io.oeid.mogakgo.domain.profile.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.PROFILE_CARD_LIKE_ALREADY_EXIST;
-import static io.oeid.mogakgo.exception.code.ErrorCode401.USER_ACCOUNT_DISABLED;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROFILE_CARD_LIKE_FORBIDDEN_OPERATION;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
@@ -14,7 +13,6 @@ import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileLikeInfoAP
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.application.UserProfileService;
 import io.oeid.mogakgo.domain.user.domain.User;
-import io.oeid.mogakgo.domain.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,23 +76,15 @@ public class ProfileCardLikeService {
         if (!tokenUser.getId().equals(userId)) {
             throw new ProfileCardLikeException(PROFILE_CARD_LIKE_FORBIDDEN_OPERATION);
         }
-        validateDeletedUser(tokenUser);
     }
 
     private void validateReceiver(Long userId) {
-        User receiver = userCommonService.getUserById(userId);
-        validateDeletedUser(receiver);
+        userCommonService.getUserById(userId);
     }
 
     private void validateLikeAlreadyExist(Long userId, Long creatorId) {
         if (profileCardLikeRepository.findBySenderAndReceiver(userId, creatorId).isPresent()) {
             throw new ProfileCardLikeException(PROFILE_CARD_LIKE_ALREADY_EXIST);
-        }
-    }
-
-    private void validateDeletedUser(User user) {
-        if (user.getDeletedAt() != null) {
-            throw new UserException(USER_ACCOUNT_DISABLED);
         }
     }
 }
