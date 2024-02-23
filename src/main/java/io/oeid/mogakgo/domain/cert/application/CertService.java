@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.cert.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SERVICE_REGION;
+import static io.oeid.mogakgo.exception.code.ErrorCode401.USER_ACCOUNT_DISABLED;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.INVALID_CERT_INFORMATION;
 
 import io.oeid.mogakgo.domain.cert.exception.CertException;
@@ -9,16 +10,20 @@ import io.oeid.mogakgo.domain.geo.exception.GeoException;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.application.UserGeoService;
 import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.domain.user.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CertService {
 
     private final UserGeoService userGeoService;
     private final UserCommonService userCommonService;
 
+    @Transactional
     public Long certificate(Long tokenUserId, Long userId, int areaCode) {
         User tokenUser = validateToken(tokenUserId);
         validateCertificator(tokenUser, userId);
@@ -42,6 +47,9 @@ public class CertService {
     private void validateCertificator(User tokenUser, Long userId) {
         if (!tokenUser.getId().equals(userId)) {
             throw new CertException(INVALID_CERT_INFORMATION);
+        }
+        if (tokenUser.getDeletedAt() != null) {
+            throw new UserException(USER_ACCOUNT_DISABLED);
         }
     }
 
