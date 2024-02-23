@@ -3,6 +3,7 @@ package io.oeid.mogakgo.common.swagger.template;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerAuthErrorExamples;
+import io.oeid.mogakgo.domain.auth.presentation.dto.req.AuthReissueRequest;
 import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthAccessTokenResponse;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,5 +33,5 @@ public interface AuthSwagger {
     })
     ResponseEntity<AuthAccessTokenResponse> reissue(
         @Parameter(in = ParameterIn.HEADER, hidden = true) String accessToken,
-        @Parameter(in = ParameterIn.COOKIE) String refreshToken);
+        AuthReissueRequest refreshToken);
 }

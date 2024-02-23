@@ -62,9 +62,11 @@ public class User {
     @Column(name = "github_url")
     private String githubUrl;
 
+    @Column(name = "repository_url")
+    private String repositoryUrl;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @OrderBy("byteSize ASC")
+    @OrderBy("byteSize DESC")
     private final List<UserDevelopLanguageTag> userDevelopLanguageTags = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -107,19 +109,20 @@ public class User {
     @JoinColumn(name = "achievement_id")
     private Achievement achievement;
 
-    private User(Long githubPk, String githubId, String avatarUrl, String githubUrl) {
+    private User(Long githubPk, String githubId, String avatarUrl, String githubUrl, String repositoryUrl) {
         this.githubPk = githubPk;
         this.username = githubId;
         this.githubId = githubId;
         this.avatarUrl = avatarUrl;
         this.githubUrl = githubUrl;
+        this.repositoryUrl = repositoryUrl;
         this.role = Role.ROLE_USER;
         this.jandiRate = 0d;
         this.signupYn = false;
     }
 
-    public static User of(long githubPk, String username, String avatarUrl, String githubUrl) {
-        return new User(githubPk, username, avatarUrl, githubUrl);
+    public static User of(long githubPk, String username, String avatarUrl, String githubUrl, String repositoryUrl) {
+        return new User(githubPk, username, avatarUrl, githubUrl, repositoryUrl);
     }
 
     public void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
@@ -140,10 +143,11 @@ public class User {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
-    public void updateGithubInfo(String githubId, String avatarUrl, String githubUrl) {
+    public void updateGithubInfo(String githubId, String avatarUrl, String githubUrl, String repositoryUrl) {
         this.githubId = githubId;
         this.avatarUrl = avatarUrl;
         this.githubUrl = githubUrl;
+        this.repositoryUrl = repositoryUrl;
     }
 
     public void updateUsername(String username) {
