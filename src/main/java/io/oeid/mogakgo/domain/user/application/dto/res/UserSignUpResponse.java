@@ -1,9 +1,7 @@
 package io.oeid.mogakgo.domain.user.application.dto.res;
 
 import io.oeid.mogakgo.domain.user.domain.User;
-import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
-import io.oeid.mogakgo.domain.user.domain.enums.DevelopLanguage;
 import io.oeid.mogakgo.domain.user.domain.enums.WantedJob;
 import java.util.List;
 import lombok.AccessLevel;
@@ -19,7 +17,6 @@ public class UserSignUpResponse {
     private String githubId;
     private String avatarUrl;
     private String githubUrl;
-    private List<DevelopLanguage> developLanguages;
     private List<WantedJob> wantedJobs;
 
     public static UserSignUpResponse from(User user) {
@@ -29,8 +26,6 @@ public class UserSignUpResponse {
             user.getGithubId(),
             user.getAvatarUrl(),
             user.getGithubUrl(),
-            user.getUserDevelopLanguageTags().stream()
-                .map(UserDevelopLanguageTag::getDevelopLanguage).toList(),
             user.getUserWantedJobTags().stream().map(UserWantedJobTag::getWantedJob).toList()
         );
     }

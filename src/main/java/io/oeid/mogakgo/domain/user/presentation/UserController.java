@@ -4,9 +4,11 @@ import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.swagger.template.UserSwagger;
 import io.oeid.mogakgo.domain.user.application.UserService;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiRequest;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserDevelopLanguageApiRes;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserSignUpApiResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,6 +36,13 @@ public class UserController implements UserSwagger {
         @RequestBody @Valid UserSignUpApiRequest apiRequest) {
         var response = userService.userSignUp(apiRequest.toRequest(userId));
         return ResponseEntity.ok(UserSignUpApiResponse.from(response));
+    }
+
+    @GetMapping("/develop-language")
+    public ResponseEntity<List<UserDevelopLanguageApiRes>> userDevelopLanguageApi(
+        @UserId Long userId) {
+        var response = userService.updateUserDevelopLanguages(userId);
+        return ResponseEntity.ok(response.stream().map(UserDevelopLanguageApiRes::from).toList());
     }
 
     @DeleteMapping

@@ -10,6 +10,7 @@ import io.oeid.mogakgo.domain.notification.presentation.dto.res.NotificationPubl
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,8 +35,7 @@ public interface NotificationSwagger {
         FCMTokenApiRequest request);
 
     @Operation(summary = "알림 조회", description = "회원의 알림을 조회할 때 사용하는 API")
-    @ApiResponse(responseCode = "200", description = "알림 조회 성공",
-        content = @Content(schema = @Schema(implementation = NotificationPublicApiRes.class)))
+    @ApiResponse(responseCode = "200", description = "알림 조회 성공")
     @ApiResponse(responseCode = "404", description = "요청한 유저가 존재하지 않음", content = @Content(
         mediaType = APPLICATION_JSON_VALUE,
         schema = @Schema(implementation = ErrorResponse.class),
@@ -43,7 +43,12 @@ public interface NotificationSwagger {
             @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
         })
     )
+    @Parameters({
+        @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),
+        @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
+        @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
+    })
     ResponseEntity<CursorPaginationResult<NotificationPublicApiRes>> getByUserId(
         @Parameter(hidden = true) Long id,
-        CursorPaginationInfoReq pageable);
+        @Parameter(hidden = true) CursorPaginationInfoReq pageable);
 }
