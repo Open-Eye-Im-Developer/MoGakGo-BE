@@ -60,13 +60,13 @@ public class ProjectJoinRequest {
   
     @Builder
     private ProjectJoinRequest(User sender, Project project) {
+        this.sender = sender;
+        this.project = project;
+        this.requestStatus = RequestStatus.PENDING;
         validateSender(sender);
         validateProject(project);
         validateProjectCreator();
         validateUserRegion();
-        this.sender = sender;
-        this.project = project;
-        this.requestStatus = RequestStatus.PENDING;
     }
 
     public static ProjectJoinRequest of(User sender, Project project) {

@@ -42,9 +42,9 @@ public class ProfileCard {
 
     @Builder
     private ProfileCard(User user) {
-        validateUser(user);
         this.user = user;
         this.totalLikeAmount = 0L;
+        validateUser(user);
     }
 
     public void validateUser(User user) {

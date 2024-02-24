@@ -52,10 +52,10 @@ public class ProfileCardLike {
 
     @Builder
     private ProfileCardLike(User sender, User receiver) {
-        validateSender(sender);
-        validateReceiver(receiver);
         this.sender = sender;
         this.receiver = receiver;
+        validateSender(sender);
+        validateReceiver(receiver);
     }
 
     private void validateSender(User tokenUser) {
