@@ -7,7 +7,7 @@ import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileLikeInfoAP
 public interface ProfileCardLikeRepositoryCustom {
 
     Long getLikeCountByCondition(Long senderId, Long receiverId);
-    Long getLikeCount(Long userId);
+    Long getReceivedLikeCount(Long userId);
     CursorPaginationResult<UserProfileLikeInfoAPIRes> getLikeInfoBySender(
         Long senderId, CursorPaginationInfoReq pageable);
 }
