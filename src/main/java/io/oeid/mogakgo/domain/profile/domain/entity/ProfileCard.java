@@ -1,9 +1,11 @@
 package io.oeid.mogakgo.domain.profile.domain.entity;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.PROFILE_CARD_LIKE_AMOUNT_IS_ZERO;
+import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
 
 import io.oeid.mogakgo.domain.profile.exception.ProfileCardException;
 import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.domain.user.exception.UserException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,8 +42,15 @@ public class ProfileCard {
 
     @Builder
     private ProfileCard(User user) {
+        validateUser(user);
         this.user = user;
         this.totalLikeAmount = 0L;
+    }
+
+    public void validateUser(User user) {
+        if (!this.user.getId().equals(user.getId())) {
+            throw new UserException(USER_NOT_FOUND);
+        }
     }
 
     public void increaseLikeAmount() {
@@ -56,8 +65,6 @@ public class ProfileCard {
     }
 
     public static ProfileCard from(User user) {
-        return ProfileCard.builder()
-            .user(user)
-            .build();
+        return new ProfileCard(user);
     }
 }
