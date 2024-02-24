@@ -1,8 +1,12 @@
 package io.oeid.mogakgo.domain.project_join_req.domain.entity;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_CREATOR_PROJECT_JOIN_REQUEST;
+import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_PROJECT_JOIN_REQUEST_REGION;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION;
+import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_NOT_FOUND;
 
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
+import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.user.domain.User;
@@ -56,6 +60,10 @@ public class ProjectJoinRequest {
   
     @Builder
     private ProjectJoinRequest(User sender, Project project) {
+        validateSender(sender);
+        validateProject(project);
+        validateProjectCreator();
+        validateUserRegion();
         this.sender = sender;
         this.project = project;
         this.requestStatus = RequestStatus.PENDING;
@@ -91,5 +99,24 @@ public class ProjectJoinRequest {
         if (!sender.getId().equals(user.getId())) {
             throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION);
         }
+    }
+
+    private void validateProjectCreator() {
+        if (project.getCreator().getId().equals(sender.getId())) {
+            throw new ProjectJoinRequestException(INVALID_CREATOR_PROJECT_JOIN_REQUEST);
+        }
+    }
+
+    private void validateUserRegion() {
+        if (!project.getCreatorInfo().getRegion().equals(sender.getRegion())) {
+            throw new ProjectJoinRequestException(INVALID_PROJECT_JOIN_REQUEST_REGION);
+        }
+    }
+
+    private void validateProject(Project project) {
+        if (!this.project.getId().equals(project.getId())) {
+            throw new ProjectException(PROJECT_NOT_FOUND);
+        }
+        this.project.validateAvailableMatched();
     }
 }
