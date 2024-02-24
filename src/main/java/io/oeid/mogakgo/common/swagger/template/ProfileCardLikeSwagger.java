@@ -2,8 +2,10 @@ package io.oeid.mogakgo.common.swagger.template;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProfileCardErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProfileCardLikeErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
+import io.oeid.mogakgo.domain.profile.presentation.dto.req.UserProfileLikeCancelAPIReq;
 import io.oeid.mogakgo.domain.profile.presentation.dto.req.UserProfileLikeCreateAPIReq;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileLikeAPIRes;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileLikeCreateAPIRes;
@@ -124,5 +126,34 @@ public interface ProfileCardLikeSwagger {
         @Parameter(hidden = true) Long userId,
         @Parameter(description = "'찔러보기' 요청을 조회하는 사용자 ID", required = true) Long id,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable
+    );
+
+    @Operation(summary = "사용자의 '찔러보기' 요청 취소", description = "사용자가 자신이 보낸 '찔러보기' 요청을 취소할 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "'찔러보기' 요청 취소 성공"),
+        @ApiResponse(responseCode = "400", description = "요청한 데이터가 유효하지 않음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E040105", value = SwaggerProfileCardLikeErrorExamples.PROFILE_CARD_LIKE_NOT_EXIST),
+                    @ExampleObject(name = "E040104", value = SwaggerProfileCardErrorExamples.PROFILE_CARD_LIKE_AMOUNT_IS_ZERO),
+                    @ExampleObject(name = "E020107", value = SwaggerUserErrorExamples.USER_AVAILABLE_LIKE_COUNT_IS_ZERO),
+                    @ExampleObject(name = "E020108", value = SwaggerUserErrorExamples.USER_AVAILABLE_LIKE_COUNT_IS_FULL)
+                }
+            )),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND),
+                    @ExampleObject(name = "E040301", value = SwaggerProfileCardLikeErrorExamples.PROFILE_CARD_NOT_FOUND)
+                }
+            )),
+    })
+    ResponseEntity<Void> cancel(
+        @Parameter(hidden = true) Long userId,
+        UserProfileLikeCancelAPIReq request
     );
 }
