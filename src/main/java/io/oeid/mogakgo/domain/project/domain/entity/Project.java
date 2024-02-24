@@ -112,6 +112,10 @@ public class Project extends BaseTimeEntity {
         }
     }
 
+    public void validateAvailableMatched() {
+        this.projectStatus.validateAvailableMatched();
+    }
+
     private void validateAvailableCancel(User tokenUser) {
         validateCreator(tokenUser);
         this.projectStatus.validateAvailableCancel();

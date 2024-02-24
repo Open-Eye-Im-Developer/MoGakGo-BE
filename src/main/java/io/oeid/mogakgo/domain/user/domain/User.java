@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.user.domain;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_AMOUNT_IS_FULL;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_COUNT_IS_ZERO;
 
 import io.oeid.mogakgo.domain.achievement.domain.Achievement;
@@ -41,6 +42,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class User {
 
     private static final int MAX_TAG_SIZE = 3;
+    private static final int MAX_AVAILABLE_LIKE_COUNT = 10;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -157,6 +159,13 @@ public class User {
         this.username = username;
     }
 
+    public void increaseAvailableLikeCount() {
+        if (this.availableLikeCount >= MAX_AVAILABLE_LIKE_COUNT) {
+            throw new UserException(USER_AVAILABLE_LIKE_AMOUNT_IS_FULL);
+        }
+        this.availableLikeCount += 1;
+    }
+
     public void decreaseAvailableLikeCount() {
         if (this.availableLikeCount <= 0) {
             throw new UserException(USER_AVAILABLE_LIKE_COUNT_IS_ZERO);
@@ -184,12 +193,19 @@ public class User {
         if (region == null) {
             throw new UserException(ErrorCode400.USER_REGION_SHOULD_BE_NOT_EMPTY);
         }
-        this.region = region;
-        this.regionAuthenticationAt = LocalDateTime.now();
+        // 사용자가 아직 동네 인증을 하지 않았거나, 새롭게 인증하려는 지역이 이미 인증된 지역과 다를 경우만 동네 인증 처리
+        if (validateAvailableRegionUpdate(region)) {
+            this.region = region;
+            this.regionAuthenticationAt = LocalDateTime.now();
+        }
     }
 
     //TODO : 추후 구현 필요
     public void decreaseJandiRate() {
         return;
+    }
+
+    private boolean validateAvailableRegionUpdate(Region region) {
+        return this.region == null || !this.region.equals(region);
     }
 }

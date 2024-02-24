@@ -1,17 +1,16 @@
 package io.oeid.mogakgo.domain.profile.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SERVICE_REGION;
-import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.geo.exception.GeoException;
+import io.oeid.mogakgo.domain.profile.application.dto.req.UserProfileCardReq;
 import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCard;
 import io.oeid.mogakgo.domain.profile.infrastructure.ProfileCardJpaRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
-import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +25,14 @@ public class ProfileCardService {
     private final ProfileCardJpaRepository profileCardRepository;
     private final UserCommonService userCommonService;
 
+    public Long create(UserProfileCardReq request) {
+
+        ProfileCard profileCard = request.toEntity(request.getUser());
+        profileCardRepository.save(profileCard);
+
+        return profileCard.getId();
+    }
+
     public CursorPaginationResult<UserPublicApiResponse> getRandomOrderedProfileCardsByRegion(
         Long userId, Region region, CursorPaginationInfoReq pageable
     ) {
@@ -39,17 +46,6 @@ public class ProfileCardService {
 
         Collections.shuffle(profiles.getData());
         return profiles;
-    }
-
-    @Transactional
-    public void increaseTotalLikeAmount(Long userId) {
-        var profileCard = getProfileCard(userId);
-        profileCard.addLike();
-    }
-
-    private ProfileCard getProfileCard(Long userId) {
-        return profileCardRepository.findByUserId(userId)
-            .orElseThrow(() -> new UserException(USER_NOT_FOUND));
     }
 
     private User validateToken(Long userId) {

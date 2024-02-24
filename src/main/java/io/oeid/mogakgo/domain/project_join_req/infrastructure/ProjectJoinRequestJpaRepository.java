@@ -17,11 +17,8 @@ public interface ProjectJoinRequestJpaRepository extends JpaRepository<ProjectJo
     @Query("select pjr from ProjectJoinRequest pjr where pjr.sender.id = :senderId and pjr.requestStatus = 'PENDING'")
     Optional<ProjectJoinRequest> findPendingBySenderId(Long senderId);
 
-    @Query("select pjr from ProjectJoinRequest pjr where pjr.sender.id = :userId and pjr.project.id = :projectId")
-    Optional<ProjectJoinRequest> findAlreadyExists(Long userId, Long projectId);
-
     @Query("select pjr from ProjectJoinRequest pjr where pjr.sender.id = :userId and pjr.requestStatus = 'PENDING'")
-    Optional<ProjectJoinRequest> findAlreadyExistsAnotherJoinReq(Long userId);
+    Optional<ProjectJoinRequest> findAnotherRequestAlreadyExist(Long userId);
 
     @Modifying
     @Query("update ProjectJoinRequest pjr set pjr.requestStatus = 'REJECTED' "

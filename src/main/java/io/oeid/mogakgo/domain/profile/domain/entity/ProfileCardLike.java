@@ -1,6 +1,11 @@
 package io.oeid.mogakgo.domain.profile.domain.entity;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode403.PROFILE_CARD_LIKE_FORBIDDEN_OPERATION;
+import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
+
+import io.oeid.mogakgo.domain.profile.exception.ProfileCardLikeException;
 import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.domain.user.exception.UserException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -49,12 +54,23 @@ public class ProfileCardLike {
     private ProfileCardLike(User sender, User receiver) {
         this.sender = sender;
         this.receiver = receiver;
+        validateSender(sender);
+        validateReceiver(receiver);
+    }
+
+    private void validateSender(User tokenUser) {
+        if (!this.sender.getId().equals(tokenUser.getId())) {
+            throw new ProfileCardLikeException(PROFILE_CARD_LIKE_FORBIDDEN_OPERATION);
+        }
+    }
+
+    private void validateReceiver(User receiver) {
+        if (!this.receiver.getId().equals(receiver.getId())) {
+            throw new UserException(USER_NOT_FOUND);
+        }
     }
 
     public static ProfileCardLike of(User sender, User receiver) {
-        return ProfileCardLike.builder()
-            .sender(sender)
-            .receiver(receiver)
-            .build();
+        return new ProfileCardLike(sender, receiver);
     }
 }
