@@ -12,7 +12,6 @@ import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCardLike;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileLikeInfoAPIRes;
 import io.oeid.mogakgo.domain.user.domain.QUser;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -31,8 +30,8 @@ public class ProfileCardLikeRepositoryCustomImpl implements ProfileCardLikeRepos
         return jpaQueryFactory
             .select(profileCardLike.count())
             .from(profileCardLike)
-            .innerJoin(profileCardLike.sender, sender) //.on(profileCardLike.sender.id.eq(user.id))
-            .innerJoin(profileCardLike.receiver, receiver) //.on(profileCardLike.receiver.id.eq(user.id))
+            .innerJoin(profileCardLike.sender, sender)
+            .innerJoin(profileCardLike.receiver, receiver)
             .where(
                 senderIdEq(senderId),
                 receiveridEq(receiverId)
@@ -41,7 +40,7 @@ public class ProfileCardLikeRepositoryCustomImpl implements ProfileCardLikeRepos
     }
 
     @Override
-    public Long getLikeCount(Long userId) {
+    public Long getReceivedLikeCount(Long userId) {
         return jpaQueryFactory.select(profileCard.totalLikeAmount)
             .from(profileCard)
             .innerJoin(profileCard.user, user)
@@ -73,16 +72,6 @@ public class ProfileCardLikeRepositoryCustomImpl implements ProfileCardLikeRepos
         return CursorPaginationResult.fromDataWithExtraItemForNextCheck(
             result, pageable.getPageSize()
         );
-    }
-
-    @Override
-    public Optional<ProfileCardLike> findBySenderAndReceiver(Long senderId, Long receiverId) {
-        return Optional.ofNullable(jpaQueryFactory.selectFrom(profileCardLike)
-            .where(
-                senderIdEq(senderId),
-                receiveridEq(receiverId)
-            )
-            .fetchOne());
     }
 
     private BooleanExpression senderIdEq(Long senderId) {

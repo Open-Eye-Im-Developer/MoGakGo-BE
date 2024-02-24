@@ -1,5 +1,7 @@
 package io.oeid.mogakgo.domain.user.application;
 
+import io.oeid.mogakgo.domain.profile.application.ProfileCardService;
+import io.oeid.mogakgo.domain.profile.application.dto.req.UserProfileCardReq;
 import io.oeid.mogakgo.domain.user.application.dto.req.UserSignUpRequest;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserDevelopLanguageRes;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserProfileResponse;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserCommonService userCommonService;
+    private final ProfileCardService profileCardService;
     private final UserWantedJobTagJpaRepository userWantedJobTagRepository;
     private final UserDevelopLanguageTagJpaRepository userDevelopLanguageTagRepository;
     private final UserGithubUtil userGithubUtil;
@@ -44,6 +47,7 @@ public class UserService {
                 .build());
         }
         user.signUpComplete();
+        profileCardService.create(UserProfileCardReq.of(user));
         return UserSignUpResponse.from(user);
     }
 

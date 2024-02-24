@@ -31,11 +31,14 @@ public enum ErrorCode400 implements ErrorCode {
     USER_REGION_SHOULD_BE_NOT_EMPTY("E020104", "유저 지역은 비어있을 수 없습니다."),
     USER_WANTED_JOB_DUPLICATE("E020105", "중복된 희망 직무가 있습니다."),
     USER_DEVELOP_LANGUAGE_DUPLICATE("E020106", "중복된 개발 언어가 있습니다."),
-    USER_AVAILABLE_LIKE_COUNT_IS_ZERO("E020105", "당일 사용할 수 있는 찔러보기 요청을 모두 소진했습니다."),
+    USER_AVAILABLE_LIKE_COUNT_IS_ZERO("E020107", "당일 사용할 수 있는 찔러보기 요청을 모두 소진했습니다."),
+    USER_AVAILABLE_LIKE_AMOUNT_IS_FULL("E020108", "프로필 카드의 찔러보기 요청의 최대 횟수를 넘을 수 없습니다."),
     USER_ID_NOT_NULL("E020001", "유저 아이디는 필수값입니다."),
 
     PROFILE_CARD_LIKE_ALREADY_EXIST("E040102", "이미 찔러보기 요청을 전송한 프로필 카드에 찔러보기 요청을 전송할 수 없습니다."),
     INVALID_PROFILE_CARD_LIKE_RECEIVER_INFO("E040103", "찔러보기 요청의 사용자가 존재하지 않습니다."),
+    PROFILE_CARD_LIKE_AMOUNT_IS_ZERO("E040104", "프로필 카드의 찔러보기 요청이 존재하지 않습니다."),
+    PROFILE_CARD_LIKE_NOT_EXIST("E040105", "해당 프로필 카드에 '찔러보기' 요청이 존재하지 않아 요청을 취소할 수 없습니다."),
 
     INVALID_PROJECT_STATUS_TO_ACCEPT("E050101", "프로젝트가 대기중이 아니여서 참여 요청을 수락할 수 없습니다."),
     INVALID_PROJECT_REQ_STATUS_TO_ACCEPT("E050102", "프로젝트 참여 요청이 대기중이 아니여서 참여 요청을 수락할 수 없습니다."),

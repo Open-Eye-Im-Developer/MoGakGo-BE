@@ -5,6 +5,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.common.swagger.template.ProfileCardLikeSwagger;
 import io.oeid.mogakgo.domain.profile.application.ProfileCardLikeService;
+import io.oeid.mogakgo.domain.profile.presentation.dto.req.UserProfileLikeCancelAPIReq;
 import io.oeid.mogakgo.domain.profile.presentation.dto.req.UserProfileLikeCreateAPIReq;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileLikeAPIRes;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileLikeCreateAPIRes;
@@ -12,6 +13,7 @@ import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileLikeInfoAP
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,5 +63,13 @@ public class ProfileCardLikeController implements ProfileCardLikeSwagger {
     ) {
         return ResponseEntity.ok()
             .body(profileCardLikeService.getLikeInfoSenderProfile(userId, id, pageable));
+    }
+
+    @DeleteMapping("/like")
+    public ResponseEntity<Void> cancel(
+        @UserId Long userId, @Valid @RequestBody UserProfileLikeCancelAPIReq request
+    ) {
+        profileCardLikeService.cancel(userId, request);
+        return ResponseEntity.noContent().build();
     }
 }

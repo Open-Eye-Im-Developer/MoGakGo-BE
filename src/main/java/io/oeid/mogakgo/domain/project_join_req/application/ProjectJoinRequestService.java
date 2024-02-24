@@ -1,23 +1,18 @@
 package io.oeid.mogakgo.domain.project_join_req.application;
 
-import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_CREATOR_PROJECT_JOIN_REQUEST;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_MATCHING_USER_TO_ACCEPT;
-import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_PROJECT_JOIN_REQUEST_REGION;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SENDER_TO_ACCEPT;
-import static io.oeid.mogakgo.exception.code.ErrorCode400.PROJECT_JOIN_REQUEST_ALREADY_EXIST;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.PROJECT_JOIN_REQUEST_SHOULD_BE_ONLY_ONE;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_JOIN_REQUEST_NOT_FOUND;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_NOT_FOUND;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
-import io.oeid.mogakgo.exception.code.ErrorCode400;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
-import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project_join_req.application.dto.req.ProjectJoinCreateReq;
@@ -29,7 +24,6 @@ import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,13 +44,11 @@ public class ProjectJoinRequestService {
     @Transactional
     public Long create(Long userId, ProjectJoinCreateReq request) {
         User tokenUser = validateToken(userId);
-        validateSender(tokenUser, request.getSenderId());
-        Project project = validateProjectExist(request.getProjectId());
-        validateProjectStatus(project.getProjectStatus()); // 요청을 보내려는 프로젝트가 대기중이 맞는지 검사
-        validateProjectCreator(project, userId);
-        validateUserCertRegion(project, tokenUser);
-        validateAlreadyExistRequest(userId, project.getId());
-        validateUserAnotherRequestExists(userId);
+
+        Project project = validateProject(request.getProjectId());
+
+        // 다른 프로젝트에 매칭 요청을 보낸 적이 있는지 검증 (매칭은 한 번에 하나만 가능하므로)
+        validateAnotherRequestAlreadyExist(userId);
 
         // 프로젝트 매칭 요청 생성
         ProjectJoinRequest joinRequest = request.toEntity(tokenUser, project);
@@ -140,37 +132,13 @@ public class ProjectJoinRequestService {
         }
     }
 
-    private Project validateProjectExist(Long projectId) {
+    private Project validateProject(Long projectId) {
         return projectRepository.findById(projectId)
             .orElseThrow(() -> new ProjectException(PROJECT_NOT_FOUND));
     }
 
-    private void validateProjectStatus(ProjectStatus projectStatus) {
-        if (!projectStatus.equals(ProjectStatus.PENDING)) {
-            throw new ProjectJoinRequestException(ErrorCode400.INVALID_PROJECT_STATUS_TO_ACCEPT);
-        }
-    }
-
-    private void validateProjectCreator(Project project, Long userId) {
-        if (project.getCreator().getId().equals(userId)) {
-            throw new ProjectJoinRequestException(INVALID_CREATOR_PROJECT_JOIN_REQUEST);
-        }
-    }
-
-    private void validateAlreadyExistRequest(Long userId, Long projectId) {
-        if (projectJoinRequestRepository.findAlreadyExists(userId, projectId).isPresent()) {
-            throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_ALREADY_EXIST);
-        }
-    }
-
-    private void validateUserCertRegion(Project project, User tokenUser) {
-        if (!Objects.equals(project.getCreatorInfo().getRegion(), tokenUser.getRegion())) {
-            throw new ProjectJoinRequestException(INVALID_PROJECT_JOIN_REQUEST_REGION);
-        }
-    }
-
-    private void validateUserAnotherRequestExists(Long userId) {
-        if (projectJoinRequestRepository.findAlreadyExistsAnotherJoinReq(userId).isPresent()) {
+    private void validateAnotherRequestAlreadyExist(Long userId) {
+        if (projectJoinRequestRepository.findAnotherRequestAlreadyExist(userId).isPresent()) {
             throw new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_SHOULD_BE_ONLY_ONE);
         }
     }
