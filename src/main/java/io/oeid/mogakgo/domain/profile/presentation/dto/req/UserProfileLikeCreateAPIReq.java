@@ -14,7 +14,7 @@ public class UserProfileLikeCreateAPIReq {
     @NotNull
     private final Long senderId;
 
-    @Schema(description = "찔러보기 요청으 받는 사용자 ID")
+    @Schema(description = "찔러보기 요청을 받는 사용자 ID")
     @NotNull
     private final Long receiverId;
 
@@ -24,10 +24,6 @@ public class UserProfileLikeCreateAPIReq {
     }
 
     public ProfileCardLike toEntity(User sender, User receiver) {
-        return ProfileCardLike.builder()
-            .sender(sender)
-            .receiver(receiver)
-            .build();
+        return ProfileCardLike.of(sender, receiver);
     }
-
 }
