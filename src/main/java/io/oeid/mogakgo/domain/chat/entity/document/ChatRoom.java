@@ -1,7 +1,9 @@
 package io.oeid.mogakgo.domain.chat.entity.document;
 
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
+import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.exception.code.ErrorCode400;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,14 +14,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import java.util.HashSet;
-import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.socket.WebSocketSession;
 
 
 @Entity
@@ -48,12 +46,10 @@ public class ChatRoom {
     @Column(name = "status")
     private ChatStatus status;
 
-    @Transient
-    private final Set<WebSocketSession> sessions = new HashSet<>();
-
     @Builder
     private ChatRoom(String name, User creator, User sender) {
         this.name = name;
+        validateUsers(creator, sender);
         this.creator = creator;
         this.sender = sender;
         this.status = ChatStatus.OPEN;
@@ -62,4 +58,11 @@ public class ChatRoom {
     public void closeChat() {
         this.status = ChatStatus.CLOSED;
     }
+
+    private void validateUsers(User creator, User sender) {
+        if (creator.equals(sender)) {
+            throw new ChatException(ErrorCode400.CHAT_ROOM_USER_CANNOT_DUPLICATE);
+        }
+    }
+
 }

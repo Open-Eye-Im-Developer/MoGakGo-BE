@@ -7,7 +7,6 @@ import io.oeid.mogakgo.domain.chat.application.ChatWebSocketService;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -30,7 +29,6 @@ public class CustomWebSocketHandler implements WebSocketHandler {
         log.info("afterConnectionEstablished: {}", session.getId());
     }
 
-    // TODO: 세션 추가 삭제 구현하기!
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message)
         throws Exception {
@@ -38,12 +36,13 @@ public class CustomWebSocketHandler implements WebSocketHandler {
         String payload = textMessage.getPayload();
         ChatMessage chatMessage = objectMapper.readValue(payload, ChatMessage.class);
         ChatRoom chatRoom = chatWebSocketService.findChatRoomById(chatMessage.getRoomId());
-        Set<WebSocketSession> sessions = chatRoom.getSessions();
-        chatWebSocketService.manageChatCollections(chatRoom.getId());
         switch (chatMessage.getMessageType()) {
-            case ENTER -> sessions.add(session);
-            case QUIT -> sessions.remove(session);
-            default -> sendMessageToEachSocket(sessions, textMessage);
+            case ENTER -> chatWebSocketService.addSessionToRoom(chatRoom.getId(), session);
+            case QUIT -> {
+                chatWebSocketService.removeSessionFromRoom(chatRoom.getId(), session);
+                chatWebSocketService.closeChatRoom(chatRoom.getId());
+            }
+            default -> chatWebSocketService.sendMessageToEachSocket(chatRoom.getId(), textMessage);
         }
         chatWebSocketService.saveChatMessage(chatMessage, chatRoom.getId());
     }
@@ -64,15 +63,5 @@ public class CustomWebSocketHandler implements WebSocketHandler {
     @Override
     public boolean supportsPartialMessages() {
         return false;
-    }
-
-    private void sendMessageToEachSocket(Set<WebSocketSession> sessions, TextMessage message) {
-        sessions.parallelStream().forEach(session -> {
-            try {
-                session.sendMessage(message);
-            } catch (Exception e) {
-                throw new ChatException(CHAT_WEB_SOCKET_ERROR);
-            }
-        });
     }
 }
