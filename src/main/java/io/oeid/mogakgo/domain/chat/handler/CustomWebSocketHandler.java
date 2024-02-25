@@ -28,9 +28,9 @@ public class CustomWebSocketHandler implements WebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         log.info("afterConnectionEstablished: {}", session.getId());
-        session.sendMessage(new TextMessage("You are connected to the chat room."));
     }
 
+    // TODO: 세션 추가 삭제 구현하기!
     @Override
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message)
         throws Exception {
@@ -38,8 +38,13 @@ public class CustomWebSocketHandler implements WebSocketHandler {
         String payload = textMessage.getPayload();
         ChatMessage chatMessage = objectMapper.readValue(payload, ChatMessage.class);
         ChatRoom chatRoom = chatWebSocketService.findChatRoomById(chatMessage.getRoomId());
+        Set<WebSocketSession> sessions = chatRoom.getSessions();
         chatWebSocketService.manageChatCollections(chatRoom.getId());
-        sendMessageToEachSocket(chatRoom.getSessions(), textMessage);
+        switch (chatMessage.getMessageType()) {
+            case ENTER -> sessions.add(session);
+            case QUIT -> sessions.remove(session);
+            default -> sendMessageToEachSocket(sessions, textMessage);
+        }
         chatWebSocketService.saveChatMessage(chatMessage, chatRoom.getId());
     }
 
