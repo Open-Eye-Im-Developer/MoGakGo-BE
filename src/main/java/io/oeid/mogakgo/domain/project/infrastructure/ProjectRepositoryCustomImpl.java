@@ -64,6 +64,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                     project.getCreator().getUserWantedJobTags().stream().map(
                         UserWantedJobTag::getWantedJob).map(String::valueOf).toList()
                 ),
+                project.getProjectStatus(),
                 project.getProjectTags().stream().map(ProjectTag::getContent).toList(),
                 new MeetingInfoResponse(
                     project.getMeetingInfo().getMeetStartTime(),
