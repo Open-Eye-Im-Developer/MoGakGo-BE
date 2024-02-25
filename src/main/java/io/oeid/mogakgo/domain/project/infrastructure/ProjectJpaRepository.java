@@ -19,6 +19,6 @@ public interface ProjectJpaRepository extends JpaRepository<Project, Long>, Proj
     Optional<Project> findByIdWithDeleted(Long id);
 
     @Query("select p from Project p "
-        + "where p.creator.id = :creatorId and p.projectStatus in ('PROGRESS', 'MATCHED')")
+        + "where p.creator.id = :creatorId and p.projectStatus in ('PENDING', 'MATCHED')")
     List<Project> findNotEndProjectOneByCreatorId(Long creatorId, Pageable pageable);
 }
