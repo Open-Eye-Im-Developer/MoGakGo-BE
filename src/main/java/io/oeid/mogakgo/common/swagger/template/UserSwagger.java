@@ -4,9 +4,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiReq;
+import io.oeid.mogakgo.domain.user.presentation.dto.req.UserUpdateApiReq;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserDevelopLanguageApiRes;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserSignUpApiResponse;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserUpdateApiRes;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -80,4 +82,27 @@ public interface UserSwagger {
     })
     ResponseEntity<List<UserDevelopLanguageApiRes>> userDevelopLanguageApi(
         @Parameter(hidden = true) Long userId);
+
+
+    @Operation(summary = "회원 정보 수정", description = "회원 정보를 수정할 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "회원 정보 수정 성공",
+            content = @Content(schema = @Schema(implementation = UserUpdateApiRes.class))),
+        @ApiResponse(responseCode = "400", description = "요청한 데이터가 유효하지 않음",
+            content = @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E020103", value = SwaggerUserErrorExamples.INVALID_USER_NAME),
+                    @ExampleObject(name = "E020105", value = SwaggerUserErrorExamples.USER_WANTED_JOB_DUPLICATE),
+                    @ExampleObject(name = "E020109", value = SwaggerUserErrorExamples.USER_AVATAR_URL_NOT_NULL)
+                })),
+        @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않음",
+            content = @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND))),
+    })
+    ResponseEntity<UserUpdateApiRes> userUpdateApi(@Parameter(hidden = true) Long userId,
+        UserUpdateApiReq request);
 }
