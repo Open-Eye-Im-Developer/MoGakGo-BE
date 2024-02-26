@@ -5,6 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiRequest;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserDevelopLanguageApiRes;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserMatchingStatus;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserSignUpApiResponse;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
@@ -80,4 +81,8 @@ public interface UserSwagger {
     })
     ResponseEntity<List<UserDevelopLanguageApiRes>> userDevelopLanguageApi(
         @Parameter(hidden = true) Long userId);
+
+    @Operation(summary = "매칭 상태 조회", description = "매칭 상태를 조회할 때 사용하는 API")
+    @ApiResponse(responseCode = "200", description = "매칭 상태 조회 성공")
+    ResponseEntity<UserMatchingStatus> userMatchingStatusApi(@Parameter(hidden = true) Long userId);
 }

@@ -6,6 +6,7 @@ import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
