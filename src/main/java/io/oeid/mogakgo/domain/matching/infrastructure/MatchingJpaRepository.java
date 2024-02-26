@@ -6,7 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface MatchingJpaRepository extends JpaRepository<Matching, Long> {
+public interface MatchingJpaRepository extends JpaRepository<Matching, Long>,
+    MatchingRepositoryCustom {
 
     @Query("select m from Matching m join Project p on m.project.id = p.id "
         + "where (m.sender.id = :userId or p.creator.id = :userId) and m.matchingStatus = 'PROGRESS'")

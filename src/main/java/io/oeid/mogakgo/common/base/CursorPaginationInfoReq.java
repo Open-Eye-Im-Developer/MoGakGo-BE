@@ -19,9 +19,10 @@ public class CursorPaginationInfoReq {
     @Nullable
     private final Sort.Direction sortOrder;
 
-    public CursorPaginationInfoReq(Long cursorId, int pageSize, Direction sortOrder) {
+    public CursorPaginationInfoReq(@Nullable Long cursorId, int pageSize, Direction sortOrder) {
         this.cursorId = cursorId;
         this.pageSize = pageSize;
-        this.sortOrder = Objects.requireNonNullElse(sortOrder, Direction.ASC);
+        // 최근순 기본
+        this.sortOrder = Objects.requireNonNullElse(sortOrder, Direction.DESC);
     }
 }
