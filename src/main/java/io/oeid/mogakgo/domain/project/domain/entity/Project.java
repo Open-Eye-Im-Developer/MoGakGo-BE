@@ -99,7 +99,7 @@ public class Project extends BaseTimeEntity {
 
     public void cancel(User tokenUser, boolean projectHasReq) {
         validateAvailableCancel(tokenUser);
-        // 매칭이 되었거나, 매칭 준비중이지만 요청이 있을때는 잔디력 감소
+        // 매칭 준비중이지만 요청이 있을때는 잔디력 감소
         if (projectHasReq) {
             this.creator.decreaseJandiRate();
         }

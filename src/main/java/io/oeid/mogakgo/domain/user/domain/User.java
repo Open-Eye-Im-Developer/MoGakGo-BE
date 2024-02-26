@@ -200,6 +200,14 @@ public class User {
         }
     }
 
+    public void updateUserInfos(String username, String avatarUrl, String bio, Achievement achievement) {
+        updateUsername(username);
+        this.avatarUrl = verifyAvatarUrl(avatarUrl);
+        this.bio = bio;
+        this.achievement = achievement;
+        deleteAllWantJobTags();
+    }
+
     //TODO : 추후 구현 필요
     public void decreaseJandiRate() {
         return;
@@ -208,4 +216,15 @@ public class User {
     private boolean validateAvailableRegionUpdate(Region region) {
         return this.region == null || !this.region.equals(region);
     }
+
+    private String verifyAvatarUrl(String avatarUrl) {
+        if (avatarUrl == null || avatarUrl.isBlank()) {
+            throw new UserException(ErrorCode400.USER_AVATAR_URL_NOT_NULL);
+        }
+        return avatarUrl;
+    }
+
+
+
+
 }
