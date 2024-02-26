@@ -53,6 +53,8 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
                 projectIdEq(projectId),
                 requestStatusEq(requestStatus)
             )
+            // 오래 된 순
+            .orderBy(projectJoinRequest.id.asc())
             .limit(pageable.getPageSize() + 1)
             .fetch();
 
