@@ -53,6 +53,8 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
                 projectIdEq(projectId),
                 requestStatusEq(requestStatus)
             )
+            // 오래 된 순
+            .orderBy(projectJoinRequest.id.asc())
             .limit(pageable.getPageSize() + 1)
             .fetch();
 
@@ -93,7 +95,6 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
         List<ProjectJoinRequestDetailAPIRes> result = entities.stream().map(
             projectJoinRequest -> new ProjectJoinRequestDetailAPIRes(
                     projectJoinRequest.getProject().getId(),
-                    projectJoinRequest.getProject().getProjectStatus(),
                     projectJoinRequest.getProject().getCreator().getAvatarUrl(),
                     new MeetingInfoResponse(
                         projectJoinRequest.getProject().getMeetingInfo().getMeetStartTime(),

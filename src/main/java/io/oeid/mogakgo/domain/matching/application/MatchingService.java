@@ -1,10 +1,14 @@
 package io.oeid.mogakgo.domain.matching.application;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode403.MATCHING_FORBIDDEN_OPERATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.MATCHING_NOT_FOUND;
 
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.matching.domain.entity.Matching;
 import io.oeid.mogakgo.domain.matching.exception.MatchingException;
 import io.oeid.mogakgo.domain.matching.infrastructure.MatchingJpaRepository;
+import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingHistoryRes;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
@@ -44,6 +48,18 @@ public class MatchingService {
         matching.cancel(tokenUser);
 
         return matching.getId();
+    }
+
+    public CursorPaginationResult<MatchingHistoryRes> getMyMatches(
+        Long tokenUserId, Long userId, CursorPaginationInfoReq cursorPaginationInfoReq
+    ) {
+        User tokenUser = userCommonService.getUserById(tokenUserId);
+        // 본인만 매칭 기록 조회 가능
+        if (!tokenUser.getId().equals(userId)) {
+            throw new MatchingException(MATCHING_FORBIDDEN_OPERATION);
+        }
+
+        return matchingJpaRepository.getMyMatches(tokenUserId, cursorPaginationInfoReq);
     }
 
     private Matching getMatching(Long matchingId) {
