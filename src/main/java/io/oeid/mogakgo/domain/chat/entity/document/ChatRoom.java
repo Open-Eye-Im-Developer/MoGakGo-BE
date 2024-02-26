@@ -2,6 +2,7 @@ package io.oeid.mogakgo.domain.chat.entity.document;
 
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
+import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import jakarta.persistence.Column;
@@ -31,8 +32,9 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "name")
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     @ManyToOne
     @JoinColumn(name = "creator_id")
@@ -46,10 +48,11 @@ public class ChatRoom {
     @Column(name = "status")
     private ChatStatus status;
 
+
     @Builder
-    private ChatRoom(String name, User creator, User sender) {
-        this.name = name;
+    private ChatRoom(Project project, User creator, User sender) {
         validateUsers(creator, sender);
+        this.project = project;
         this.creator = creator;
         this.sender = sender;
         this.status = ChatStatus.OPEN;
@@ -62,6 +65,12 @@ public class ChatRoom {
     private void validateUsers(User creator, User sender) {
         if (creator.equals(sender)) {
             throw new ChatException(ErrorCode400.CHAT_ROOM_USER_CANNOT_DUPLICATE);
+        }
+    }
+
+    public void validateContainsUser(User user) {
+        if (!creator.equals(user) && !sender.equals(user)) {
+            throw new ChatException(ErrorCode400.CHAT_ROOM_USER_NOT_CONTAINS);
         }
     }
 

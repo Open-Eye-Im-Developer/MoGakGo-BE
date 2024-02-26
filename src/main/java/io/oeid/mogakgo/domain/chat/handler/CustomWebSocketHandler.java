@@ -35,7 +35,7 @@ public class CustomWebSocketHandler implements WebSocketHandler {
         TextMessage textMessage = (TextMessage) message;
         String payload = textMessage.getPayload();
         ChatMessage chatMessage = objectMapper.readValue(payload, ChatMessage.class);
-        ChatRoom chatRoom = chatWebSocketService.findChatRoomById(chatMessage.getRoomId());
+        ChatRoom chatRoom = chatWebSocketService.findChatRoomById(chatMessage.getChatRoomId());
         switch (chatMessage.getMessageType()) {
             case ENTER -> chatWebSocketService.addSessionToRoom(chatRoom.getId(), session);
             case QUIT -> {

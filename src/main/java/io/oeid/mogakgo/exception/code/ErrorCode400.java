@@ -51,6 +51,7 @@ public enum ErrorCode400 implements ErrorCode {
 
     CHAT_ROOM_CLOSED("E110101", "채팅방이 종료되어 채팅을 할 수 없습니다."),
     CHAT_ROOM_USER_CANNOT_DUPLICATE("E110102", "채팅방에 중복된 유저가 있습니다."),
+    CHAT_ROOM_USER_NOT_CONTAINS("E110103", "채팅방에 해당 유저가 없습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;

@@ -8,14 +8,14 @@ import lombok.Getter;
 public class ChatMessage {
 
     private ChatMessageType messageType;
-    private String roomId;
-    private String senderId;
+    private String chatRoomId;
+    private Long senderId;
     private String message;
     private LocalDateTime createdAt;
 
-    public ChatMessage(ChatMessageType messageType, String roomId, String senderId, String message) {
+    public ChatMessage(ChatMessageType messageType, String chatRoomId, Long senderId, String message) {
         this.messageType = messageType;
-        this.roomId = roomId;
+        this.chatRoomId = chatRoomId;
         this.senderId = senderId;
         this.message = message;
         this.createdAt = LocalDateTime.now();

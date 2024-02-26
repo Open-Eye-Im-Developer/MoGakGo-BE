@@ -8,22 +8,22 @@ import lombok.Getter;
 public class ChatRoomCreateRes {
 
     private String roomId;
-    private String name;
+    private Long projectId;
     private Long creatorId;
     private Long senderId;
     private ChatStatus chatStatus;
 
-    private ChatRoomCreateRes(String roomId, String name, Long creatorId, Long senderId,
+    private ChatRoomCreateRes(String roomId, Long projectId, Long creatorId, Long senderId,
         ChatStatus chatStatus) {
         this.roomId = roomId;
-        this.name = name;
+        this.projectId = projectId;
         this.creatorId = creatorId;
         this.senderId = senderId;
         this.chatStatus = chatStatus;
     }
 
     public static ChatRoomCreateRes from(ChatRoom chatRoom) {
-        return new ChatRoomCreateRes(chatRoom.getId(), chatRoom.getName(),
+        return new ChatRoomCreateRes(chatRoom.getId(), chatRoom.getProject().getId(),
             chatRoom.getCreator().getId(), chatRoom.getSender().getId(), chatRoom.getStatus());
     }
 
