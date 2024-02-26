@@ -34,6 +34,7 @@ public class ChatService {
     // 채팅방 리스트 조회
     // TODO 마지막 채팅 기록 가져오기 구현
     public List<ChatRoomPublicRes> findAllChatRoomByUserId(Long userId) {
+        userCommonService.getUserById(userId);
         return chatRoomRepository.findAllChatRoomByUserId(userId);
     }
 
