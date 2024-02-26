@@ -5,7 +5,9 @@ import static lombok.AccessLevel.PROTECTED;
 
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.review.domain.enums.ReviewRating;
+import io.oeid.mogakgo.domain.review.exception.ReviewException;
 import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.exception.code.ErrorCode400;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -63,16 +65,16 @@ public class Review {
 
     private void validateUsers(User sender, User receiver) {
         if (sender == null || receiver == null) {
-            throw new RuntimeException();
+            throw new ReviewException(ErrorCode400.REVIEW_SENDER_OR_RECEIVER_NOT_FOUND);
         }
         if (sender.getId().equals(receiver.getId())) {
-            throw new RuntimeException();
+            throw new ReviewException(ErrorCode400.REVIEW_USER_DUPLICATED);
         }
     }
 
     private Project validateProject(Project project) {
         if (project == null) {
-            throw new RuntimeException();
+            throw new ReviewException(ErrorCode400.REVIEW_PROJECT_NOT_NULL);
         }
         return project;
     }
