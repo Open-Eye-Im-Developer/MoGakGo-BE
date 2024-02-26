@@ -36,7 +36,6 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
         List<Project> entities = jpaQueryFactory.selectFrom(project)
             .innerJoin(project.creator, user)
             .on(project.creator.id.eq(user.id))
-            .join(project.projectTags).fetchJoin()
             .where(
                 cursorIdCondition(pageable.getCursorId()),
                 userIdEq(userId),
@@ -64,6 +63,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                     project.getCreator().getUserWantedJobTags().stream().map(
                         UserWantedJobTag::getWantedJob).map(String::valueOf).toList()
                 ),
+                project.getProjectStatus(),
                 project.getProjectTags().stream().map(ProjectTag::getContent).toList(),
                 new MeetingInfoResponse(
                     project.getMeetingInfo().getMeetStartTime(),
