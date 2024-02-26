@@ -96,7 +96,8 @@ public class ProjectService {
         // 프로젝트 존재 여부 체크
         Project project = getProject(projectId);
 
-        // 매칭이 되었거나, 매칭 준비중이지만 요청이 있을때는 잔디력 감소를 위한 변수
+        // TODO: 순서를 취소 밑으로 내릴 것인가, 쿼리 변경 할것인가
+        // 매칭 준비중이지만 요청이 있을때는 잔디력 감소를 위한 변수
         boolean projectHasReq = projectJoinRequestJpaRepository.existsByProjectId(projectId);
 
         // 프로젝트 취소

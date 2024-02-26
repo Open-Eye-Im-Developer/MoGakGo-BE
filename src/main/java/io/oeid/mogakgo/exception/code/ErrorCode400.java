@@ -19,7 +19,7 @@ public enum ErrorCode400 implements ErrorCode {
     INVALID_PROJECT_NULL_DATA("E030104", "프로젝트를 생성하기 위해 null 이여서는 안되는 데이터가 null 입니다."),
     NOT_MATCH_MEET_LOCATION("E030105", "프로젝트 만남 장소가 유저가 동네인증 한 구역이 아닙니다."),
     PROJECT_DELETION_NOT_ALLOWED("E030106", "매칭 중이거나 대기중인 프로젝트는 삭제할 수 없습니다."),
-    PROJECT_CANCEL_NOT_ALLOWED("E030107", "이미 취소 되었거나 종료된 프로젝트는 취소할 수 없습니다."),
+    PROJECT_CANCEL_NOT_ALLOWED("E030107", "진행 중인 프로젝트만 취소할 수 있습니다."),
     INVALID_MATCHING_USER_TO_CREATE_PROJECT("E030108", "매칭이 진행 중인 유저는 프로젝트 생성을 할 수 없습니다."),
     ALREADY_EXIST_PROGRESS_PROJECT("E030109", "종료되지 않은 프로젝트 카드가 있으면 프로젝트 생성을 할 수 없습니다."),
     INVALID_PROJECT_STATUS_TO_FINISH("E030110", "매칭이 진행 중인 프로젝트가 아니여서 프로젝트를 종료할 수 없습니다."),
