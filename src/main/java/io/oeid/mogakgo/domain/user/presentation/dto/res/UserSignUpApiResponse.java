@@ -13,7 +13,7 @@ import lombok.Getter;
 public class UserSignUpApiResponse {
 
     @Schema(description = "회원 ID", example = "1")
-    private Long userId;
+    private Long id;
     @Schema(description = "회원 이름", example = "거루")
     private String username;
     @Schema(description = "깃허브 ID", example = "tidavid1")
