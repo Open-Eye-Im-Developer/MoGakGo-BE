@@ -1,11 +1,15 @@
 package io.oeid.mogakgo.domain.user.application;
 
+import io.oeid.mogakgo.domain.achievement.domain.Achievement;
+import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.profile.application.ProfileCardService;
 import io.oeid.mogakgo.domain.profile.application.dto.req.UserProfileCardReq;
 import io.oeid.mogakgo.domain.user.application.dto.req.UserSignUpRequest;
+import io.oeid.mogakgo.domain.user.application.dto.req.UserUpdateReq;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserDevelopLanguageRes;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserProfileResponse;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserSignUpResponse;
+import io.oeid.mogakgo.domain.user.application.dto.res.UserUpdateRes;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
@@ -34,6 +38,7 @@ public class UserService {
     private final UserWantedJobTagJpaRepository userWantedJobTagRepository;
     private final UserDevelopLanguageTagJpaRepository userDevelopLanguageTagRepository;
     private final UserGithubUtil userGithubUtil;
+    private final AchievementJpaRepository achievementRepository;
 
     @Transactional
     public UserSignUpResponse userSignUp(UserSignUpRequest userSignUpRequest) {
@@ -76,6 +81,24 @@ public class UserService {
         return UserProfileResponse.from(user);
     }
 
+    // TODO: 이후 AchievementException 구현 시 추가 필요!
+    public UserUpdateRes updateUserInfos(Long userId, UserUpdateReq request) {
+        User user = userCommonService.getUserById(userId);
+        Achievement achievement = achievementRepository.findById(request.getAchievementId())
+            .orElseThrow();
+        user.updateUserInfos(request.getUsername(), request.getAvatarUrl(), request.getBio(),
+            achievement);
+        validateWantedJobDuplicate(request.getWantedJobs());
+        for (WantedJob wantedJob : request.getWantedJobs()) {
+            userWantedJobTagRepository.save(UserWantedJobTag.builder()
+                .user(user)
+                .wantedJob(wantedJob)
+                .build());
+        }
+        profileCardService.create(UserProfileCardReq.of(user));
+        return UserUpdateRes.from(user);
+    }
+
     @Transactional
     public void deleteUser(Long userId) {
         User user = userCommonService.getUserById(userId);
@@ -89,11 +112,5 @@ public class UserService {
         }
     }
 
-    private void validateDevelopLanguageDuplicate(List<DevelopLanguage> developLanguages) {
-        Set<DevelopLanguage> developLanguageSet = new HashSet<>(developLanguages);
-        if (developLanguageSet.size() != developLanguages.size()) {
-            throw new UserException(ErrorCode400.USER_DEVELOP_LANGUAGE_DUPLICATE);
-        }
-    }
 
 }

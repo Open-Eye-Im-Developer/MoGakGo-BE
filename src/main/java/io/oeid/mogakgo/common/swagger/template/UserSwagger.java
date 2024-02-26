@@ -3,7 +3,7 @@ package io.oeid.mogakgo.common.swagger.template;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
-import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiRequest;
+import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiReq;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserDevelopLanguageApiRes;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserSignUpApiResponse;
@@ -43,7 +43,7 @@ public interface UserSwagger {
     })
     ResponseEntity<UserSignUpApiResponse> userSignUpApi(
         @Parameter(hidden = true) Long userId,
-        UserSignUpApiRequest apiRequest);
+        UserSignUpApiReq apiRequest);
 
     @Operation(summary = "회원 삭제", description = "회원을 삭제할 때 사용하는 API")
     @ApiResponses(value = {

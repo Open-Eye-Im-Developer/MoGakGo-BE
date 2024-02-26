@@ -34,6 +34,7 @@ public enum ErrorCode400 implements ErrorCode {
     USER_AVAILABLE_LIKE_COUNT_IS_ZERO("E020107", "당일 사용할 수 있는 찔러보기 요청을 모두 소진했습니다."),
     USER_AVAILABLE_LIKE_AMOUNT_IS_FULL("E020108", "프로필 카드의 찔러보기 요청의 최대 횟수를 넘을 수 없습니다."),
     USER_ID_NOT_NULL("E020001", "유저 아이디는 필수값입니다."),
+    USER_AVATAR_URL_NOT_NULL("E020109", "유저 프로필 이미지는 필수값입니다."),
 
     PROFILE_CARD_LIKE_ALREADY_EXIST("E040102", "이미 찔러보기 요청을 전송한 프로필 카드에 찔러보기 요청을 전송할 수 없습니다."),
     INVALID_PROFILE_CARD_LIKE_RECEIVER_INFO("E040103", "찔러보기 요청의 사용자가 존재하지 않습니다."),
