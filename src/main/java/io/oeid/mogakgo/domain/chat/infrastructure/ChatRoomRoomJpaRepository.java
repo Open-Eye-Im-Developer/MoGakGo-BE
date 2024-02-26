@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ChatRoomJpaRepository extends JpaRepository<ChatRoom, String> {
+public interface ChatRoomRoomJpaRepository extends JpaRepository<ChatRoom, String>,
+    ChatRoomCustomRepository {
 
     @Query("select c from ChatRoom c where c.creator.id = ?1 or c.sender.id = ?1 order by c.id DESC")
     List<ChatRoom> findAllByUserId(Long id);

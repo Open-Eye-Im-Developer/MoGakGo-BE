@@ -3,6 +3,8 @@ package io.oeid.mogakgo.domain.chat.presentation;
 import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.domain.chat.application.ChatService;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +20,8 @@ public class ChatController {
     private final ChatService chatService;
 
     @GetMapping
-    public void getChatRoomList(@UserId Long userId) {
-        chatService.findAllChatRoomByUserId(userId);
+    public ResponseEntity<List<ChatRoomPublicRes>> getChatRoomList(@UserId Long userId) {
+        return ResponseEntity.ok(chatService.findAllChatRoomByUserId(userId));
     }
 
     @GetMapping("/{chatRoomId}")

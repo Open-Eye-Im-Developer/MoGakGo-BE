@@ -8,7 +8,7 @@ import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
-import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomJpaRepository;
+import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomSessionRepository;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
@@ -24,7 +24,7 @@ import org.springframework.web.socket.WebSocketSession;
 @Service
 public class ChatWebSocketService {
 
-    private final ChatRoomJpaRepository chatRoomJpaRepository;
+    private final ChatRoomRoomJpaRepository chatRoomJpaRepository;
     private final ChatRepository chatRepository;
     private final ChatRoomSessionRepository chatRoomSessionRepository;
 

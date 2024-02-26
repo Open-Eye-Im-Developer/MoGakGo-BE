@@ -6,7 +6,7 @@ import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
-import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomJpaRepository;
+import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
 import io.oeid.mogakgo.domain.matching.exception.MatchingException;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
@@ -27,16 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatService {
 
     private final UserCommonService userCommonService;
-    private final ChatRoomJpaRepository chatRoomRepository;
+    private final ChatRoomRoomJpaRepository chatRoomRepository;
     private final ChatRepository chatRepository;
     private final ProjectJpaRepository projectRepository;
 
     // 채팅방 리스트 조회
     // TODO 마지막 채팅 기록 가져오기 구현
     public List<ChatRoomPublicRes> findAllChatRoomByUserId(Long userId) {
-        User user = userCommonService.getUserById(userId);
-        return null;
-        //return chatRoomRepository.findAllByUserId(user.getId());
+        return chatRoomRepository.findAllChatRoomByUserId(userId);
     }
 
     // 채팅방 생성
