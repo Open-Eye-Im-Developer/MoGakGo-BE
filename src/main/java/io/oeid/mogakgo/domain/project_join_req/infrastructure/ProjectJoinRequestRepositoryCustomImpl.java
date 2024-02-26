@@ -93,7 +93,6 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
         List<ProjectJoinRequestDetailAPIRes> result = entities.stream().map(
             projectJoinRequest -> new ProjectJoinRequestDetailAPIRes(
                     projectJoinRequest.getProject().getId(),
-                    projectJoinRequest.getProject().getProjectStatus(),
                     projectJoinRequest.getProject().getCreator().getAvatarUrl(),
                     new MeetingInfoResponse(
                         projectJoinRequest.getProject().getMeetingInfo().getMeetStartTime(),

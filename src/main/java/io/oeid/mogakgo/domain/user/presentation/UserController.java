@@ -4,11 +4,14 @@ import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.swagger.template.UserSwagger;
 import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.user.application.UserService;
-import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiRequest;
+import io.oeid.mogakgo.domain.user.application.dto.req.UserUpdateReq;
+import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiReq;
+import io.oeid.mogakgo.domain.user.presentation.dto.req.UserUpdateApiReq;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserDevelopLanguageApiRes;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserMatchingStatus;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserSignUpApiResponse;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserUpdateApiRes;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,18 +37,25 @@ public class UserController implements UserSwagger {
         return ResponseEntity.ok(UserPublicApiResponse.fromByUserProfile(response));
     }
 
-    @PatchMapping("/sign")
-    public ResponseEntity<UserSignUpApiResponse> userSignUpApi(@UserId Long userId,
-        @RequestBody @Valid UserSignUpApiRequest apiRequest) {
-        var response = userService.userSignUp(apiRequest.toRequest(userId));
-        return ResponseEntity.ok(UserSignUpApiResponse.from(response));
-    }
-
     @GetMapping("/develop-language")
     public ResponseEntity<List<UserDevelopLanguageApiRes>> userDevelopLanguageApi(
         @UserId Long userId) {
         var response = userService.updateUserDevelopLanguages(userId);
         return ResponseEntity.ok(response.stream().map(UserDevelopLanguageApiRes::from).toList());
+    }
+
+    @PatchMapping
+    public ResponseEntity<UserUpdateApiRes> userUpdateApi(@UserId Long userId,
+        @RequestBody @Valid UserUpdateApiReq request) {
+        var result = userService.updateUserInfos(userId, UserUpdateReq.from(request));
+        return ResponseEntity.ok(UserUpdateApiRes.from(result));
+    }
+
+    @PatchMapping("/sign")
+    public ResponseEntity<UserSignUpApiResponse> userSignUpApi(@UserId Long userId,
+        @RequestBody @Valid UserSignUpApiReq apiRequest) {
+        var response = userService.userSignUp(apiRequest.toRequest(userId));
+        return ResponseEntity.ok(UserSignUpApiResponse.from(response));
     }
 
     @DeleteMapping

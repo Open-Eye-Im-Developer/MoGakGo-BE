@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserSignUpApiRequest {
+public class UserSignUpApiReq {
 
     @Schema(description = "회원명", example = "거루", implementation = String.class)
     @NotBlank(message = "username은 필수입니다.")
