@@ -52,14 +52,26 @@ public class ChatService {
     }
 
     // 채팅방 조회
-    public ChatRoomDataRes findAllChatInChatRoom(Long userId, String chatRoomId) {
-        var user = userCommonService.getUserById(userId);
-        var chatRoom = chatRoomRepository.findById(chatRoomId)
-            .orElseThrow(() -> new MatchingException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
-        chatRoom.validateContainsUser(user);
+    public void findAllChatInChatRoom(Long userId, String chatRoomId) {
+//        var user = userCommonService.getUserById(userId);
+//        var chatRoom = findChatRoomById(chatRoomId);
+//        chatRoom.validateContainsUser(user);
+//        var project = projectRepository.findById(chatRoom.getProject().getId())
+//            .orElseThrow(() -> new ProjectException(ErrorCode404.PROJECT_NOT_FOUND));
+//        var chatList = chatRepository.findAllByCollection(chatRoomId);
+//        return ChatRoomDataRes.of(project.getMeetingInfo(), chatList);
+    }
+
+    public ChatRoomDataRes findChatRoomDetailData(Long userId, String chatRoomId) {
+        userCommonService.getUserById(userId);
+        var chatRoom = findChatRoomById(chatRoomId);
         var project = projectRepository.findById(chatRoom.getProject().getId())
             .orElseThrow(() -> new ProjectException(ErrorCode404.PROJECT_NOT_FOUND));
-        var chatList = chatRepository.findAllByCollection(chatRoomId);
-        return ChatRoomDataRes.of(project.getMeetingInfo(), chatList);
+        return ChatRoomDataRes.from(project.getMeetingInfo());
+    }
+
+    private ChatRoom findChatRoomById(String chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId)
+            .orElseThrow(() -> new MatchingException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
     }
 }

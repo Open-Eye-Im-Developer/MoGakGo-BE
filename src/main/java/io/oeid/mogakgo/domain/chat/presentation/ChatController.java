@@ -1,14 +1,18 @@
 package io.oeid.mogakgo.domain.chat.presentation;
 
 import io.oeid.mogakgo.common.annotation.UserId;
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.common.swagger.template.ChatSwagger;
 import io.oeid.mogakgo.domain.chat.application.ChatService;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,9 +29,15 @@ public class ChatController implements ChatSwagger {
         return ResponseEntity.ok(chatService.findAllChatRoomByUserId(userId));
     }
 
-    @GetMapping("/{chatRoomId}")
+    @GetMapping("detail/{chatRoomId}")
     public ResponseEntity<ChatRoomDataRes> getChatRoomDetailData(@UserId Long userId,
         @PathVariable String chatRoomId) {
-        return ResponseEntity.ok(chatService.findAllChatInChatRoom(userId, chatRoomId));
+        return ResponseEntity.ok(chatService.findChatRoomDetailData(userId, chatRoomId));
+    }
+
+    @GetMapping("/{chatRoomId}")
+    public ResponseEntity<CursorPaginationResult<Void>> getChatData(@PathVariable String chatRoomId,
+        @UserId Long userId, @Valid @ModelAttribute CursorPaginationInfoReq pageable) {
+        return ResponseEntity.ok().build();
     }
 }
