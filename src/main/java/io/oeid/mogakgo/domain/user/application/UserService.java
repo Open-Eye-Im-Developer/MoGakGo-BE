@@ -82,6 +82,7 @@ public class UserService {
     }
 
     // TODO: 이후 AchievementException 구현 시 추가 필요!
+    @Transactional
     public UserUpdateRes updateUserInfos(Long userId, UserUpdateReq request) {
         User user = userCommonService.getUserById(userId);
         Achievement achievement = achievementRepository.findById(request.getAchievementId())
