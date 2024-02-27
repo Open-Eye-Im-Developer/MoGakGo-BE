@@ -59,6 +59,7 @@ public class ChatRoom {
     }
 
     public void closeChat() {
+        validateChatAvailableClosed();
         this.status = ChatStatus.CLOSED;
     }
 
@@ -71,6 +72,12 @@ public class ChatRoom {
     public void validateContainsUser(User user) {
         if (!creator.equals(user) && !sender.equals(user)) {
             throw new ChatException(ErrorCode400.CHAT_ROOM_USER_NOT_CONTAINS);
+        }
+    }
+
+    private void validateChatAvailableClosed() {
+        if (this.status.equals(ChatStatus.CLOSED)) {
+            throw new ChatException(ErrorCode400.CHAT_ROOM_ALREADY_CLOSED);
         }
     }
 
