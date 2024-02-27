@@ -1,10 +1,13 @@
 package io.oeid.mogakgo.domain.chat.application;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode404.CHAT_ROOM_NOT_FOUND;
+
 import io.oeid.mogakgo.domain.chat.application.dto.req.ChatRoomCreateReq;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomCreateRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
+import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
 import io.oeid.mogakgo.domain.matching.exception.MatchingException;
@@ -55,11 +58,20 @@ public class ChatService {
     public ChatRoomDataRes findAllChatInChatRoom(Long userId, String chatRoomId) {
         var user = userCommonService.getUserById(userId);
         var chatRoom = chatRoomRepository.findById(chatRoomId)
-            .orElseThrow(() -> new MatchingException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
+            .orElseThrow(() -> new MatchingException(CHAT_ROOM_NOT_FOUND));
         chatRoom.validateContainsUser(user);
         var project = projectRepository.findById(chatRoom.getProject().getId())
             .orElseThrow(() -> new ProjectException(ErrorCode404.PROJECT_NOT_FOUND));
         var chatList = chatRepository.findAllByCollection(chatRoomId);
         return ChatRoomDataRes.of(project.getMeetingInfo(), chatList);
+    }
+
+    @Transactional
+    public void leaveChatroom(Long userId, String chatRoomId) {
+        var user = userCommonService.getUserById(userId);
+        var chatRoom = chatRoomRepository.findById(chatRoomId)
+            .orElseThrow(() -> new ChatException(CHAT_ROOM_NOT_FOUND));
+        chatRoom.validateContainsUser(user);
+        chatRoom.closeChat();
     }
 }
