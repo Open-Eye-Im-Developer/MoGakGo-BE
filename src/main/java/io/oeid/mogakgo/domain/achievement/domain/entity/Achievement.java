@@ -1,6 +1,7 @@
-package io.oeid.mogakgo.domain.achievement.domain;
+package io.oeid.mogakgo.domain.achievement.domain.entity;
 
-import io.oeid.mogakgo.domain.achievement.domain.enums.AchievementType;
+import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
+import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,7 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,16 +33,18 @@ public class Achievement {
     @Column(name = "img_url")
     private String imgUrl;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type")
-    private AchievementType achievementType;
+    @Column(name = "progress_level")
+    private Integer progressLevel;
 
-    @Builder
-    private Achievement(String title, String description, String imgUrl,
-        AchievementType achievementType) {
-        this.title = title;
-        this.description = description;
-        this.imgUrl = imgUrl;
-        this.achievementType = achievementType;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "requirement_type")
+    private RequirementType requirementType;
+
+    @Column(name = "requirement_value")
+    private Integer requirementValue;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "activity_type")
+    private ActivityType activityType;
+
 }
