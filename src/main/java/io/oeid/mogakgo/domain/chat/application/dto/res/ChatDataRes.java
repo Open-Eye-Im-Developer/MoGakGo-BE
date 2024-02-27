@@ -13,6 +13,8 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatDataRes {
 
+    @Schema(description = "채팅 ID")
+    private Long id;
     @Schema(description = "메시지 타입")
     private ChatMessageType messageType;
     @Schema(description = "보낸 사람 ID")
@@ -23,7 +25,7 @@ public class ChatDataRes {
     private LocalDateTime createdAt;
 
     public static ChatDataRes from(ChatMessage chatMessage) {
-        return new ChatDataRes(chatMessage.getMessageType(), chatMessage.getSenderId(),
-            chatMessage.getMessage(), chatMessage.getCreatedAt());
+        return new ChatDataRes(chatMessage.getId(), chatMessage.getMessageType(),
+            chatMessage.getSenderId(), chatMessage.getMessage(), chatMessage.getCreatedAt());
     }
 }

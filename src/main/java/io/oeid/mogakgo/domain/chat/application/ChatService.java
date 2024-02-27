@@ -59,7 +59,7 @@ public class ChatService {
         var user = userCommonService.getUserById(userId);
         var chatRoom = findChatRoomById(chatRoomId);
         chatRoom.validateContainsUser(user);
-        return null;
+        return chatRepository.findAllByCollection(chatRoomId, pageable);
     }
 
     public ChatRoomDataRes findChatRoomDetailData(Long userId, String chatRoomId) {
