@@ -22,11 +22,10 @@ public enum ActivityType {
     FRESH_DEVELOPER(List.of(28, 29, 30)),
     ;
 
-    private final List<Integer> IncludedDbIdList;
+    private final List<Integer> includedDbIdList;
 
     ActivityType(List<Integer> includedDbIdList) {
-        IncludedDbIdList = includedDbIdList;
+        this.includedDbIdList = includedDbIdList;
     }
-
 
 }
