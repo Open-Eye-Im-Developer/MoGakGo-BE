@@ -4,8 +4,8 @@ import static io.oeid.mogakgo.exception.code.ErrorCode500.CHAT_WEB_SOCKET_ERROR;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.oeid.mogakgo.domain.chat.application.ChatWebSocketService;
+import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
-import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

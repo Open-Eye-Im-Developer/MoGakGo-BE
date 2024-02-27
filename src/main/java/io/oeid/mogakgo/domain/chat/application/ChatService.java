@@ -4,7 +4,7 @@ import io.oeid.mogakgo.domain.chat.application.dto.req.ChatRoomCreateReq;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomCreateRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
-import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
+import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
 import io.oeid.mogakgo.domain.matching.exception.MatchingException;
