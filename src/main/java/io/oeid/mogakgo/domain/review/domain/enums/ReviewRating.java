@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum ReviewRating {
-    ONE(1),
-    TWO(2),
-    THREE(3),
-    FOUR(4),
-    FIVE(5);
+    ONE(-2),
+    TWO(-1),
+    THREE(1),
+    FOUR(2),
+    FIVE(3);
 
     private final int value;
 

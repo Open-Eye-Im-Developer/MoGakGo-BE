@@ -9,8 +9,11 @@ import io.oeid.mogakgo.domain.review.infrastructure.ReviewJpaRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,7 @@ public class ReviewService {
     private final ProjectJpaRepository projectRepository;
     private final UserCommonService userCommonService;
 
+    @Transactional
     public ReviewCreateRes createNewReview(ReviewCreateReq request) {
         reviewRepository.findReviewByProjectData(request.getSenderId(), request.getReceiverId(),
             request.getProjectId()).ifPresent(review -> {
@@ -36,9 +40,17 @@ public class ReviewService {
             .rating(request.getRating())
             .build()
         );
+        receiver.updateJandiRateByReview(review.getRating(),
+            calculateProjectTime(project.getMeetingInfo().getMeetStartTime(),
+                project.getMeetingInfo().getMeetEndTime()));
         return ReviewCreateRes.from(review);
     }
 
-
+    private double calculateProjectTime(LocalDateTime meetStartTime, LocalDateTime meetEndTime) {
+        Duration duration = Duration.between(meetStartTime, meetEndTime);
+        double hours = duration.toHours();
+        double minutes = duration.toMinutes() % 60;
+        return hours + minutes / 60;
+    }
 
 }

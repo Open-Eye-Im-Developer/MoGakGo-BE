@@ -5,6 +5,7 @@ import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_CO
 
 import io.oeid.mogakgo.domain.achievement.domain.Achievement;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
+import io.oeid.mogakgo.domain.review.domain.enums.ReviewRating;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
@@ -43,6 +44,7 @@ public class User {
 
     private static final int MAX_TAG_SIZE = 3;
     private static final int MAX_AVAILABLE_LIKE_COUNT = 10;
+    private static final double JANDI_WEIGHT = 2.5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -111,7 +113,8 @@ public class User {
     @JoinColumn(name = "achievement_id")
     private Achievement achievement;
 
-    private User(Long githubPk, String githubId, String avatarUrl, String githubUrl, String repositoryUrl) {
+    private User(Long githubPk, String githubId, String avatarUrl, String githubUrl,
+        String repositoryUrl) {
         this.githubPk = githubPk;
         this.username = githubId;
         this.githubId = githubId;
@@ -123,7 +126,8 @@ public class User {
         this.signupYn = false;
     }
 
-    public static User of(long githubPk, String username, String avatarUrl, String githubUrl, String repositoryUrl) {
+    public static User of(long githubPk, String username, String avatarUrl, String githubUrl,
+        String repositoryUrl) {
         return new User(githubPk, username, avatarUrl, githubUrl, repositoryUrl);
     }
 
@@ -145,7 +149,8 @@ public class User {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
-    public void updateGithubInfo(String githubId, String avatarUrl, String githubUrl, String repositoryUrl) {
+    public void updateGithubInfo(String githubId, String avatarUrl, String githubUrl,
+        String repositoryUrl) {
         this.githubId = githubId;
         this.avatarUrl = avatarUrl;
         this.githubUrl = githubUrl;
@@ -200,7 +205,8 @@ public class User {
         }
     }
 
-    public void updateUserInfos(String username, String avatarUrl, String bio, Achievement achievement) {
+    public void updateUserInfos(String username, String avatarUrl, String bio,
+        Achievement achievement) {
         updateUsername(username);
         this.avatarUrl = verifyAvatarUrl(avatarUrl);
         this.bio = bio;
@@ -208,9 +214,12 @@ public class User {
         deleteAllWantJobTags();
     }
 
-    //TODO : 추후 구현 필요
-    public void decreaseJandiRate() {
-        return;
+    public void updateJandiRateByReview(ReviewRating rating, double time) {
+        this.jandiRate += rating.getValue() * time * JANDI_WEIGHT;
+    }
+
+    public void updateJandiRateByCancel() {
+        this.jandiRate += -5 * JANDI_WEIGHT;
     }
 
     private boolean validateAvailableRegionUpdate(Region region) {
@@ -223,8 +232,6 @@ public class User {
         }
         return avatarUrl;
     }
-
-
 
 
 }
