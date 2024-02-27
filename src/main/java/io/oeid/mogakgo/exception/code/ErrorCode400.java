@@ -60,6 +60,7 @@ public enum ErrorCode400 implements ErrorCode {
     REVIEW_SENDER_OR_RECEIVER_NOT_FOUND("E120101", "리뷰를 작성하기 위한 유저 정보가 존재하지 않습니다."),
     REVIEW_USER_DUPLICATED("E120102", "자신에 대한 리뷰는 작성할 수 없습니다."),
     REVIEW_PROJECT_NOT_NULL("E120103", "리뷰를 작성하기 위한 프로젝트 정보가 존재하지 않습니다."),
+    REVIEW_ALREADY_EXISTS("E120104", "이미 작성된 리뷰가 존재합니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
