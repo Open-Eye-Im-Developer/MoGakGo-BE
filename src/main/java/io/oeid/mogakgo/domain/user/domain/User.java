@@ -122,7 +122,7 @@ public class User {
         this.githubUrl = githubUrl;
         this.repositoryUrl = repositoryUrl;
         this.role = Role.ROLE_USER;
-        this.jandiRate = 0d;
+        this.jandiRate = 10d;
         this.signupYn = false;
     }
 
