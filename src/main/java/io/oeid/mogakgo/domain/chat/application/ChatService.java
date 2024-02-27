@@ -1,6 +1,9 @@
 package io.oeid.mogakgo.domain.chat.application;
 
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.chat.application.dto.req.ChatRoomCreateReq;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomCreateRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
@@ -52,19 +55,17 @@ public class ChatService {
     }
 
     // 채팅방 조회
-    public void findAllChatInChatRoom(Long userId, String chatRoomId) {
-//        var user = userCommonService.getUserById(userId);
-//        var chatRoom = findChatRoomById(chatRoomId);
-//        chatRoom.validateContainsUser(user);
-//        var project = projectRepository.findById(chatRoom.getProject().getId())
-//            .orElseThrow(() -> new ProjectException(ErrorCode404.PROJECT_NOT_FOUND));
-//        var chatList = chatRepository.findAllByCollection(chatRoomId);
-//        return ChatRoomDataRes.of(project.getMeetingInfo(), chatList);
+    public CursorPaginationResult<ChatDataRes> findAllChatInChatRoom(Long userId, String chatRoomId, CursorPaginationInfoReq pageable) {
+        var user = userCommonService.getUserById(userId);
+        var chatRoom = findChatRoomById(chatRoomId);
+        chatRoom.validateContainsUser(user);
+        return null;
     }
 
     public ChatRoomDataRes findChatRoomDetailData(Long userId, String chatRoomId) {
-        userCommonService.getUserById(userId);
+        var user = userCommonService.getUserById(userId);
         var chatRoom = findChatRoomById(chatRoomId);
+        chatRoom.validateContainsUser(user);
         var project = projectRepository.findById(chatRoom.getProject().getId())
             .orElseThrow(() -> new ProjectException(ErrorCode404.PROJECT_NOT_FOUND));
         return ChatRoomDataRes.from(project.getMeetingInfo());

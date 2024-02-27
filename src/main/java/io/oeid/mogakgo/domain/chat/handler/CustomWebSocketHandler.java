@@ -3,6 +3,7 @@ package io.oeid.mogakgo.domain.chat.handler;
 import static io.oeid.mogakgo.exception.code.ErrorCode500.CHAT_WEB_SOCKET_ERROR;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.oeid.mogakgo.domain.chat.application.ChatIdSequenceGeneratorService;
 import io.oeid.mogakgo.domain.chat.application.ChatWebSocketService;
 import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
@@ -23,6 +24,7 @@ public class CustomWebSocketHandler implements WebSocketHandler {
 
     private final ObjectMapper objectMapper;
     private final ChatWebSocketService chatWebSocketService;
+    private final ChatIdSequenceGeneratorService sequenceGeneratorService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -44,6 +46,7 @@ public class CustomWebSocketHandler implements WebSocketHandler {
             }
             default -> chatWebSocketService.sendMessageToEachSocket(chatRoom.getId(), textMessage);
         }
+        chatMessage.setId(sequenceGeneratorService.generateSequence(chatMessage.getChatRoomId()));
         chatWebSocketService.saveChatMessage(chatMessage, chatRoom.getId());
     }
 
