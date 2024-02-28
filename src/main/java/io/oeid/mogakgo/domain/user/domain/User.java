@@ -3,7 +3,7 @@ package io.oeid.mogakgo.domain.user.domain;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_AMOUNT_IS_FULL;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_COUNT_IS_ZERO;
 
-import io.oeid.mogakgo.domain.achievement.domain.Achievement;
+import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
 import io.oeid.mogakgo.domain.user.exception.UserException;
