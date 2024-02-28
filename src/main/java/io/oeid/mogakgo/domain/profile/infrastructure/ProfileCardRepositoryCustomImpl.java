@@ -35,6 +35,8 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
                 regionEq(region),
                 deletedProfileCardEq()
             )
+            // 최근순
+            .orderBy(profileCard.id.desc())
             .limit(pageable.getPageSize() + 1)
             .fetch();
 
@@ -69,7 +71,7 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
     }
 
     private BooleanExpression cursorIdCondition(Long cursorId) {
-        return cursorId != null ? profileCard.id.gt(cursorId) : null;
+        return cursorId != null ? profileCard.id.lt(cursorId) : null;
     }
 
     private BooleanExpression deletedProfileCardEq() {
