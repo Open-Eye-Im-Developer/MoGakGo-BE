@@ -13,6 +13,7 @@ import io.oeid.mogakgo.domain.project.domain.entity.ProjectTag;
 import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.MeetingInfoResponse;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
 import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
@@ -81,6 +82,37 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     }
 
     @Override
+    public CursorPaginationResult<ProjectInfoAPIRes> findByCreatorIdWithPagination(
+        Long userId, CursorPaginationInfoReq pageable
+    ) {
+        List<Project> entities = jpaQueryFactory.selectFrom(project)
+            .innerJoin(project.creator, user)
+            .on(project.creator.id.eq(user.id))
+            .where(
+                userIdEq(userId),
+                deletedAtEq()
+            )
+            .orderBy(project.id.desc())
+            .limit(pageable.getPageSize() + 1)
+            .fetch();
+
+        List<ProjectInfoAPIRes> result = entities.stream().map(
+            project -> new ProjectInfoAPIRes(
+                project.getId(),
+                project.getProjectStatus(),
+                project.getCreator().getAvatarUrl(),
+                project.getMeetingInfo().getMeetDetail(),
+                project.getMeetingInfo().getMeetStartTime(),
+                project.getMeetingInfo().getMeetEndTime()
+            )
+        ).toList();
+
+        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(
+            result, pageable.getPageSize()
+        );
+    }
+
+    @Override
     public List<Region> getDensityRankProjectsByRegion(int limit) {
         return jpaQueryFactory.select(project.creatorInfo.region)
             .from(project)
@@ -111,5 +143,9 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
         return project.createdAt.year().eq(today.getYear())
             .and(project.createdAt.month().eq(today.getMonthValue()))
             .and(project.createdAt.dayOfMonth().eq(today.getDayOfMonth()));
+    }
+
+    private BooleanExpression deletedAtEq() {
+        return project.deletedAt.isNull();
     }
 }
