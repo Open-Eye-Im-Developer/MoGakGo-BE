@@ -1,6 +1,6 @@
 package io.oeid.mogakgo.domain.user.application;
 
-import io.oeid.mogakgo.domain.achievement.domain.Achievement;
+import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.profile.application.ProfileCardService;
 import io.oeid.mogakgo.domain.profile.application.dto.req.UserProfileCardReq;
