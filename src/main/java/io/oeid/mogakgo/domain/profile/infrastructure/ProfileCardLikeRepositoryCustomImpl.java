@@ -58,6 +58,8 @@ public class ProfileCardLikeRepositoryCustomImpl implements ProfileCardLikeRepos
                 cursorIdCondition(pageable.getCursorId()),
                 senderIdEq(senderId)
             )
+            // 최근순
+            .orderBy(profileCardLike.id.desc())
             .limit(pageable.getPageSize() + 1)
             .fetch();
 
@@ -83,6 +85,6 @@ public class ProfileCardLikeRepositoryCustomImpl implements ProfileCardLikeRepos
     }
 
     private BooleanExpression cursorIdCondition(Long cursorId) {
-        return cursorId != null ? profileCardLike.id.gt(cursorId) : null;
+        return cursorId != null ? profileCardLike.id.lt(cursorId) : null;
     }
 }

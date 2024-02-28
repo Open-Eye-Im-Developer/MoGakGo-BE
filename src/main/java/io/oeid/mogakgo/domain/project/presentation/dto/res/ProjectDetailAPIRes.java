@@ -1,6 +1,10 @@
 package io.oeid.mogakgo.domain.project.presentation.dto.res;
 
+import io.oeid.mogakgo.domain.project.domain.entity.Project;
+import io.oeid.mogakgo.domain.project.domain.entity.ProjectTag;
 import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
+import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
+import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -44,6 +48,33 @@ public class ProjectDetailAPIRes {
             projectStatus,
             projectTags,
             meetingInfo
+        );
+    }
+
+    public static ProjectDetailAPIRes from(Project project) {
+        return ProjectDetailAPIRes.of(project.getId(),
+            new UserPublicApiResponse(
+                project.getCreator().getId(),
+                project.getCreator().getUsername(),
+                project.getCreator().getGithubId(),
+                project.getCreator().getAvatarUrl(),
+                project.getCreator().getGithubUrl(),
+                project.getCreator().getBio(),
+                project.getCreator().getJandiRate(),
+                project.getCreator().getAchievement() != null ? project.getCreator()
+                    .getAchievement().getTitle() : null,
+                project.getCreator().getUserDevelopLanguageTags().stream().map(
+                    UserDevelopLanguageTag::getDevelopLanguage).map(String::valueOf).toList(),
+                project.getCreator().getUserWantedJobTags().stream().map(
+                    UserWantedJobTag::getWantedJob).map(String::valueOf).toList()
+            ),
+            project.getProjectStatus(),
+            project.getProjectTags().stream().map(ProjectTag::getContent).toList(),
+            new MeetingInfoResponse(
+                project.getMeetingInfo().getMeetStartTime(),
+                project.getMeetingInfo().getMeetEndTime(),
+                project.getMeetingInfo().getMeetDetail()
+            )
         );
     }
 }

@@ -22,6 +22,7 @@ import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDensityRankRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequestJpaRepository;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
@@ -148,6 +149,23 @@ public class ProjectService {
         // 요청할 때마다 랜덤 정렬
         Collections.shuffle(projects.getData());
         return projects;
+    }
+
+    public CursorPaginationResult<ProjectInfoAPIRes> getByCreatorId(
+        Long userId, Long creatorId, CursorPaginationInfoReq pageable
+    ) {
+        User user = getUser(userId);
+        validateProjectCardCreator(user, creatorId);
+
+        return projectJpaRepository.findByCreatorIdWithPagination(creatorId, pageable);
+    }
+
+    public ProjectDetailAPIRes getByProjectId(Long userId, Long id, Long projectId) {
+        User user = getUser(userId);
+
+        validateProjectCardCreator(user, id);
+
+        return ProjectDetailAPIRes.from(getProject(projectId));
     }
 
     public ProjectDensityRankRes getDensityRankProjects() {

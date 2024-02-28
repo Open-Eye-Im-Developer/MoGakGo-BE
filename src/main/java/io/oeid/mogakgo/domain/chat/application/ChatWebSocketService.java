@@ -3,8 +3,8 @@ package io.oeid.mogakgo.domain.chat.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode500.CHAT_WEB_SOCKET_ERROR;
 
+import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
-import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;

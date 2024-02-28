@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.chat.entity.document;
+package io.oeid.mogakgo.domain.chat.entity;
 
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
