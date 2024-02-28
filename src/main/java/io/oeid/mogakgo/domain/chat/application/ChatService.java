@@ -1,7 +1,5 @@
 package io.oeid.mogakgo.domain.chat.application;
 
-import static io.oeid.mogakgo.exception.code.ErrorCode404.CHAT_ROOM_NOT_FOUND;
-
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.chat.application.dto.req.ChatRoomCreateReq;
@@ -9,7 +7,6 @@ import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomCreateRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
-import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
@@ -40,7 +37,7 @@ public class ChatService {
     // 채팅방 리스트 조회
     // TODO 마지막 채팅 기록 가져오기 구현
     public List<ChatRoomPublicRes> findAllChatRoomByUserId(Long userId) {
-        userCommonService.getUserById(userId);
+        findUserById(userId);
         return chatRoomRepository.findAllChatRoomByUserId(userId);
     }
 
@@ -49,24 +46,35 @@ public class ChatService {
     public ChatRoomCreateRes createChatRoom(Long creatorId, ChatRoomCreateReq request) {
         Project project = projectRepository.findById(request.getProjectId())
             .orElseThrow(() -> new MatchingException(ErrorCode404.PROJECT_NOT_FOUND));
-        User creator = userCommonService.getUserById(creatorId);
-        User sender = userCommonService.getUserById(request.getSenderId());
+        User creator = findUserById(creatorId);
+        User sender = findUserById(request.getSenderId());
         ChatRoom chatRoom = chatRoomRepository.save(
             ChatRoom.builder().project(project).creator(creator).sender(sender).build());
         chatRepository.createCollection(chatRoom.getId());
         return ChatRoomCreateRes.from(chatRoom);
     }
 
+    @Transactional
+    public void leaveChatroom(Long userId, String chatRoomId) {
+        var user = findUserById(userId);
+        var chatRoom = findChatRoomById(chatRoomId);
+
+        // 채팅방 비활성화
+        chatRoom.closeChat();
+
+        chatRoom.leave(user);
+    }
+
     // 채팅방 조회
     public CursorPaginationResult<ChatDataRes> findAllChatInChatRoom(Long userId, String chatRoomId, CursorPaginationInfoReq pageable) {
-        var user = userCommonService.getUserById(userId);
+        var user = findUserById(userId);
         var chatRoom = findChatRoomById(chatRoomId);
         chatRoom.validateContainsUser(user);
         return chatRepository.findAllByCollection(chatRoomId, pageable);
     }
 
     public ChatRoomDataRes findChatRoomDetailData(Long userId, String chatRoomId) {
-        var user = userCommonService.getUserById(userId);
+        var user = findUserById(userId);
         var chatRoom = findChatRoomById(chatRoomId);
         chatRoom.validateContainsUser(user);
         var project = projectRepository.findById(chatRoom.getProject().getId())
@@ -79,12 +87,8 @@ public class ChatService {
             .orElseThrow(() -> new MatchingException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
     }
 
-    @Transactional
-    public void leaveChatroom(Long userId, String chatRoomId) {
-        var user = userCommonService.getUserById(userId);
-        var chatRoom = chatRoomRepository.findById(chatRoomId)
-            .orElseThrow(() -> new ChatException(CHAT_ROOM_NOT_FOUND));
-        chatRoom.validateContainsUser(user);
-        chatRoom.closeChat();
+    private User findUserById(Long userId) {
+        return userCommonService.getUserById(userId);
     }
+
 }
