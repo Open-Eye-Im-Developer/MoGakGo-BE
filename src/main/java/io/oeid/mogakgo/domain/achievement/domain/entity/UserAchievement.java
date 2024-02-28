@@ -1,5 +1,8 @@
 package io.oeid.mogakgo.domain.achievement.domain.entity;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.NON_ACHIEVED_USER_ACHIEVEMENT;
+
+import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
 import io.oeid.mogakgo.domain.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,7 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Entity
-@Table(name = "user_achievement_tb")
+@Table(name = "user_achievement_mapping_tb")
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class UserAchievement {
@@ -47,5 +50,11 @@ public class UserAchievement {
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public void validateAvailableUpdateAchievement() {
+        if (this.completed.equals(Boolean.FALSE)) {
+            throw new UserAchievementException(NON_ACHIEVED_USER_ACHIEVEMENT);
+        }
+    }
 
 }
