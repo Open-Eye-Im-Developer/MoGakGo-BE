@@ -62,8 +62,8 @@ public enum ErrorCode400 implements ErrorCode {
     REVIEW_PROJECT_NOT_NULL("E120103", "리뷰를 작성하기 위한 프로젝트 정보가 존재하지 않습니다."),
     REVIEW_ALREADY_EXISTS("E120104", "이미 작성된 리뷰가 존재합니다."),
 
-    NON_ACHIEVED_USER_ACHIEVEMENT("E130101", "미달성 업적을 사용할 수 없습니다."),
-    ACHIEVEMENT_SHOULD_BE_DIFFERENT("E130102", "이미 해당 업적을 대표 업적으로 사용중입니다."),
+    NON_ACHIEVED_USER_ACHIEVEMENT("E140101", "미달성 업적을 사용할 수 없습니다."),
+    ACHIEVEMENT_SHOULD_BE_DIFFERENT("E140102", "이미 해당 업적을 대표 업적으로 사용중입니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
