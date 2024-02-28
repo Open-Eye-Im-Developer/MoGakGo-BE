@@ -59,8 +59,20 @@ public class ChatRoom {
     }
 
     public void closeChat() {
-        validateChatAvailableClosed();
-        this.status = ChatStatus.CLOSED;
+        if (this.status.equals(ChatStatus.OPEN)) {
+            this.status = ChatStatus.CLOSED;
+        }
+    }
+
+    public void leave(User user) {
+        validateDuplicateUser();
+        validateContainsUser(user);
+        if (isCreator(user)) {
+            this.creator = null;
+        }
+        if (isSender(user)) {
+            this.sender = null;
+        }
     }
 
     private void validateUsers(User creator, User sender) {
@@ -78,6 +90,20 @@ public class ChatRoom {
     private void validateChatAvailableClosed() {
         if (this.status.equals(ChatStatus.CLOSED)) {
             throw new ChatException(ErrorCode400.CHAT_ROOM_ALREADY_CLOSED);
+        }
+    }
+
+    private boolean isCreator(User user) {
+        return this.creator.equals(user);
+    }
+
+    private boolean isSender(User user) {
+        return this.sender.equals(user);
+    }
+
+    private void validateDuplicateUser() {
+        if (this.creator.equals(this.sender)) {
+            throw new ChatException(ErrorCode400.CHAT_ROOM_USER_CANNOT_DUPLICATE);
         }
     }
 
