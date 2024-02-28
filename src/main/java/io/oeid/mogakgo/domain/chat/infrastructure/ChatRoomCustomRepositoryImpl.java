@@ -1,6 +1,8 @@
 package io.oeid.mogakgo.domain.chat.infrastructure;
 
-import static io.oeid.mogakgo.domain.chat.entity.document.QChatRoom.chatRoom;
+
+
+import static io.oeid.mogakgo.domain.chat.entity.QChatRoom.chatRoom;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
