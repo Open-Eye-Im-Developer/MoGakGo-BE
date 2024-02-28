@@ -1,6 +1,6 @@
 package io.oeid.mogakgo.domain.chat.application.dto.res;
 
-import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
+import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
 import lombok.Getter;
 

@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.chat.application.vo;
+package io.oeid.mogakgo.domain.chat.application.dto.res;
 
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatMessageType;
@@ -11,8 +11,10 @@ import lombok.Getter;
 @Schema(description = "채팅 데이터")
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ChatData {
+public class ChatDataRes {
 
+    @Schema(description = "채팅 ID")
+    private Long id;
     @Schema(description = "메시지 타입")
     private ChatMessageType messageType;
     @Schema(description = "보낸 사람 ID")
@@ -22,8 +24,8 @@ public class ChatData {
     @Schema(description = "생성 시간")
     private LocalDateTime createdAt;
 
-    public static ChatData from(ChatMessage chatMessage) {
-        return new ChatData(chatMessage.getMessageType(), chatMessage.getSenderId(),
-            chatMessage.getMessage(), chatMessage.getCreatedAt());
+    public static ChatDataRes from(ChatMessage chatMessage) {
+        return new ChatDataRes(chatMessage.getId(), chatMessage.getMessageType(),
+            chatMessage.getSenderId(), chatMessage.getMessage(), chatMessage.getCreatedAt());
     }
 }

@@ -1,6 +1,6 @@
 package io.oeid.mogakgo.domain.chat.infrastructure;
 
-import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
+import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

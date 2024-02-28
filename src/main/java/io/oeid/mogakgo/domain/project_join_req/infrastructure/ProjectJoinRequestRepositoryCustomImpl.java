@@ -84,11 +84,13 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
     ) {
         List<ProjectJoinRequest> entities = jpaQueryFactory.selectFrom(projectJoinRequest)
             .where(
-                cursorIdCondition(pageable.getCursorId()),
+                cursorIdConditionForDesc(pageable.getCursorId()),
                 senderIdEq(senderId),
                 projectIdEq(projectId),
                 requestStatusEq(requestStatus)
             )
+            // 최근순
+            .orderBy(projectJoinRequest.id.desc())
             .limit(pageable.getPageSize() + 1)
             .fetch();
 
@@ -123,6 +125,10 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
 
     private BooleanExpression cursorIdCondition(Long cursorId) {
         return cursorId != null ? projectJoinRequest.id.gt(cursorId) : null;
+    }
+
+    private BooleanExpression cursorIdConditionForDesc(Long cursorId) {
+        return cursorId != null ? projectJoinRequest.id.lt(cursorId) : null;
     }
 
 }

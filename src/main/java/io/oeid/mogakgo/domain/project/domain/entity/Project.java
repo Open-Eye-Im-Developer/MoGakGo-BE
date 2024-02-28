@@ -101,7 +101,7 @@ public class Project extends BaseTimeEntity {
         validateAvailableCancel(tokenUser);
         // 매칭 준비중이지만 요청이 있을때는 잔디력 감소
         if (projectHasReq) {
-            this.creator.decreaseJandiRate();
+            this.creator.updateJandiRateByCancel();
         }
         this.projectStatus = ProjectStatus.CANCELED;
     }

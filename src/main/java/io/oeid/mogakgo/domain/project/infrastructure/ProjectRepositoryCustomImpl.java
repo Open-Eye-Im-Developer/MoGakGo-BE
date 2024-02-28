@@ -44,6 +44,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                 projectStatusEq(projectStatus),
                 createdAtEq(today)
             )
+            // 최근순
             .orderBy(project.id.desc())
             .limit(pageable.getPageSize() + 1)
             .fetch();
