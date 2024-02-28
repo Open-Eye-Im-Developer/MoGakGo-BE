@@ -6,8 +6,10 @@ import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.user.application.UserService;
 import io.oeid.mogakgo.domain.user.application.dto.req.UserUpdateReq;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserJandiRateRes;
+import io.oeid.mogakgo.domain.user.presentation.dto.req.UserAchievementUpdateApiRequest;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiReq;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserUpdateApiReq;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserAchievementUpdateApiResponse;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserDevelopLanguageApiRes;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserMatchingStatus;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
@@ -76,5 +78,13 @@ public class UserController implements UserSwagger {
     public ResponseEntity<UserMatchingStatus> userMatchingStatusApi(@UserId Long userId) {
         return ResponseEntity.ok(
             new UserMatchingStatus(userMatchingService.hasProgressMatching(userId)));
+    }
+
+    @PatchMapping("/achievement")
+    public ResponseEntity<UserAchievementUpdateApiResponse> updateUserMainAchievement(
+        @UserId Long userId, @Valid @RequestBody UserAchievementUpdateApiRequest request
+    ) {
+        Long id = userService.updateAchievement(userId, request);
+        return ResponseEntity.ok().body(UserAchievementUpdateApiResponse.from(id));
     }
 }
