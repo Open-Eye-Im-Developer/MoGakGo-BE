@@ -47,7 +47,7 @@ public class ChatController implements ChatSwagger {
     }
 
     @PatchMapping("/{chatRoomId}")
-    public ResponseEntity<Void> closeChatROom(
+    public ResponseEntity<Void> leaveChatRoom(
         @UserId Long userId, @PathVariable String chatRoomId
     ) {
         chatService.leaveChatroom(userId, chatRoomId);
