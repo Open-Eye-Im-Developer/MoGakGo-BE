@@ -22,7 +22,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Entity
-@Table(name = "user_achievement_mapping_tb")
+@Table(name = "user_achievement_tb")
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class UserAchievement {
