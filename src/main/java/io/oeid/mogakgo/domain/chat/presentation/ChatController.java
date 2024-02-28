@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-// TODO: FIX SWAGGER
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chat")
@@ -32,7 +31,7 @@ public class ChatController implements ChatSwagger {
         return ResponseEntity.ok(chatService.findAllChatRoomByUserId(userId));
     }
 
-    @GetMapping("detail/{chatRoomId}")
+    @GetMapping("/detail/{chatRoomId}")
     public ResponseEntity<ChatRoomDataRes> getChatRoomDetailData(@UserId Long userId,
         @PathVariable String chatRoomId) {
         return ResponseEntity.ok(chatService.findChatRoomDetailData(userId, chatRoomId));
