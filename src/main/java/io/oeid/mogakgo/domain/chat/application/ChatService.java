@@ -2,12 +2,15 @@ package io.oeid.mogakgo.domain.chat.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode404.CHAT_ROOM_NOT_FOUND;
 
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.chat.application.dto.req.ChatRoomCreateReq;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomCreateRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
-import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
+import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
 import io.oeid.mogakgo.domain.matching.exception.MatchingException;
@@ -55,15 +58,25 @@ public class ChatService {
     }
 
     // 채팅방 조회
-    public ChatRoomDataRes findAllChatInChatRoom(Long userId, String chatRoomId) {
+    public CursorPaginationResult<ChatDataRes> findAllChatInChatRoom(Long userId, String chatRoomId, CursorPaginationInfoReq pageable) {
         var user = userCommonService.getUserById(userId);
-        var chatRoom = chatRoomRepository.findById(chatRoomId)
-            .orElseThrow(() -> new MatchingException(CHAT_ROOM_NOT_FOUND));
+        var chatRoom = findChatRoomById(chatRoomId);
+        chatRoom.validateContainsUser(user);
+        return chatRepository.findAllByCollection(chatRoomId, pageable);
+    }
+
+    public ChatRoomDataRes findChatRoomDetailData(Long userId, String chatRoomId) {
+        var user = userCommonService.getUserById(userId);
+        var chatRoom = findChatRoomById(chatRoomId);
         chatRoom.validateContainsUser(user);
         var project = projectRepository.findById(chatRoom.getProject().getId())
             .orElseThrow(() -> new ProjectException(ErrorCode404.PROJECT_NOT_FOUND));
-        var chatList = chatRepository.findAllByCollection(chatRoomId);
-        return ChatRoomDataRes.of(project.getMeetingInfo(), chatList);
+        return ChatRoomDataRes.from(project.getMeetingInfo());
+    }
+
+    private ChatRoom findChatRoomById(String chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId)
+            .orElseThrow(() -> new MatchingException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
     }
 
     @Transactional

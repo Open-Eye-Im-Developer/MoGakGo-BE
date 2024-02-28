@@ -46,7 +46,10 @@ public class SecurityConfig {
             .sessionManagement(
                 management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(
-                requests -> requests.anyRequest().authenticated())
+                requests -> {
+                    requests.requestMatchers("/api/v1/auth/**").permitAll();
+                    requests.anyRequest().authenticated();
+                })
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling(handling ->
                 handling.accessDeniedHandler(jwtAccessDeniedHandler)

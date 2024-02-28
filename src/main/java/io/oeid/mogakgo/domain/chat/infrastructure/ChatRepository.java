@@ -1,10 +1,13 @@
 package io.oeid.mogakgo.domain.chat.infrastructure;
 
+import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
+import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
@@ -24,9 +27,24 @@ public class ChatRepository {
         return mongoTemplate.save(chatMessage, collectionName);
     }
 
-    public List<ChatMessage> findAllByCollection(String collectionName) {
+    public CursorPaginationResult<ChatDataRes> findAllByCollection(String collectionName,
+        CursorPaginationInfoReq pageable) {
         Query query = new Query();
-        query.with(Sort.by(Sort.Order.desc("createdAt")));
-        return mongoTemplate.find(query, ChatMessage.class, collectionName);
+        query.limit(pageable.getPageSize()).addCriteria(cursorIdCondition(pageable.getCursorId()))
+            .with(Sort.by(Sort.Order.desc("createdAt")));
+        var result = mongoTemplate.find(query, ChatMessage.class, collectionName).stream()
+            .map(ChatDataRes::from).toList();
+        return CursorPaginationResult.fromDataWithHasNext(result, pageable.getPageSize(),
+            hasNext(pageable.getCursorId(), pageable.getPageSize(), collectionName));
+    }
+
+    private Criteria cursorIdCondition(Long cursorId) {
+        return cursorId != null ? Criteria.where("id").lt(cursorId) : Criteria.where("id").gt(0L);
+    }
+
+    private boolean hasNext(Long cursorId, int pageSize, String collectionName) {
+        return cursorId == null ? mongoTemplate.estimatedCount(collectionName) > pageSize
+            : mongoTemplate.count(new Query(Criteria.where("id").lt(cursorId)), ChatMessage.class,
+                collectionName) > pageSize;
     }
 }
