@@ -46,7 +46,7 @@ public class ChatController implements ChatSwagger {
         return ResponseEntity.ok(chatService.findAllChatInChatRoom(userId, chatRoomId, pageable));
     }
 
-    @PatchMapping("/{chatRoomId}/deactivate")
+    @PatchMapping("/{chatRoomId}")
     public ResponseEntity<Void> closeChatROom(
         @UserId Long userId, @PathVariable String chatRoomId
     ) {
