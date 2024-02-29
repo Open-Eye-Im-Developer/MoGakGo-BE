@@ -147,7 +147,7 @@ public class ProjectService {
         );
 
         // 요청할 때마다 랜덤 정렬
-        Collections.shuffle(projects.getData());
+        Collections.shuffle(projects.getData().subList(0, projects.getData().size() - 1));
         return projects;
     }
 
