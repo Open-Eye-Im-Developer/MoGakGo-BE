@@ -2,6 +2,7 @@ package io.oeid.mogakgo.domain.review.application.dto.res;
 
 import io.oeid.mogakgo.domain.review.domain.Review;
 import io.oeid.mogakgo.domain.review.domain.enums.ReviewRating;
+import io.oeid.mogakgo.domain.review.presentation.dto.res.ReviewCreateApiRes;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,17 @@ public class ReviewCreateRes {
             review.getProject().getId(),
             review.getRating(),
             review.getCreatedAt()
+        );
+    }
+
+    public ReviewCreateApiRes toApiResponse(){
+        return new ReviewCreateApiRes(
+            id,
+            senderId,
+            receiverId,
+            projectId,
+            rating.getValue(),
+            createdAt.toString()
         );
     }
 }
