@@ -23,16 +23,13 @@ public class UserUpdateApiRes {
     private String avatarUrl;
     @Schema(description = "유저가 원하는 직군", example = "[\"BACKEND\", \"FRONTEND\"]")
     private List<String> wantedJobs;
-    @Schema(description = "유저의 업적 ID", example = "1")
-    private Long achievementId;
 
     public static UserUpdateApiRes from(UserUpdateRes userUpdateRes) {
         return new UserUpdateApiRes(
             userUpdateRes.getUsername(),
             userUpdateRes.getBio(),
             userUpdateRes.getAvatarUrl(),
-            userUpdateRes.getWantedJobs().stream().map(WantedJob::getJobName).toList(),
-            userUpdateRes.getAchievementId()
+            userUpdateRes.getWantedJobs().stream().map(WantedJob::getJobName).toList()
         );
     }
 }
