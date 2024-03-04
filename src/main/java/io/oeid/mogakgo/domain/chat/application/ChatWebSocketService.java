@@ -28,6 +28,7 @@ public class ChatWebSocketService {
     private final UserCommonService userCommonService;
 
     public ChatDataRes handleChatMessage(Long userId, String roomId, ChatReq request) {
+        log.info("handleChatMessage userId: {}, roomId: {}", userId, roomId);
         User user = userCommonService.getUserById(userId);
         verifyChatRoomByRoomIdAndUser(roomId, user);
         ChatMessage chatMessage = chatRepository.save(
@@ -40,6 +41,7 @@ public class ChatWebSocketService {
     }
 
     private void verifyChatRoomByRoomIdAndUser(String roomId, User user) {
+        log.info("verifyChatRoomByRoomIdAndUser - roomId: {}, UserId: {}", roomId, user.getId());
         ChatRoom chatRoom = chatRoomJpaRepository.findByIdAndUser(roomId, user)
             .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
         if (chatRoom.getStatus().equals(ChatStatus.CLOSED)) {

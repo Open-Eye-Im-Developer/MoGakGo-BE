@@ -22,6 +22,7 @@ public class ChatWebSocketController {
     @MessageMapping("/chatroom/{chatRoomId}")
     @SendTo("/topic/chatroom/{chatRoomId}")
     public ChatDataRes sendChatData(@DestinationVariable("chatRoomId") String chatRoomId, ChatApiReq request) {
+        log.info("ChatWebSocketController - sendChatData start -> chatRoomId: {}", chatRoomId);
         return chatWebSocketService.handleChatMessage(request.getUserId(), chatRoomId, ChatReq.from(request));
     }
 }
