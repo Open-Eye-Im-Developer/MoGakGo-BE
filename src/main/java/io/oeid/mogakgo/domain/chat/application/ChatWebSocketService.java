@@ -1,23 +1,21 @@
 package io.oeid.mogakgo.domain.chat.application;
 
 
-import static io.oeid.mogakgo.exception.code.ErrorCode500.CHAT_WEB_SOCKET_ERROR;
-
+import io.oeid.mogakgo.domain.chat.application.dto.req.ChatReq;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
-import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomSessionRepository;
+import io.oeid.mogakgo.domain.user.application.UserCommonService;
+import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketSession;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,43 +24,26 @@ public class ChatWebSocketService {
 
     private final ChatRoomRoomJpaRepository chatRoomJpaRepository;
     private final ChatRepository chatRepository;
-    private final ChatRoomSessionRepository chatRoomSessionRepository;
+    private final ChatIdSequenceGeneratorService sequenceGeneratorService;
+    private final UserCommonService userCommonService;
 
-    @Transactional(readOnly = true)
-    public ChatRoom findChatRoomById(String roomId) {
-        ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId).orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
-        if(chatRoom.getStatus().equals(ChatStatus.CLOSED)){
+    public ChatDataRes handleChatMessage(Long userId, String roomId, ChatReq request) {
+        User user = userCommonService.getUserById(userId);
+        verifyChatRoomByRoomIdAndUser(roomId, user);
+        ChatMessage chatMessage = chatRepository.save(
+            ChatMessage.builder().id(sequenceGeneratorService.generateSequence(roomId))
+                .senderId(user.getId())
+                .messageType(request.getMessageType())
+                .message(request.getMessage())
+                .build(), roomId);
+        return ChatDataRes.from(chatMessage);
+    }
+
+    private void verifyChatRoomByRoomIdAndUser(String roomId, User user) {
+        ChatRoom chatRoom = chatRoomJpaRepository.findByIdAndUser(roomId, user)
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
+        if (chatRoom.getStatus().equals(ChatStatus.CLOSED)) {
             throw new ChatException(ErrorCode400.CHAT_ROOM_CLOSED);
         }
-        return chatRoom;
-    }
-
-    public void saveChatMessage(ChatMessage chatMessage, String roomId) {
-        chatRepository.save(chatMessage, roomId);
-    }
-
-    public void closeChatRoom(String roomId) {
-        ChatRoom chatRoom = chatRoomJpaRepository.findById(roomId).orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
-        chatRoomSessionRepository.removeRoom(chatRoom.getId());
-        chatRoom.closeChat();
-    }
-
-    public void addSessionToRoom(String roomId, WebSocketSession session) {
-        chatRoomSessionRepository.addSession(roomId, session);
-    }
-
-    public void removeSessionFromRoom(String roomId, WebSocketSession session) {
-        chatRoomSessionRepository.removeSession(roomId, session);
-    }
-
-    public void sendMessageToEachSocket(String roomId, TextMessage textMessage){
-        chatRoomSessionRepository.getSession(roomId).forEach(session -> {
-            try {
-                session.sendMessage(textMessage);
-            } catch (Exception e) {
-                log.error("sendMessageToEachSocket: {}", e.getMessage());
-                throw new ChatException(CHAT_WEB_SOCKET_ERROR);
-            }
-        });
     }
 }

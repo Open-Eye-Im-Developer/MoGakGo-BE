@@ -15,15 +15,13 @@ public class UserUpdateRes {
     private String bio;
     private String avatarUrl;
     private List<WantedJob> wantedJobs;
-    private Long achievementId;
 
     public static UserUpdateRes from(User user){
         return new UserUpdateRes(
             user.getUsername(),
             user.getBio(),
             user.getAvatarUrl(),
-            user.getUserWantedJobTags().stream().map(UserWantedJobTag::getWantedJob).toList(),
-            user.getAchievement().getId()
+            user.getUserWantedJobTags().stream().map(UserWantedJobTag::getWantedJob).toList()
         );
     }
 }

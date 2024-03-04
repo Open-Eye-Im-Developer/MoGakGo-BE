@@ -24,7 +24,8 @@ public class ReviewService {
     private final UserCommonService userCommonService;
 
     @Transactional
-    public ReviewCreateRes createNewReview(ReviewCreateReq request) {
+    public ReviewCreateRes createNewReview(Long userId, ReviewCreateReq request) {
+        validateUser(userId, request.getSenderId());
         reviewRepository.findReviewByProjectData(request.getSenderId(), request.getReceiverId(),
             request.getProjectId()).ifPresent(review -> {
             throw new ReviewException(ErrorCode400.REVIEW_ALREADY_EXISTS);
@@ -53,4 +54,9 @@ public class ReviewService {
         return hours + minutes / 60;
     }
 
+    private void validateUser(Long userId, Long senderId) {
+        if (!userId.equals(senderId)) {
+            throw new ReviewException(ErrorCode400.REVIEW_USER_NOT_MATCH);
+        }
+    }
 }
