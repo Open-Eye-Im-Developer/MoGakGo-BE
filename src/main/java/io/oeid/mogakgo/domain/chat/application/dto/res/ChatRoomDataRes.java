@@ -18,11 +18,20 @@ public class ChatRoomDataRes {
     private String meetDetail;
     @Schema(description = "프로젝트 시작 시간")
     private LocalDateTime meetStartTime;
+    @Schema(description = "프로젝트 위치 위도")
+    private Double meetLocationLatitude;
+    @Schema(description = "프로젝트 위치 경도")
+    private Double meetLocationLongitude;
     @Schema(description = "프로젝트 종료 시간")
     private LocalDateTime meetEndTime;
 
     public static ChatRoomDataRes from(MeetingInfo meetingInfo) {
-        return new ChatRoomDataRes(meetingInfo.getMeetDetail(), meetingInfo.getMeetStartTime(),
+        var meetLocation = meetingInfo.getMeetLocation();
+        return new ChatRoomDataRes(
+            meetingInfo.getMeetDetail(),
+            meetingInfo.getMeetStartTime(),
+            meetLocation.getX(),
+            meetLocation.getY(),
             meetingInfo.getMeetEndTime());
     }
 }
