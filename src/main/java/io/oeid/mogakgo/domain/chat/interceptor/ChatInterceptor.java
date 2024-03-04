@@ -3,6 +3,7 @@ package io.oeid.mogakgo.domain.chat.interceptor;
 import io.oeid.mogakgo.domain.auth.jwt.JwtHelper;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.exception.code.ErrorCode401;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class ChatInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         if (Objects.requireNonNull(accessor.getCommand()).equals(StompCommand.CONNECT)) {
-            log.info("CONNECT REQUEST: {}", accessor.getSessionId());
+            log.info("CONNECT REQUEST: {} at: {}", accessor.getSessionId(), LocalDateTime.now());
             verifyAccessToken(accessor);
         }
         return message;
