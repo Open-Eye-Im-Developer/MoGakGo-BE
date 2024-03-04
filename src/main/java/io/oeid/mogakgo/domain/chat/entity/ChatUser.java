@@ -13,7 +13,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,11 +42,11 @@ public class ChatUser {
     @Column(name = "available_yn")
     private Boolean availableYn;
 
-    @Builder
-    private ChatUser(ChatRoom chatRoom, User user) {
+    protected ChatUser(ChatRoom chatRoom, User user) {
         this.chatRoom = verifyChatRoom(chatRoom);
         this.user = verifyUser(user);
         this.availableYn = true;
+        this.chatRoom.addChatUser(this);
     }
 
     public void disableChatUser() {

@@ -3,7 +3,6 @@ package io.oeid.mogakgo.common.base;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import lombok.Getter;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.lang.Nullable;
 
@@ -17,7 +16,7 @@ public class CursorPaginationInfoReq {
     private final int pageSize;
 
     @Nullable
-    private final Sort.Direction sortOrder;
+    private final Direction sortOrder;
 
     public CursorPaginationInfoReq(@Nullable Long cursorId, int pageSize, Direction sortOrder) {
         this.cursorId = cursorId;

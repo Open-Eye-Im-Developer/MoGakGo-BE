@@ -59,6 +59,7 @@ public enum ErrorCode400 implements ErrorCode {
     CHAT_ROOM_ALREADY_CLOSED("E110104", "채팅방이 이미 종료되었습니다."),
     CHAT_ROOM_SHOULD_NOT_NULL("E110105", "채팅방 정보가 존재하지 않습니다."),
     CHAT_USER_SHOULD_NOT_NULL("E110106", "채팅방 유저 정보가 존재하지 않습니다."),
+    CHAT_ROOM_MAX_USER_SIZE("E110107", "채팅방에 최대 유저 수를 초과하여 채팅방을 생성할 수 없습니다."),
 
     REVIEW_SENDER_OR_RECEIVER_NOT_FOUND("E120101", "리뷰를 작성하기 위한 유저 정보가 존재하지 않습니다."),
     REVIEW_USER_DUPLICATED("E120102", "자신에 대한 리뷰는 작성할 수 없습니다."),

@@ -5,6 +5,7 @@ import static io.oeid.mogakgo.exception.code.ErrorCode404.MATCHING_NOT_FOUND;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.domain.chat.application.ChatService;
 import io.oeid.mogakgo.domain.matching.domain.entity.Matching;
 import io.oeid.mogakgo.domain.matching.exception.MatchingException;
 import io.oeid.mogakgo.domain.matching.infrastructure.MatchingJpaRepository;
@@ -22,18 +23,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class MatchingService {
 
     private final MatchingJpaRepository matchingJpaRepository;
-
     private final UserCommonService userCommonService;
+    private final ChatService chatService;
 
     @Transactional
     public Long create(ProjectJoinRequest projectJoinRequest) {
+        var project = projectJoinRequest.getProject();
+        var creator = project.getCreator();
+        var sender = projectJoinRequest.getSender();
         Matching matching = Matching.builder()
-            .project(projectJoinRequest.getProject())
-            .sender(projectJoinRequest.getSender())
+            .project(project)
+            .sender(sender)
             .build();
-
         matchingJpaRepository.save(matching);
-
+        chatService.createChatRoom(project, creator, sender);
         return matching.getId();
     }
 

@@ -13,6 +13,7 @@ public enum ErrorCode404 implements ErrorCode {
     PROJECT_JOIN_REQUEST_NOT_FOUND("E050301", "해당 프로젝트 참여 요청이 존재하지 않습니다."),
     MATCHING_NOT_FOUND("E090301", "해당 매칭이 존재하지 않습니다."),
     CHAT_ROOM_NOT_FOUND("E110301", "해당 채팅방이 존재하지 않습니다."),
+    CHAT_USER_NOT_FOUND("E110302", "해당 채팅 유저가 존재하지 않습니다."),
     ACHIEVEMENT_NOT_FOUND("E130301", "해당 업적이 존재하지 않습니다."),
     ;
 
