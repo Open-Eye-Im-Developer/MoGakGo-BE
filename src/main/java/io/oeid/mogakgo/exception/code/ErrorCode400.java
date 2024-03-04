@@ -56,6 +56,7 @@ public enum ErrorCode400 implements ErrorCode {
     CHAT_ROOM_CLOSED("E110101", "채팅방이 종료되어 채팅을 할 수 없습니다."),
     CHAT_ROOM_USER_CANNOT_DUPLICATE("E110102", "채팅방에 중복된 유저가 있습니다."),
     CHAT_ROOM_USER_NOT_CONTAINS("E110103", "채팅방에 해당 유저가 없습니다."),
+    CHAT_ROOM_ALREADY_CLOSED("E110104", "채팅방이 이미 종료되었습니다."),
 
     REVIEW_SENDER_OR_RECEIVER_NOT_FOUND("E120101", "리뷰를 작성하기 위한 유저 정보가 존재하지 않습니다."),
     REVIEW_USER_DUPLICATED("E120102", "자신에 대한 리뷰는 작성할 수 없습니다."),
@@ -63,6 +64,9 @@ public enum ErrorCode400 implements ErrorCode {
     REVIEW_ALREADY_EXISTS("E120104", "이미 작성된 리뷰가 존재합니다."),
     REVIEW_USER_NOT_MATCH("E120105", "리뷰 작성자와 리뷰 대상자가 일치하지 않습니다."),
     REVIEW_RATING_INVALID("E120106", "유효하지 않은 리뷰 평점입니다."),
+
+    NON_ACHIEVED_USER_ACHIEVEMENT("E140101", "미달성 업적을 사용할 수 없습니다."),
+    ACHIEVEMENT_SHOULD_BE_DIFFERENT("E140102", "이미 해당 업적을 대표 업적으로 사용중입니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;

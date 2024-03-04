@@ -13,13 +13,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-// TODO: FIX SWAGGER
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chat")
@@ -32,7 +32,7 @@ public class ChatController implements ChatSwagger {
         return ResponseEntity.ok(chatService.findAllChatRoomByUserId(userId));
     }
 
-    @GetMapping("detail/{chatRoomId}")
+    @GetMapping("/detail/{chatRoomId}")
     public ResponseEntity<ChatRoomDataRes> getChatRoomDetailData(@UserId Long userId,
         @PathVariable String chatRoomId) {
         return ResponseEntity.ok(chatService.findChatRoomDetailData(userId, chatRoomId));
@@ -43,5 +43,13 @@ public class ChatController implements ChatSwagger {
         @PathVariable String chatRoomId,
         @UserId Long userId, @Valid @ModelAttribute CursorPaginationInfoReq pageable) {
         return ResponseEntity.ok(chatService.findAllChatInChatRoom(userId, chatRoomId, pageable));
+    }
+
+    @PatchMapping("/{chatRoomId}")
+    public ResponseEntity<Void> leaveChatRoom(
+        @UserId Long userId, @PathVariable String chatRoomId
+    ) {
+        chatService.leaveChatroom(userId, chatRoomId);
+        return ResponseEntity.noContent().build();
     }
 }
