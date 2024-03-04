@@ -25,6 +25,7 @@ public class ChatInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         if (Objects.requireNonNull(accessor.getCommand()).equals(StompCommand.CONNECT)) {
+            log.info("CONNECT REQUEST: {}", accessor.getSessionId());
             verifyAccessToken(accessor);
         }
         return message;
