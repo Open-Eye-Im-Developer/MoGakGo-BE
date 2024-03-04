@@ -10,6 +10,7 @@ import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDensityRankRes
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -179,4 +180,53 @@ public interface ProjectSwagger {
             content = @Content(schema = @Schema(implementation = ProjectDensityRankRes.class))),
     })
     ResponseEntity<ProjectDensityRankRes> getDensityRankProjects();
+
+    @Operation(summary = "사용자가 생성한 프로젝트 리스트 조회", description = "회원이 자신이 만든 프로젝트 리스트를 조회할 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "프로젝트 리스트 조회 성공"),
+        @ApiResponse(responseCode = "403", description = "본인의 프로젝트 카드만 조회 할 수 있음.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E030101", value = SwaggerProjectErrorExamples.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION))),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
+            ))
+    })
+    @Parameters({
+        @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),
+        @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
+        @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
+    })
+    ResponseEntity<CursorPaginationResult<ProjectInfoAPIRes>> getProjectsByCreator(
+        @Parameter(hidden = true) Long userId,
+        @Parameter(description = "프로젝트를 생성한 사용자 ID", required = true) Long creatorId,
+        @Parameter(hidden = true) CursorPaginationInfoReq pageable
+    );
+
+    @Operation(summary = "사용자가 생성한 프로젝트 상세 정보 조회", description = "회원이 자신이 생성한 프로젝트의 상세 정보를 조회할 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "프로젝트 조회 성공"),
+        @ApiResponse(responseCode = "403", description = "본인의 프로젝트 카드만 조회 할 수 있음.",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E030101", value = SwaggerProjectErrorExamples.PROJECT_JOIN_REQUEST_FORBIDDEN_OPERATION))),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E030301", value = SwaggerProjectErrorExamples.PROJECT_NOT_FOUND),
+                    @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
+                }))
+    })
+    ResponseEntity<ProjectDetailAPIRes> getById(
+        @Parameter(hidden = true) Long userId,
+        @Parameter(description = "조회하려는 프로젝트 ID", required = true) Long projectId,
+        @Parameter(description = "프로젝트 생성자 ID", required = true) Long id
+    );
 }

@@ -1,12 +1,13 @@
 package io.oeid.mogakgo.domain.user.application;
 
-import io.oeid.mogakgo.domain.achievement.domain.Achievement;
+import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.profile.application.ProfileCardService;
 import io.oeid.mogakgo.domain.profile.application.dto.req.UserProfileCardReq;
 import io.oeid.mogakgo.domain.user.application.dto.req.UserSignUpRequest;
 import io.oeid.mogakgo.domain.user.application.dto.req.UserUpdateReq;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserDevelopLanguageRes;
+import io.oeid.mogakgo.domain.user.application.dto.res.UserJandiRateRes;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserProfileResponse;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserSignUpResponse;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserUpdateRes;
@@ -104,6 +105,11 @@ public class UserService {
     public void deleteUser(Long userId) {
         User user = userCommonService.getUserById(userId);
         user.delete();
+    }
+
+    public UserJandiRateRes getUserJandiRate(Long userId) {
+        User user = userCommonService.getUserById(userId);
+        return UserJandiRateRes.of(user.getId(), user.getJandiRate());
     }
 
     private void validateWantedJobDuplicate(List<WantedJob> wantedJobs) {
