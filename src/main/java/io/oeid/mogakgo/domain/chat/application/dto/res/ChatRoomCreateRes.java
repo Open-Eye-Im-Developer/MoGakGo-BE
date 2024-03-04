@@ -23,7 +23,7 @@ public class ChatRoomCreateRes {
     }
 
     public static ChatRoomCreateRes from(ChatRoom chatRoom) {
-        return new ChatRoomCreateRes(chatRoom.getId(), chatRoom.getProject().getId(),
+        return new ChatRoomCreateRes(chatRoom.getId().toString(), chatRoom.getProject().getId(),
             chatRoom.getCreator().getId(), chatRoom.getSender().getId(), chatRoom.getStatus());
     }
 

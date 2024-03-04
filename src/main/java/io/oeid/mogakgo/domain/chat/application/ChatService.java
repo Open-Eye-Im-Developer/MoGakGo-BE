@@ -50,7 +50,7 @@ public class ChatService {
         User sender = findUserById(request.getSenderId());
         ChatRoom chatRoom = chatRoomRepository.save(
             ChatRoom.builder().project(project).creator(creator).sender(sender).build());
-        chatRepository.createCollection(chatRoom.getId());
+        chatRepository.createCollection(chatRoom.getId().toString());
         return ChatRoomCreateRes.from(chatRoom);
     }
 
