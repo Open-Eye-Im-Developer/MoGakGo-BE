@@ -57,8 +57,8 @@ dependencies {
     // Spring Boot WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket:3.1.8'
     // Flyway
-    implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-mysql'
+    implementation 'org.flywaydb:flyway-core:10.8.1'
+    implementation 'org.flywaydb:flyway-mysql:10.8.1'
 
     // SpringBoot Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.8'
