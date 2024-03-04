@@ -13,6 +13,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,5 +44,13 @@ public class ChatController implements ChatSwagger {
         @PathVariable String chatRoomId,
         @UserId Long userId, @Valid @ModelAttribute CursorPaginationInfoReq pageable) {
         return ResponseEntity.ok(chatService.findAllChatInChatRoom(userId, chatRoomId, pageable));
+    }
+
+    @PatchMapping("/{chatRoomId}")
+    public ResponseEntity<Void> leaveChatRoom(
+        @UserId Long userId, @PathVariable String chatRoomId
+    ) {
+        chatService.leaveChatroom(userId, chatRoomId);
+        return ResponseEntity.noContent().build();
     }
 }

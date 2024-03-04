@@ -46,7 +46,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                         )
                     )
                 )
-            ).from(chatRoom).join(chatRoom.creator, creator).join(chatRoom.sender, sender)
+            ).from(chatRoom).leftJoin(chatRoom.creator, creator).leftJoin(chatRoom.sender, sender)
             .where(chatRoom.creator.id.eq(userId).or(chatRoom.sender.id.eq(userId)))
             .fetch();
     }

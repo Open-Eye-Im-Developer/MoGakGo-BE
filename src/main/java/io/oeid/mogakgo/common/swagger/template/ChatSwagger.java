@@ -80,4 +80,28 @@ public interface ChatSwagger {
         @Parameter(in = ParameterIn.PATH) String chatRoomId,
         @Parameter(hidden = true) Long userId,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable);
+
+    @Operation(summary = "채팅방 나가기", description = "채팅방에 참여중인 사용자가 채팅방을 나가기 위해 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "채팅방 나가기 성공"),
+        @ApiResponse(responseCode = "400", description = "요청한 데이터가 유효하지 않음",
+            content = @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E110102", value = SwaggerChatErrorExamples.CHAT_ROOM_USER_CANNOT_DUPLICATE)
+            )),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 유효하지 않음",
+            content = @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND),
+                    @ExampleObject(name = "E110301", value = SwaggerChatErrorExamples.CHAT_ROOM_NOT_FOUND)
+                }
+            ))
+    })
+    ResponseEntity<Void> leaveChatRoom(
+        @Parameter(hidden = true) Long userId,
+        @Parameter(in = ParameterIn.PATH) String chatRoomId
+    );
 }
