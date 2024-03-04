@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface ChatRoomRoomJpaRepository extends JpaRepository<ChatRoom, String>,
     ChatRoomCustomRepository {
 
-    @Query("select c from ChatRoom c where c.id = ?1 and c.creator = ?2 and c.sender = ?2")
+    @Query("select c from ChatRoom c where c.id = ?1 and (c.creator = ?2 or c.sender = ?2)")
     Optional<ChatRoom> findByIdAndUser(String id, User user);
 }
