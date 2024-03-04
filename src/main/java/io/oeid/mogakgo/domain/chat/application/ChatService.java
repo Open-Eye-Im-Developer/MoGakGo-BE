@@ -60,11 +60,9 @@ public class ChatService {
     }
 
     // 채팅방 조회
-    // TODO 검증 로직 수정
     public CursorPaginationResult<ChatDataRes> findAllChatInChatRoom(Long userId, String chatRoomId,
         CursorPaginationInfoReq pageable) {
-        findUserById(userId);
-        findChatRoomById(chatRoomId);
+        findChatUser(chatRoomId, userId);
         return chatRepository.findAllByCollection(chatRoomId, pageable);
     }
 
