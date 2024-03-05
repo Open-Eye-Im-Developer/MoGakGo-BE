@@ -6,12 +6,12 @@ import io.oeid.mogakgo.core.properties.swagger.error.SwaggerGeoErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
+import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDensityRankRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
-import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
-import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestRes;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -168,7 +168,7 @@ public interface ProjectSwagger {
         @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
         @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
     })
-    ResponseEntity<CursorPaginationResult<projectJoinRequestRes>> getJoinRequest(
+    ResponseEntity<CursorPaginationResult<ProjectJoinRequestRes>> getJoinRequest(
         @Parameter(hidden = true) Long userId,
         @Parameter(description = "프로젝트 ID", required = true) Long id,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable

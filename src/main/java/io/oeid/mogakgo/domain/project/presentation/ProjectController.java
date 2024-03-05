@@ -11,7 +11,7 @@ import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDensityRankRes
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
-import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +57,7 @@ public class ProjectController implements ProjectSwagger {
     }
 
     @GetMapping("/{id}/requests")
-    public ResponseEntity<CursorPaginationResult<projectJoinRequestRes>> getJoinRequest(
+    public ResponseEntity<CursorPaginationResult<ProjectJoinRequestRes>> getJoinRequest(
         @UserId Long userId, @PathVariable Long id,
         @Valid @ModelAttribute CursorPaginationInfoReq pageable
     ) {
