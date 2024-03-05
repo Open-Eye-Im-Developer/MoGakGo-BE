@@ -35,12 +35,19 @@ public class ChatService {
     public CursorPaginationResult<ChatRoomPublicRes> findAllChatRoomByUserId(Long userId,
         CursorPaginationInfoReq pageable) {
         log.info("findAllChatRoomByUserId - userId: {}", userId);
-        var result = chatRoomRepository.getChatRoomList(userId, pageable);
-        for (var response : result) {
-            var chatMessage = chatRepository.findLastChatByCollection(response.getChatRoomId());
-            chatMessage.ifPresent(
-                message -> response.addLastMessage(message.getMessage(), message.getCreatedAt()));
-        }
+        var chatRoomList = chatRoomRepository.getChatRoomList(userId, pageable.getCursorId(),
+            pageable.getPageSize());
+        var result = chatRoomList.stream().map(
+            chatRoom -> {
+                var user = chatRoom.getOppositeUser(userId);
+                ChatRoomPublicRes res = ChatRoomPublicRes.of(chatRoom, user);
+                var chatMessage = chatRepository.findLastChatByCollection(
+                    chatRoom.getId().toString());
+                chatMessage.ifPresent(
+                    message -> res.addLastMessage(message.getMessage(), message.getCreatedAt()));
+                return res;
+            }
+        ).toList();
         return CursorPaginationResult.fromDataWithExtraItemForNextCheck(result,
             pageable.getPageSize());
     }

@@ -1,6 +1,9 @@
 package io.oeid.mogakgo.domain.chat.application.dto.res;
 
+import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfo;
+import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
+import io.oeid.mogakgo.domain.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,12 +17,6 @@ public class ChatRoomPublicRes {
     private Long cursorId;
     @Schema(description = "프로젝트 ID")
     private Long projectId;
-    @Schema(description = "미팅 상세 정보")
-    private String meetDetail;
-    @Schema(description = "미팅 시작 시간")
-    private LocalDateTime meetStartTime;
-    @Schema(description = "미팅 종료 시간")
-    private LocalDateTime meetEndTime;
     @Schema(description = "채팅방 ID")
     private String chatRoomId;
     @Schema(description = "마지막 메시지")
@@ -29,16 +26,25 @@ public class ChatRoomPublicRes {
     @Schema(description = "채팅방 상태")
     private ChatStatus status;
 
+    private ChatUserInfo chatUserInfo;
 
-    public ChatRoomPublicRes(Long cursorId, Long projectId, UUID chatRoomId, ChatStatus status,
-        String meetDetail, LocalDateTime meetStartTime, LocalDateTime meetEndTime) {
+    private ChatRoomPublicRes(Long cursorId, Long projectId, UUID chatRoomId, ChatStatus status,
+        ChatUserInfo chatUserInfo) {
         this.cursorId = cursorId;
         this.projectId = projectId;
         this.chatRoomId = chatRoomId.toString();
         this.status = status;
-        this.meetDetail = meetDetail;
-        this.meetStartTime = meetStartTime;
-        this.meetEndTime = meetEndTime;
+        this.chatUserInfo = chatUserInfo;
+    }
+
+    public static ChatRoomPublicRes of(ChatRoom chatRoom, User user) {
+        return new ChatRoomPublicRes(
+            chatRoom.getCursorId(),
+            chatRoom.getProject().getId(),
+            chatRoom.getId(),
+            chatRoom.getStatus(),
+            ChatUserInfo.from(user)
+        );
     }
 
     public void addLastMessage(String lastMessage, LocalDateTime lastMessageCreatedAt) {

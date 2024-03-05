@@ -8,10 +8,9 @@ import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfo;
+import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -46,28 +45,17 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
     }
 
     @Override
-    public List<ChatRoomPublicRes> getChatRoomList(Long userId, CursorPaginationInfoReq pageable) {
-        return jpaQueryFactory.select(
-                Projections.constructor(
-                    ChatRoomPublicRes.class,
-                    chatRoom.cursorId,
-                    chatRoom.project.id,
-                    chatRoom.id,
-                    chatRoom.status,
-                    project.meetingInfo.meetDetail,
-                    project.meetingInfo.meetStartTime,
-                    project.meetingInfo.meetEndTime
-                )
-            )
+    public List<ChatRoom> getChatRoomList(Long userId, Long cursorId, int pageSize) {
+        return jpaQueryFactory
+            .select(chatUser.chatRoom)
             .from(chatUser)
             .leftJoin(chatUser.chatRoom, chatRoom)
-            .leftJoin(chatUser.chatRoom.project, project)
             .where(
-                cursorIdCondition(pageable.getCursorId()),
+                cursorIdCondition(cursorId),
                 userIdEq(userId)
             )
             .orderBy(chatRoom.cursorId.desc())
-            .limit(pageable.getPageSize() + 1L)
+            .limit(pageSize + 1L)
             .fetch();
     }
 
@@ -76,6 +64,6 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
     }
 
     private BooleanExpression userIdEq(Long userId) {
-        return userId == null ? null : chatUser.user.id.eq(userId);
+        return userId == null ? null : chatUser.user.id.eq(userId).and(chatUser.availableYn.isTrue());
     }
 }

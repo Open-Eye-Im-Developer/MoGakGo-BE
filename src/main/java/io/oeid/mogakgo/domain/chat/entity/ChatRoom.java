@@ -92,6 +92,14 @@ public class ChatRoom {
         chatUser.disableChatUser();
     }
 
+    public User getOppositeUser(Long userId){
+        return chatUsers.stream()
+            .filter(cu -> !cu.getUser().getId().equals(userId))
+            .findFirst()
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND))
+            .getUser();
+    }
+
     protected void addChatUser(ChatUser chatUser) {
         if (chatUsers.size() >= CHAT_USER_MAX_SIZE) {
             throw new ChatException(ErrorCode400.CHAT_ROOM_MAX_USER_SIZE);
