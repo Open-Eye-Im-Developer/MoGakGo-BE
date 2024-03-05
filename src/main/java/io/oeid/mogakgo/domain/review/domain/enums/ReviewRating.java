@@ -4,6 +4,7 @@ import io.oeid.mogakgo.domain.review.exception.ReviewException;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import lombok.Getter;
 
+// TODO: 리뷰 점수 로직 수정
 @Getter
 public enum ReviewRating {
     ONE(-2),

@@ -6,7 +6,6 @@ import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
-import io.oeid.mogakgo.domain.chat.entity.ChatUser;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatUserJpaRepository;
@@ -33,12 +32,17 @@ public class ChatService {
     private final ChatRepository chatRepository;
 
     // 채팅방 리스트 조회
-    // TODO 마지막 채팅 기록 가져오기 구현
-    // TODO: [2024-03-04] 페이지네이션 적용하기
-    // TODO: [2024-03-04] QUERYDSL 최적화 필요 -> ChatUser 추가됨에 따라
-    public CursorPaginationResult<ChatRoomPublicRes> findAllChatRoomByUserId(Long userId, CursorPaginationInfoReq pageable) {
-        findUserById(userId);
-        return chatRoomRepository.findAllChatRoomByUserId(userId, pageable);
+    public CursorPaginationResult<ChatRoomPublicRes> findAllChatRoomByUserId(Long userId,
+        CursorPaginationInfoReq pageable) {
+        log.info("findAllChatRoomByUserId - userId: {}", userId);
+        var result = chatRoomRepository.getChatRoomList(userId, pageable);
+        for (var response : result) {
+            var chatMessage = chatRepository.findLastChatByCollection(response.getChatRoomId());
+            chatMessage.ifPresent(
+                message -> response.addLastMessage(message.getMessage(), message.getCreatedAt()));
+        }
+        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(result,
+            pageable.getPageSize());
     }
 
     // 채팅방 생성
@@ -62,18 +66,14 @@ public class ChatService {
     // 채팅방 조회
     public CursorPaginationResult<ChatDataRes> findAllChatInChatRoom(Long userId, String chatRoomId,
         CursorPaginationInfoReq pageable) {
-        findChatUser(chatRoomId, userId);
+        verifyChatUser(chatRoomId, userId);
         return chatRepository.findAllByCollection(chatRoomId, pageable);
     }
 
-    // TODO: QUERYDSL로 JOIN해서 한번에 처리하기 -> ChatUser -> ChatRoom <- Project
-    // TODO: 채팅방 상대 정보 조회도 포함해야합니다!
     public ChatRoomDataRes findChatRoomDetailData(Long userId, String chatRoomId) {
-        var chatUser = findChatUser(chatRoomId, userId);
-//        var project = projectRepository.findById(chatRoom.getProject().getId())
-//            .orElseThrow(() -> new ProjectException(ErrorCode404.PROJECT_NOT_FOUND));
-//        return ChatRoomDataRes.from(project.getMeetingInfo());
-        return null;
+        log.info("findChatRoomDetailData - userId: {}, chatRoomId: {}", userId, chatRoomId);
+        verifyChatUser(chatRoomId, userId);
+        return chatRoomRepository.getChatDetailData(userId, UUID.fromString(chatRoomId));
     }
 
     private ChatRoom findChatRoomById(String chatRoomId) {
@@ -85,10 +85,14 @@ public class ChatService {
         return userCommonService.getUserById(userId);
     }
 
-    private ChatUser findChatUser(String chatRoomIdStr, Long userId) {
+    private void verifyChatUser(String chatRoomIdStr, Long userId) {
+        log.info("verifyChatUser - chatRoomId: {}, userId: {}", chatRoomIdStr, userId);
         UUID chatRoomId = UUID.fromString(chatRoomIdStr);
-        return chatUserRepository.findByChatRoomIdAndUserId(chatRoomId, userId)
-            .orElseThrow(() -> new MatchingException(ErrorCode404.CHAT_USER_NOT_FOUND));
+        chatUserRepository.findByChatRoomIdAndUserId(chatRoomId, userId)
+            .ifPresentOrElse(null,
+                () -> {
+                    throw new MatchingException(ErrorCode404.CHAT_USER_NOT_FOUND);
+                });
     }
 
 }

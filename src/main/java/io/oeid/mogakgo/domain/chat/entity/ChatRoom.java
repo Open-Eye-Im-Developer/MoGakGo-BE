@@ -50,6 +50,10 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "cursor_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long cursorId;
+
     @ManyToOne
     @JoinColumn(name = "project_id")
     private Project project;

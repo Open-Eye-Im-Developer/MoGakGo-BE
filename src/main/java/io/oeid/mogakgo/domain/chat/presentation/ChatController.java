@@ -9,12 +9,11 @@ import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,8 +27,8 @@ public class ChatController implements ChatSwagger {
     private final ChatService chatService;
 
     @GetMapping
-    public ResponseEntity<List<ChatRoomPublicRes>> getChatRoomList(@UserId Long userId) {
-        return ResponseEntity.ok(chatService.findAllChatRoomByUserId(userId));
+    public ResponseEntity<CursorPaginationResult<ChatRoomPublicRes>> getChatRoomList(@UserId Long userId, CursorPaginationInfoReq pageable) {
+        return ResponseEntity.ok(chatService.findAllChatRoomByUserId(userId, pageable));
     }
 
     @GetMapping("/detail/{chatRoomId}")
