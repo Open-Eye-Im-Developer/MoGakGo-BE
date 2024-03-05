@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS user_tb (
     github_url VARCHAR(255),
     jandi_rate DOUBLE,
     region ENUM('JONGNO', 'JUNG', 'YONGSAN', 'SEONGDONG', 'GWANGJIN', 'DONGDAEMUN', 'JUNGNANG', 'SEONGBUK', 'GANGBUK', 'DOBONG', 'NOWON', 'EUNPYEONG', 'SEODAEMUN', 'MAPO', 'YANGCHEON', 'GANGSEO', 'GURO', 'GEUMCHEON', 'YOUNGDEUNGPO', 'DONGJAK', 'GWANAK', 'SEOCHO', 'GANGNAM', 'SONGPA', 'GANGDONG', 'BUNDANG'),
-    region_authenticated_at datetime(6),
+    region_authentication_at datetime(6),
     role ENUM('ROLE_USER'),
     username VARCHAR(255),
     signup_yn TINYINT,
