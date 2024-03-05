@@ -223,7 +223,7 @@ public class User {
     }
 
     public void updateJandiRateByReview(ReviewRating rating, double time) {
-        this.jandiRate += rating.getValue() * time * JANDI_WEIGHT;
+        this.jandiRate += rating.getJandiValue() * time * JANDI_WEIGHT;
     }
 
     public void updateJandiRateByCancel() {
