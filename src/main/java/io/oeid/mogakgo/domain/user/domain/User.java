@@ -165,11 +165,11 @@ public class User {
         this.username = username;
     }
 
-    public synchronized void increaseAvailableLikeCount() {
+    public void increaseAvailableLikeCount() {
         this.availableLikeCount += 1;
     }
 
-    public synchronized void decreaseAvailableLikeCount() {
+    public void decreaseAvailableLikeCount() {
         if (this.availableLikeCount <= 0) {
             throw new UserException(USER_AVAILABLE_LIKE_COUNT_IS_ZERO);
         }
