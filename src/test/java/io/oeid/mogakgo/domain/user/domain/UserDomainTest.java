@@ -176,6 +176,8 @@ class UserDomainTest {
     @ParameterizedTest
     @MethodSource("jandiRateByReview")
     void 유저_잔디력_업데이트_by_리뷰(ReviewRating rating, double time, double expectedRate) {
+        // Arrange
+        User user = User.of(GITHUB_PK, GITHUB_ID, AVATAR_URL, GITHUB_URL, REPOSITORY_URL);
         // Act
         user.updateJandiRateByReview(rating, time);
         // Assert
@@ -185,8 +187,10 @@ class UserDomainTest {
 
     @Test
     void 유저_잔디력_업데이트_by_취소() {
+        // Arrange
+        User user = User.of(GITHUB_PK, GITHUB_ID, AVATAR_URL, GITHUB_URL, REPOSITORY_URL);
         // Assert
-        var expectedJandiRate = user.getJandiRate() - 2 * 2.5;
+        var expectedJandiRate = user.getJandiRate() - 1 * 2.5;
         // Act
         user.updateJandiRateByCancel();
         // Assert
