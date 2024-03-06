@@ -138,8 +138,7 @@ public interface ProfileCardLikeSwagger {
                 examples = {
                     @ExampleObject(name = "E040105", value = SwaggerProfileCardLikeErrorExamples.PROFILE_CARD_LIKE_NOT_EXIST),
                     @ExampleObject(name = "E040104", value = SwaggerProfileCardErrorExamples.PROFILE_CARD_LIKE_AMOUNT_IS_ZERO),
-                    @ExampleObject(name = "E020107", value = SwaggerUserErrorExamples.USER_AVAILABLE_LIKE_COUNT_IS_ZERO),
-                    @ExampleObject(name = "E020108", value = SwaggerUserErrorExamples.USER_AVAILABLE_LIKE_COUNT_IS_FULL)
+                    @ExampleObject(name = "E020107", value = SwaggerUserErrorExamples.USER_AVAILABLE_LIKE_COUNT_IS_ZERO)
                 }
             )),
         @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
