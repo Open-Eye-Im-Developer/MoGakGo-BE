@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Schema(description = "프로젝트 요청 응답 DTO")
 @Getter
-public class projectJoinRequestRes {
+public class ProjectJoinRequestRes {
 
     @Schema(description = "프로젝트 요청 ID")
     private Long id;
@@ -17,7 +17,7 @@ public class projectJoinRequestRes {
     @Schema(description = "요청 상태")
     private RequestStatus requestStatus;
 
-    public projectJoinRequestRes(
+    public ProjectJoinRequestRes(
         Long id, User user, RequestStatus requestStatus
     ) {
         this.id = id;

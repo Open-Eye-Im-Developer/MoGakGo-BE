@@ -8,11 +8,10 @@ import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
-import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
-import io.oeid.mogakgo.domain.user.application.UserCommonService;
-import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.domain.chat.infrastructure.ChatUserJpaRepository;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,28 +21,26 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChatWebSocketService {
 
-    private final ChatRoomRoomJpaRepository chatRoomJpaRepository;
+    private final ChatUserJpaRepository chatUserRepository;
     private final ChatRepository chatRepository;
     private final ChatIdSequenceGeneratorService sequenceGeneratorService;
-    private final UserCommonService userCommonService;
 
     public ChatDataRes handleChatMessage(Long userId, String roomId, ChatReq request) {
         log.info("handleChatMessage userId: {}, roomId: {}", userId, roomId);
-        User user = userCommonService.getUserById(userId);
-        verifyChatRoomByRoomIdAndUser(roomId, user);
+        verifyChatRoomByRoomIdAndUser(roomId, userId);
         ChatMessage chatMessage = chatRepository.save(
             ChatMessage.builder().id(sequenceGeneratorService.generateSequence(roomId))
-                .senderId(user.getId())
+                .senderId(userId)
                 .messageType(request.getMessageType())
                 .message(request.getMessage())
                 .build(), roomId);
         return ChatDataRes.from(chatMessage);
     }
 
-    private void verifyChatRoomByRoomIdAndUser(String roomId, User user) {
-        log.info("verifyChatRoomByRoomIdAndUser - roomId: {}, UserId: {}", roomId, user.getId());
-        ChatRoom chatRoom = chatRoomJpaRepository.findByIdAndUser(roomId, user)
-            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
+    private void verifyChatRoomByRoomIdAndUser(String roomId, Long userId) {
+        log.info("verifyChatRoomByRoomIdAndUser - roomId: {}, UserId: {}", roomId, userId);
+        ChatRoom chatRoom = chatUserRepository.findByChatRoomIdAndUserId(UUID.fromString(roomId), userId)
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND)).getChatRoom();
         if (chatRoom.getStatus().equals(ChatStatus.CLOSED)) {
             throw new ChatException(ErrorCode400.CHAT_ROOM_CLOSED);
         }

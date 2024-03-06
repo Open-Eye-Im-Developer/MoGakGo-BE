@@ -4,6 +4,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -36,6 +37,12 @@ public class ChatRepository {
             .map(ChatDataRes::from).toList();
         return CursorPaginationResult.fromDataWithHasNext(result, pageable.getPageSize(),
             hasNext(pageable.getCursorId(), pageable.getPageSize(), collectionName));
+    }
+
+    public Optional<ChatMessage> findLastChatByCollection(String collectionName) {
+        Query query = new Query();
+        query.limit(1).with(Sort.by(Sort.Order.desc("createdAt")));
+        return Optional.ofNullable(mongoTemplate.findOne(query, ChatMessage.class, collectionName));
     }
 
     private Criteria cursorIdCondition(Long cursorId) {
