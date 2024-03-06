@@ -31,8 +31,7 @@ public enum ErrorCode400 implements ErrorCode {
     USER_REGION_SHOULD_BE_NOT_EMPTY("E020104", "유저 지역은 비어있을 수 없습니다."),
     USER_WANTED_JOB_DUPLICATE("E020105", "중복된 희망 직무가 있습니다."),
     USER_DEVELOP_LANGUAGE_DUPLICATE("E020106", "중복된 개발 언어가 있습니다."),
-    USER_AVAILABLE_LIKE_COUNT_IS_ZERO("E020107", "당일 사용할 수 있는 찔러보기 요청을 모두 소진했습니다."),
-    USER_AVAILABLE_LIKE_AMOUNT_IS_FULL("E020108", "프로필 카드의 찔러보기 요청의 최대 횟수를 넘을 수 없습니다."),
+    USER_AVAILABLE_LIKE_COUNT_IS_ZERO("E020107", "취소할 수 있는 찔러보기 요청이 존재하지 않습니다."),
     USER_ID_NOT_NULL("E020001", "유저 아이디는 필수값입니다."),
     USER_AVATAR_URL_NOT_NULL("E020109", "유저 프로필 이미지는 필수값입니다."),
 
@@ -57,6 +56,9 @@ public enum ErrorCode400 implements ErrorCode {
     CHAT_ROOM_USER_CANNOT_DUPLICATE("E110102", "채팅방에 중복된 유저가 있습니다."),
     CHAT_ROOM_USER_NOT_CONTAINS("E110103", "채팅방에 해당 유저가 없습니다."),
     CHAT_ROOM_ALREADY_CLOSED("E110104", "채팅방이 이미 종료되었습니다."),
+    CHAT_ROOM_SHOULD_NOT_NULL("E110105", "채팅방 정보가 존재하지 않습니다."),
+    CHAT_USER_SHOULD_NOT_NULL("E110106", "채팅방 유저 정보가 존재하지 않습니다."),
+    CHAT_ROOM_MAX_USER_SIZE("E110107", "채팅방에 최대 유저 수를 초과하여 채팅방을 생성할 수 없습니다."),
 
     REVIEW_SENDER_OR_RECEIVER_NOT_FOUND("E120101", "리뷰를 작성하기 위한 유저 정보가 존재하지 않습니다."),
     REVIEW_USER_DUPLICATED("E120102", "자신에 대한 리뷰는 작성할 수 없습니다."),

@@ -1,7 +1,6 @@
 package io.oeid.mogakgo.domain.user.domain;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.ACHIEVEMENT_SHOULD_BE_DIFFERENT;
-import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_AMOUNT_IS_FULL;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_COUNT_IS_ZERO;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.USER_FORBIDDEN_OPERATION;
 
@@ -46,7 +45,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class User {
 
     private static final int MAX_TAG_SIZE = 3;
-    private static final int MAX_AVAILABLE_LIKE_COUNT = 10;
     private static final double JANDI_WEIGHT = 2.5;
 
     @Id
@@ -134,14 +132,14 @@ public class User {
         return new User(githubPk, username, avatarUrl, githubUrl, repositoryUrl);
     }
 
-    public void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
+    protected void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
         if (userDevelopLanguageTags.size() + 1 > MAX_TAG_SIZE) {
             throw new UserException(ErrorCode400.USER_DEVELOP_LANGUAGE_BAD_REQUEST);
         }
         userDevelopLanguageTags.add(userDevelopLanguageTag);
     }
 
-    public void addWantedJob(UserWantedJobTag userWantedJobTag) {
+    protected void addWantedJob(UserWantedJobTag userWantedJobTag) {
         if (userWantedJobTags.size() + 1 > MAX_TAG_SIZE) {
             throw new UserException(ErrorCode400.USER_DEVELOP_LANGUAGE_BAD_REQUEST);
         }
@@ -168,9 +166,6 @@ public class User {
     }
 
     public void increaseAvailableLikeCount() {
-        if (this.availableLikeCount >= MAX_AVAILABLE_LIKE_COUNT) {
-            throw new UserException(USER_AVAILABLE_LIKE_AMOUNT_IS_FULL);
-        }
         this.availableLikeCount += 1;
     }
 
@@ -223,11 +218,11 @@ public class User {
     }
 
     public void updateJandiRateByReview(ReviewRating rating, double time) {
-        this.jandiRate += rating.getValue() * time * JANDI_WEIGHT;
+        this.jandiRate += rating.getJandiValue() * time * JANDI_WEIGHT;
     }
 
     public void updateJandiRateByCancel() {
-        this.jandiRate += -5 * JANDI_WEIGHT;
+        this.jandiRate -= ReviewRating.ONE.getValue() * JANDI_WEIGHT;
     }
 
     private boolean validateAvailableRegionUpdate(Region region) {

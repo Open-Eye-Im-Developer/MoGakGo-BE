@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 
 @Tag(name = "Chat", description = "채팅 관련 API")
@@ -38,7 +37,14 @@ public interface ChatSwagger {
                 examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
             ))
     })
-    ResponseEntity<List<ChatRoomPublicRes>> getChatRoomList(@Parameter(hidden = true) Long userId);
+    @Parameters({
+        @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),
+        @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
+        @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
+    })
+    ResponseEntity<CursorPaginationResult<ChatRoomPublicRes>> getChatRoomList(
+        @Parameter(hidden = true) Long userId,
+        @Parameter(hidden = true) CursorPaginationInfoReq pageable);
 
     @Operation(summary = "채팅방 상세 조회", description = "채팅방의 상세 정보를 조회하는 API")
     @ApiResponses(value = {

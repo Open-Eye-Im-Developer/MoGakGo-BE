@@ -4,11 +4,11 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestDetailAPIRes;
-import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestRes;
 
 public interface ProjectJoinRequestRepositoryCustom {
 
-    CursorPaginationResult<projectJoinRequestRes> findByConditionWithPagination(
+    CursorPaginationResult<ProjectJoinRequestRes> findByConditionWithPagination(
         Long senderId, Long projectId, RequestStatus requestStatus, CursorPaginationInfoReq pageable
     );
 
