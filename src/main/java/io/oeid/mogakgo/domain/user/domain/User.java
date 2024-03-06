@@ -134,14 +134,14 @@ public class User {
         return new User(githubPk, username, avatarUrl, githubUrl, repositoryUrl);
     }
 
-    public void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
+    protected void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
         if (userDevelopLanguageTags.size() + 1 > MAX_TAG_SIZE) {
             throw new UserException(ErrorCode400.USER_DEVELOP_LANGUAGE_BAD_REQUEST);
         }
         userDevelopLanguageTags.add(userDevelopLanguageTag);
     }
 
-    public void addWantedJob(UserWantedJobTag userWantedJobTag) {
+    protected void addWantedJob(UserWantedJobTag userWantedJobTag) {
         if (userWantedJobTags.size() + 1 > MAX_TAG_SIZE) {
             throw new UserException(ErrorCode400.USER_DEVELOP_LANGUAGE_BAD_REQUEST);
         }
@@ -227,7 +227,7 @@ public class User {
     }
 
     public void updateJandiRateByCancel() {
-        this.jandiRate += -5 * JANDI_WEIGHT;
+        this.jandiRate += ReviewRating.ONE.getValue() * JANDI_WEIGHT;
     }
 
     private boolean validateAvailableRegionUpdate(Region region) {
