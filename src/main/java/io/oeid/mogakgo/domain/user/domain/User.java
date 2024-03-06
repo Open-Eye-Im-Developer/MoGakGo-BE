@@ -1,9 +1,11 @@
 package io.oeid.mogakgo.domain.user.domain;
 
-import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_AMOUNT_IS_FULL;
+import static io.oeid.mogakgo.exception.code.ErrorCode400.ACHIEVEMENT_SHOULD_BE_DIFFERENT;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_COUNT_IS_ZERO;
+import static io.oeid.mogakgo.exception.code.ErrorCode403.USER_FORBIDDEN_OPERATION;
 
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
+import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.review.domain.enums.ReviewRating;
 import io.oeid.mogakgo.domain.user.domain.enums.Role;
@@ -43,7 +45,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class User {
 
     private static final int MAX_TAG_SIZE = 3;
-    private static final int MAX_AVAILABLE_LIKE_COUNT = 10;
     private static final double JANDI_WEIGHT = 2.5;
 
     @Id
@@ -164,14 +165,11 @@ public class User {
         this.username = username;
     }
 
-    public void increaseAvailableLikeCount() {
-        if (this.availableLikeCount >= MAX_AVAILABLE_LIKE_COUNT) {
-            throw new UserException(USER_AVAILABLE_LIKE_AMOUNT_IS_FULL);
-        }
+    public synchronized void increaseAvailableLikeCount() {
         this.availableLikeCount += 1;
     }
 
-    public void decreaseAvailableLikeCount() {
+    public synchronized void decreaseAvailableLikeCount() {
         if (this.availableLikeCount <= 0) {
             throw new UserException(USER_AVAILABLE_LIKE_COUNT_IS_ZERO);
         }
@@ -205,13 +203,18 @@ public class User {
         }
     }
 
-    public void updateUserInfos(String username, String avatarUrl, String bio,
-        Achievement achievement) {
+    public void updateUserInfos(String username, String avatarUrl, String bio) {
         updateUsername(username);
         this.avatarUrl = verifyAvatarUrl(avatarUrl);
         this.bio = bio;
-        this.achievement = achievement;
         deleteAllWantJobTags();
+    }
+
+    public void updateAchievement(Achievement achievement) {
+        if (this.achievement != null && this.achievement.equals(achievement)) {
+            throw new UserAchievementException(ACHIEVEMENT_SHOULD_BE_DIFFERENT);
+        }
+        this.achievement = achievement;
     }
 
     public void updateJandiRateByReview(ReviewRating rating, double time) {
@@ -233,5 +236,10 @@ public class User {
         return avatarUrl;
     }
 
+    public void validateUpdater(Long userId) {
+        if (!this.id.equals(userId)) {
+            throw new UserException(USER_FORBIDDEN_OPERATION);
+        }
+    }
 
 }

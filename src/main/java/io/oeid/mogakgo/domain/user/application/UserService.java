@@ -1,7 +1,14 @@
 package io.oeid.mogakgo.domain.user.application;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.NON_ACHIEVED_USER_ACHIEVEMENT;
+import static io.oeid.mogakgo.exception.code.ErrorCode404.ACHIEVEMENT_NOT_FOUND;
+
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
+import io.oeid.mogakgo.domain.achievement.domain.entity.UserAchievement;
+import io.oeid.mogakgo.domain.achievement.exception.AchievementException;
+import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
+import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
 import io.oeid.mogakgo.domain.profile.application.ProfileCardService;
 import io.oeid.mogakgo.domain.profile.application.dto.req.UserProfileCardReq;
 import io.oeid.mogakgo.domain.user.application.dto.req.UserSignUpRequest;
@@ -19,6 +26,7 @@ import io.oeid.mogakgo.domain.user.domain.enums.WantedJob;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserDevelopLanguageTagJpaRepository;
 import io.oeid.mogakgo.domain.user.infrastructure.UserWantedJobTagJpaRepository;
+import io.oeid.mogakgo.domain.user.presentation.dto.req.UserAchievementUpdateApiRequest;
 import io.oeid.mogakgo.domain.user.util.UserGithubUtil;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import java.util.ArrayList;
@@ -40,6 +48,7 @@ public class UserService {
     private final UserDevelopLanguageTagJpaRepository userDevelopLanguageTagRepository;
     private final UserGithubUtil userGithubUtil;
     private final AchievementJpaRepository achievementRepository;
+    private final UserAchievementJpaRepository userAchievementRepository;
 
     @Transactional
     public UserSignUpResponse userSignUp(UserSignUpRequest userSignUpRequest) {
@@ -86,10 +95,7 @@ public class UserService {
     @Transactional
     public UserUpdateRes updateUserInfos(Long userId, UserUpdateReq request) {
         User user = userCommonService.getUserById(userId);
-        Achievement achievement = achievementRepository.findById(request.getAchievementId())
-            .orElseThrow();
-        user.updateUserInfos(request.getUsername(), request.getAvatarUrl(), request.getBio(),
-            achievement);
+        user.updateUserInfos(request.getUsername(), request.getAvatarUrl(), request.getBio());
         validateWantedJobDuplicate(request.getWantedJobs());
         for (WantedJob wantedJob : request.getWantedJobs()) {
             userWantedJobTagRepository.save(UserWantedJobTag.builder()
@@ -97,8 +103,28 @@ public class UserService {
                 .wantedJob(wantedJob)
                 .build());
         }
-        profileCardService.create(UserProfileCardReq.of(user));
         return UserUpdateRes.from(user);
+    }
+
+    @Transactional
+    public Long updateAchievement(Long userId, UserAchievementUpdateApiRequest request) {
+        User user = userCommonService.getUserById(userId);
+
+        // 토큰 값과 업데이트하려는 사용자 ID의 일치 여부 검증
+        user.validateUpdater(request.getUserId());
+
+        // 해당 업적의 존재 여부 검증
+        validateAchievement(request.getAchievementId());
+
+        UserAchievement userAchievement = userAchievementRepository
+            .findByUserAndAchievementId(userId, request.getAchievementId())
+            .orElseThrow(() -> new UserAchievementException(NON_ACHIEVED_USER_ACHIEVEMENT));
+
+        // 변경하려는 업적의 달성 여부 검증
+        userAchievement.validateAvailableUpdateAchievement();
+
+        user.updateAchievement(userAchievement.getAchievement());
+        return user.getId();
     }
 
     @Transactional
@@ -119,5 +145,8 @@ public class UserService {
         }
     }
 
-
+    private Achievement validateAchievement(Long achievementId) {
+        return achievementRepository.findById(achievementId)
+            .orElseThrow(() -> new AchievementException(ACHIEVEMENT_NOT_FOUND));
+    }
 }

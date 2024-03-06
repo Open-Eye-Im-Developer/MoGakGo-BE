@@ -44,7 +44,9 @@ public class ProfileCardService {
             null, region, pageable
         );
 
-        Collections.shuffle(profiles.getData());
+        if (profiles.getData().size() >= 2) {
+            Collections.shuffle(profiles.getData().subList(0, profiles.getData().size() - 1));
+        }
         return profiles;
     }
 

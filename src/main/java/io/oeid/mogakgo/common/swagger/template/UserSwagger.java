@@ -2,10 +2,14 @@ package io.oeid.mogakgo.common.swagger.template;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+import io.oeid.mogakgo.core.properties.swagger.error.SwaggerAchievementErrorExamples;
+import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserAchievementErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserJandiRateRes;
+import io.oeid.mogakgo.domain.user.presentation.dto.req.UserAchievementUpdateApiRequest;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserSignUpApiReq;
 import io.oeid.mogakgo.domain.user.presentation.dto.req.UserUpdateApiReq;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserAchievementUpdateApiResponse;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserDevelopLanguageApiRes;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserMatchingStatus;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
@@ -124,5 +128,37 @@ public interface UserSwagger {
                 examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND))),
     })
     ResponseEntity<UserJandiRateRes> userJandiRateApi(@Parameter(in = ParameterIn.PATH) Long userId);
-  
+
+    @Operation(summary = "사용자의 대표 업적 변경", description = "사용자가 자신의 대표 업적을 변경하고 싶을 때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "대표 업적 변경 성공"),
+        @ApiResponse(responseCode = "400", description = "요청한 데이터가 유효하지 않음",
+            content = @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E140101", value = SwaggerUserAchievementErrorExamples.NON_ACHIEVED_USER_ACHIEVEMENT),
+                    @ExampleObject(name = "E140102", value = SwaggerUserAchievementErrorExamples.ACHIEVEMENT_SHOULD_BE_DIFFERENT)
+                }
+            )),
+        @ApiResponse(responseCode = "403", description = "사용자의 대표 업적을 변경할 권한이 없음",
+            content = @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject(name = "E020201", value = SwaggerUserErrorExamples.USER_FORBIDDEN_OPERATION)
+            )),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
+            content = @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E130301", value = SwaggerAchievementErrorExamples.ACHIEVEMENT_NOT_FOUND),
+                    @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
+                }
+            ))
+    })
+    ResponseEntity<UserAchievementUpdateApiResponse> updateUserMainAchievement(
+        @Parameter(hidden = true) Long userId,
+        UserAchievementUpdateApiRequest request
+    );
 }

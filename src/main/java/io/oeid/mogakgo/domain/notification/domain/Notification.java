@@ -81,4 +81,8 @@ public class Notification {
         }
         return detailData;
     }
+
+    public void markAsChecked() {
+        this.checkedYn = true;
+    }
 }

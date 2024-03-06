@@ -31,8 +31,7 @@ public enum ErrorCode400 implements ErrorCode {
     USER_REGION_SHOULD_BE_NOT_EMPTY("E020104", "유저 지역은 비어있을 수 없습니다."),
     USER_WANTED_JOB_DUPLICATE("E020105", "중복된 희망 직무가 있습니다."),
     USER_DEVELOP_LANGUAGE_DUPLICATE("E020106", "중복된 개발 언어가 있습니다."),
-    USER_AVAILABLE_LIKE_COUNT_IS_ZERO("E020107", "당일 사용할 수 있는 찔러보기 요청을 모두 소진했습니다."),
-    USER_AVAILABLE_LIKE_AMOUNT_IS_FULL("E020108", "프로필 카드의 찔러보기 요청의 최대 횟수를 넘을 수 없습니다."),
+    USER_AVAILABLE_LIKE_COUNT_IS_ZERO("E020107", "취소할 수 있는 찔러보기 요청이 존재하지 않습니다."),
     USER_ID_NOT_NULL("E020001", "유저 아이디는 필수값입니다."),
     USER_AVATAR_URL_NOT_NULL("E020109", "유저 프로필 이미지는 필수값입니다."),
 
@@ -56,11 +55,17 @@ public enum ErrorCode400 implements ErrorCode {
     CHAT_ROOM_CLOSED("E110101", "채팅방이 종료되어 채팅을 할 수 없습니다."),
     CHAT_ROOM_USER_CANNOT_DUPLICATE("E110102", "채팅방에 중복된 유저가 있습니다."),
     CHAT_ROOM_USER_NOT_CONTAINS("E110103", "채팅방에 해당 유저가 없습니다."),
+    CHAT_ROOM_ALREADY_CLOSED("E110104", "채팅방이 이미 종료되었습니다."),
 
     REVIEW_SENDER_OR_RECEIVER_NOT_FOUND("E120101", "리뷰를 작성하기 위한 유저 정보가 존재하지 않습니다."),
     REVIEW_USER_DUPLICATED("E120102", "자신에 대한 리뷰는 작성할 수 없습니다."),
     REVIEW_PROJECT_NOT_NULL("E120103", "리뷰를 작성하기 위한 프로젝트 정보가 존재하지 않습니다."),
     REVIEW_ALREADY_EXISTS("E120104", "이미 작성된 리뷰가 존재합니다."),
+    REVIEW_USER_NOT_MATCH("E120105", "리뷰 작성자와 리뷰 대상자가 일치하지 않습니다."),
+    REVIEW_RATING_INVALID("E120106", "유효하지 않은 리뷰 평점입니다."),
+
+    NON_ACHIEVED_USER_ACHIEVEMENT("E140101", "미달성 업적을 사용할 수 없습니다."),
+    ACHIEVEMENT_SHOULD_BE_DIFFERENT("E140102", "이미 해당 업적을 대표 업적으로 사용중입니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
