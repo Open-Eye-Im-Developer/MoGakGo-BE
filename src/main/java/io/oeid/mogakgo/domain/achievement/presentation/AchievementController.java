@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.achievement.presentation;
 
 import io.oeid.mogakgo.common.annotation.UserId;
+import io.oeid.mogakgo.common.swagger.template.AchievementSwagger;
 import io.oeid.mogakgo.domain.achievement.application.AchievementService;
 import io.oeid.mogakgo.domain.achievement.application.dto.res.AchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/achievements")
 @RequiredArgsConstructor
-public class AchievementController {
+public class AchievementController implements AchievementSwagger {
 
     private final AchievementService achievementService;
 
