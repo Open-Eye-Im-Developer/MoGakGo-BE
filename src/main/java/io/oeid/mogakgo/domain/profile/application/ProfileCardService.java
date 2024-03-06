@@ -9,9 +9,9 @@ import io.oeid.mogakgo.domain.geo.exception.GeoException;
 import io.oeid.mogakgo.domain.profile.application.dto.req.UserProfileCardReq;
 import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCard;
 import io.oeid.mogakgo.domain.profile.infrastructure.ProfileCardJpaRepository;
+import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileInfoAPIRes;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
-import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,15 +33,15 @@ public class ProfileCardService {
         return profileCard.getId();
     }
 
-    public CursorPaginationResult<UserPublicApiResponse> getRandomOrderedProfileCardsByRegion(
+    public CursorPaginationResult<UserProfileInfoAPIRes> getRandomOrderedProfileCardsByRegion(
         Long userId, Region region, CursorPaginationInfoReq pageable
     ) {
         validateToken(userId);
         validateRegionCoverage(region);
 
-        CursorPaginationResult<UserPublicApiResponse> profiles = profileCardRepository
+        CursorPaginationResult<UserProfileInfoAPIRes> profiles = profileCardRepository
             .findByConditionWithPagination(
-            null, region, pageable
+            userId, region, pageable
         );
 
         if (profiles.getData().size() >= 2) {
