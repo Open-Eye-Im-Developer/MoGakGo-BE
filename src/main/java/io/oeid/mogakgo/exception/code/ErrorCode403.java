@@ -12,6 +12,7 @@ public enum ErrorCode403 implements ErrorCode {
     PROFILE_CARD_LIKE_FORBIDDEN_OPERATION("E040101", "본인 프로필 카드의 좋아요 수만 조회할 수 있습니다."),
     MATCHING_FORBIDDEN_OPERATION("E090201", "해당 매칭에 대한 권한이 없습니다."),
     USER_FORBIDDEN_OPERATION("E020201", "사용자 정보를 수정할 권한이 없습니다."),
+    ACHIEVEMENT_FORBIDDEN_OPERATION("E140201", "사용자의 업적 정보를 조회할 권한이 없습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.FORBIDDEN;
