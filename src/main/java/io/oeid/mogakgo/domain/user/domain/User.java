@@ -222,7 +222,7 @@ public class User {
     }
 
     public void updateJandiRateByCancel() {
-        this.jandiRate += ReviewRating.ONE.getValue() * JANDI_WEIGHT;
+        this.jandiRate -= ReviewRating.ONE.getValue() * JANDI_WEIGHT;
     }
 
     private boolean validateAvailableRegionUpdate(Region region) {
