@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS review_tb (
     sender_id BIGINT,
     receiver_id BIGINT,
     project_id BIGINT,
-    rating ENUM('1', '2', '3', '4', '5'),
+    rating ENUM('ONE', 'TWO', 'THREE', 'FOUR', 'FIVE'),
     created_at TIMESTAMP,
     PRIMARY KEY (id)
 );
