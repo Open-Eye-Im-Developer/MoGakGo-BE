@@ -2,7 +2,6 @@ package io.oeid.mogakgo.domain.user.presentation.dto.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -27,7 +26,4 @@ public class UserUpdateApiReq {
     @Schema(description = "선호하는 직군", example = "[\"BACKEND\", \"FRONTEND\"]")
     @Size(min = 1, max = 3)
     private List<String> wantedJobs;
-    @Schema(description = "업적 ID", example = "1")
-    @NotNull
-    private Long achievementId;
 }
