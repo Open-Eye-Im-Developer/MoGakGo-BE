@@ -7,21 +7,23 @@ import lombok.Getter;
 // TODO: 리뷰 점수 로직 수정
 @Getter
 public enum ReviewRating {
-    ONE(-2),
-    TWO(-1),
-    THREE(1),
-    FOUR(2),
-    FIVE(3);
+    ONE(1, -2),
+    TWO(2, -1),
+    THREE(3, 1),
+    FOUR(4, 2),
+    FIVE(5, 3);
 
     private final int value;
+    private final int jandiValue;
 
-    ReviewRating(int value) {
+    ReviewRating(int value, int jandiValue) {
         this.value = value;
+        this.jandiValue = jandiValue;
     }
 
-    public static ReviewRating from(int rating){
-        for(ReviewRating reviewRating : ReviewRating.values()){
-            if(reviewRating.value == rating){
+    public static ReviewRating from(int rating) {
+        for (ReviewRating reviewRating : ReviewRating.values()) {
+            if (reviewRating.value == rating) {
                 return reviewRating;
             }
         }
