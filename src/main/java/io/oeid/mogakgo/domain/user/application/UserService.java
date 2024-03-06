@@ -91,7 +91,6 @@ public class UserService {
         return UserProfileResponse.from(user);
     }
 
-    // TODO: 이후 AchievementException 구현 시 추가 필요!
     @Transactional
     public UserUpdateRes updateUserInfos(Long userId, UserUpdateReq request) {
         User user = userCommonService.getUserById(userId);
