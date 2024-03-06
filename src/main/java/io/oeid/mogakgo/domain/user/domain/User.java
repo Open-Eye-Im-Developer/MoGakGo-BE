@@ -1,7 +1,6 @@
 package io.oeid.mogakgo.domain.user.domain;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.ACHIEVEMENT_SHOULD_BE_DIFFERENT;
-import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_AMOUNT_IS_FULL;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_COUNT_IS_ZERO;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.USER_FORBIDDEN_OPERATION;
 
@@ -46,7 +45,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class User {
 
     private static final int MAX_TAG_SIZE = 3;
-    private static final int MAX_AVAILABLE_LIKE_COUNT = 10;
     private static final double JANDI_WEIGHT = 2.5;
 
     @Id
@@ -167,14 +165,11 @@ public class User {
         this.username = username;
     }
 
-    public void increaseAvailableLikeCount() {
-        if (this.availableLikeCount >= MAX_AVAILABLE_LIKE_COUNT) {
-            throw new UserException(USER_AVAILABLE_LIKE_AMOUNT_IS_FULL);
-        }
+    public synchronized void increaseAvailableLikeCount() {
         this.availableLikeCount += 1;
     }
 
-    public void decreaseAvailableLikeCount() {
+    public synchronized void decreaseAvailableLikeCount() {
         if (this.availableLikeCount <= 0) {
             throw new UserException(USER_AVAILABLE_LIKE_COUNT_IS_ZERO);
         }

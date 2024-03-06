@@ -31,8 +31,7 @@ public enum ErrorCode400 implements ErrorCode {
     USER_REGION_SHOULD_BE_NOT_EMPTY("E020104", "유저 지역은 비어있을 수 없습니다."),
     USER_WANTED_JOB_DUPLICATE("E020105", "중복된 희망 직무가 있습니다."),
     USER_DEVELOP_LANGUAGE_DUPLICATE("E020106", "중복된 개발 언어가 있습니다."),
-    USER_AVAILABLE_LIKE_COUNT_IS_ZERO("E020107", "당일 사용할 수 있는 찔러보기 요청을 모두 소진했습니다."),
-    USER_AVAILABLE_LIKE_AMOUNT_IS_FULL("E020108", "프로필 카드의 찔러보기 요청의 최대 횟수를 넘을 수 없습니다."),
+    USER_AVAILABLE_LIKE_COUNT_IS_ZERO("E020107", "취소할 수 있는 찔러보기 요청이 존재하지 않습니다."),
     USER_ID_NOT_NULL("E020001", "유저 아이디는 필수값입니다."),
     USER_AVATAR_URL_NOT_NULL("E020109", "유저 프로필 이미지는 필수값입니다."),
 
