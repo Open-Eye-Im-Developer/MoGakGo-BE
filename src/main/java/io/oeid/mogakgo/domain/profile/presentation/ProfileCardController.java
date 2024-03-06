@@ -6,7 +6,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.common.swagger.template.ProfileCardSwagger;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.profile.application.ProfileCardService;
-import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
+import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileInfoAPIRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class ProfileCardController implements ProfileCardSwagger {
     private final ProfileCardService profileCardService;
 
     @GetMapping("/{region}")
-    public ResponseEntity<CursorPaginationResult<UserPublicApiResponse>> getRandomOrderedProfileCardsByRegion(
+    public ResponseEntity<CursorPaginationResult<UserProfileInfoAPIRes>> getRandomOrderedProfileCardsByRegion(
         @UserId Long userId, @PathVariable Region region,
         @Valid @ModelAttribute CursorPaginationInfoReq pageable
     ) {
