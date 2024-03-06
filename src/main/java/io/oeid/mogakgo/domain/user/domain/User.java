@@ -132,14 +132,14 @@ public class User {
         return new User(githubPk, username, avatarUrl, githubUrl, repositoryUrl);
     }
 
-    public void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
+    protected void addDevelopLanguage(UserDevelopLanguageTag userDevelopLanguageTag) {
         if (userDevelopLanguageTags.size() + 1 > MAX_TAG_SIZE) {
             throw new UserException(ErrorCode400.USER_DEVELOP_LANGUAGE_BAD_REQUEST);
         }
         userDevelopLanguageTags.add(userDevelopLanguageTag);
     }
 
-    public void addWantedJob(UserWantedJobTag userWantedJobTag) {
+    protected void addWantedJob(UserWantedJobTag userWantedJobTag) {
         if (userWantedJobTags.size() + 1 > MAX_TAG_SIZE) {
             throw new UserException(ErrorCode400.USER_DEVELOP_LANGUAGE_BAD_REQUEST);
         }
@@ -165,11 +165,11 @@ public class User {
         this.username = username;
     }
 
-    public synchronized void increaseAvailableLikeCount() {
+    public void increaseAvailableLikeCount() {
         this.availableLikeCount += 1;
     }
 
-    public synchronized void decreaseAvailableLikeCount() {
+    public void decreaseAvailableLikeCount() {
         if (this.availableLikeCount <= 0) {
             throw new UserException(USER_AVAILABLE_LIKE_COUNT_IS_ZERO);
         }
@@ -222,7 +222,7 @@ public class User {
     }
 
     public void updateJandiRateByCancel() {
-        this.jandiRate += -5 * JANDI_WEIGHT;
+        this.jandiRate += ReviewRating.ONE.getValue() * JANDI_WEIGHT;
     }
 
     private boolean validateAvailableRegionUpdate(Region region) {
