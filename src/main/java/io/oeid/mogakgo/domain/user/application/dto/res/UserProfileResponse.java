@@ -14,13 +14,13 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserProfileResponse {
 
-    private final long id;
+    private final Long id;
     private final String username;
     private final String githubId;
     private final String avatarUrl;
     private final String githubUrl;
     private final String bio;
-    private final double jandiRate;
+    private final Double jandiRate;
     private final String achievementTitle;
     private final List<DevelopLanguage> developLanguages;
     private final List<WantedJob> wantedJobs;
