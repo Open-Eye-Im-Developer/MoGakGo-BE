@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Entity
@@ -37,7 +36,6 @@ public class UserDevelopLanguageTag {
     @Column(name = "develop_language")
     private DevelopLanguage developLanguage;
 
-    @Setter
     @Column(name = "byte_size", nullable = false)
     private Integer byteSize;
 

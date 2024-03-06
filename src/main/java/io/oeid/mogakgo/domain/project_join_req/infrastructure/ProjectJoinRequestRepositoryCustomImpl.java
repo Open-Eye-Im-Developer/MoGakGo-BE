@@ -10,7 +10,7 @@ import io.oeid.mogakgo.domain.project.presentation.dto.res.MeetingInfoResponse;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.ProjectJoinRequest;
 import io.oeid.mogakgo.domain.project_join_req.domain.entity.enums.RequestStatus;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestDetailAPIRes;
-import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestRes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -22,7 +22,7 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public CursorPaginationResult<projectJoinRequestRes> findByConditionWithPagination(
+    public CursorPaginationResult<ProjectJoinRequestRes> findByConditionWithPagination(
         Long senderId, Long projectId, RequestStatus requestStatus, CursorPaginationInfoReq pageable
     ) {
 //        List<projectJoinRequestRes> result = jpaQueryFactory.select(
@@ -58,8 +58,8 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
             .limit(pageable.getPageSize() + 1)
             .fetch();
 
-        List<projectJoinRequestRes> result = entities.stream().map(
-            projectJoinRequest -> new projectJoinRequestRes(
+        List<ProjectJoinRequestRes> result = entities.stream().map(
+            projectJoinRequest -> new ProjectJoinRequestRes(
                 projectJoinRequest.getId(),
                 projectJoinRequest.getSender(),
                 projectJoinRequest.getRequestStatus()

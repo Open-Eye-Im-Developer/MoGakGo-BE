@@ -25,7 +25,7 @@ import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequestJpaRepository;
-import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.projectJoinRequestRes;
+import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestRes;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
@@ -108,7 +108,7 @@ public class ProjectService {
         projectJoinRequestJpaRepository.rejectAllByProjectId(projectId);
     }
 
-    public CursorPaginationResult<projectJoinRequestRes> getJoinRequest(
+    public CursorPaginationResult<ProjectJoinRequestRes> getJoinRequest(
         Long userId, Long projectId, CursorPaginationInfoReq pageable
     ) {
         // 유저 존재 여부 체크
