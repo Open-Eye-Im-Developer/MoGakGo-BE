@@ -22,7 +22,7 @@ public interface AchievementSwagger {
     @Operation(summary = "사용자의 진행중, 달성한 업적 상세 조회", description = "사용자가 자신이 진행중이거나 달성한 업적에 대해 조회할 떄 사용하는 API")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "업적 상세 조회 성공"),
-        @ApiResponse(responseCode = "403", description = "요청한 데이터가 유효하지 않음",
+        @ApiResponse(responseCode = "403", description = "권한이 없음",
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = ErrorResponse.class),
