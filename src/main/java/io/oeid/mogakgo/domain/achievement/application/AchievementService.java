@@ -2,7 +2,6 @@ package io.oeid.mogakgo.domain.achievement.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode403.ACHIEVEMENT_FORBIDDEN_OPERATION;
 
-import io.oeid.mogakgo.domain.achievement.application.dto.res.AchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.exception.AchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
@@ -25,14 +24,7 @@ public class AchievementService {
         User user = validateToken(userId);
         validateUser(user, id);
 
-        return userAchievementRepository.getAchievedOrInProcessUserAchievementInfo(userId);
-    }
-
-    public List<AchievementInfoRes> getAchievementInfo(Long userId, Long id) {
-        User user = validateToken(userId);
-        validateUser(user, id);
-
-        return userAchievementRepository.getNonAchievedAchievementInfo(userId);
+        return userAchievementRepository.getAchievementInfoAboutUser(userId);
     }
 
     private User validateToken(Long userId) {
