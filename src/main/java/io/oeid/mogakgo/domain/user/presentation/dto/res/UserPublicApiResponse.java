@@ -27,6 +27,8 @@ public class UserPublicApiResponse {
     private final String bio;
     @Schema(description = "잔디 비율", example = "0.5")
     private final double jandiRate;
+    @Schema(description = "업적 ID", example = "1")
+    private final Long achievementId;
     @Schema(description = "업적 제목", example = "이세계 개발자")
     private final String achievementTitle;
     @Schema(description = "개발 언어", example = "[\"JAVA\", \"KOTLIN\"]")
@@ -43,6 +45,7 @@ public class UserPublicApiResponse {
             response.getGithubUrl(),
             response.getBio(),
             response.getJandiRate(),
+            response.getAchievementId(),
             response.getAchievementTitle(),
             response.getDevelopLanguages().stream().map(Enum::name).toList(),
             response.getWantedJobs().stream().map(Enum::name).toList()
@@ -58,6 +61,7 @@ public class UserPublicApiResponse {
             user.getGithubUrl(),
             user.getBio(),
             user.getJandiRate(),
+            user.getAchievement() != null ? user.getAchievement().getId() : null,
             user.getAchievement() != null ? user.getAchievement().getTitle() : null,
             user.getUserDevelopLanguageTags().stream()
                 .map(UserDevelopLanguageTag::getDevelopLanguage).map(Enum::name).toList(),
