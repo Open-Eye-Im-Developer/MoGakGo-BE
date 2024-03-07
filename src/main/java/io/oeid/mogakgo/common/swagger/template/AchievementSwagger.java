@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 @Tag(name = "Achievement", description = "사용자의 업적 조회 관련 API")
 public interface AchievementSwagger {
 
-    @Operation(summary = "사용자의 진행중, 달성한 업적 상세 조회", description = "사용자가 자신이 진행중이거나 달성한 업적에 대해 조회할 떄 사용하는 API")
+    @Operation(summary = "사용자의 업적 상세 조회", description = "사용자가 자신의 업적에 대해 조회할 떄 사용하는 API")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "업적 상세 조회 성공"),
         @ApiResponse(responseCode = "403", description = "권한이 없음",
