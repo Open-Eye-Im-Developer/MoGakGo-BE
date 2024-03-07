@@ -55,6 +55,7 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
                     profileCard.getUser().getGithubUrl(),
                     profileCard.getUser().getBio(),
                     profileCard.getUser().getJandiRate(),
+                    profileCard.getUser().getAchievement() != null ? profileCard.getUser().getAchievement().getId() : null,
                     profileCard.getUser().getAchievement() != null ? profileCard.getUser().getAchievement().getTitle() : null,
                     profileCard.getUser().getUserDevelopLanguageTags().stream().map(
                         UserDevelopLanguageTag::getDevelopLanguage).map(String::valueOf).toList(),
