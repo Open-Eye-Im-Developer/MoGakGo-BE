@@ -3,6 +3,7 @@ package io.oeid.mogakgo.domain.user.presentation;
 import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.swagger.template.UserSwagger;
 import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
+import io.oeid.mogakgo.domain.user.application.UserAchievementService;
 import io.oeid.mogakgo.domain.user.application.UserService;
 import io.oeid.mogakgo.domain.user.application.dto.req.UserUpdateReq;
 import io.oeid.mogakgo.domain.user.application.dto.res.UserJandiRateRes;
@@ -34,6 +35,7 @@ public class UserController implements UserSwagger {
 
     private final UserService userService;
     private final UserMatchingService userMatchingService;
+    private final UserAchievementService userAchievementService;
 
     @GetMapping
     public ResponseEntity<UserPublicApiResponse> userGetApi(@UserId Long userId) {
@@ -84,7 +86,7 @@ public class UserController implements UserSwagger {
     public ResponseEntity<UserAchievementUpdateApiResponse> updateUserMainAchievement(
         @UserId Long userId, @Valid @RequestBody UserAchievementUpdateApiRequest request
     ) {
-        Long id = userService.updateAchievement(userId, request);
+        Long id = userAchievementService.updateAchievement(userId, request);
         return ResponseEntity.ok().body(UserAchievementUpdateApiResponse.from(id));
     }
 }

@@ -2,7 +2,6 @@ package io.oeid.mogakgo.domain.user.domain;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.ACHIEVEMENT_SHOULD_BE_DIFFERENT;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.USER_AVAILABLE_LIKE_COUNT_IS_ZERO;
-import static io.oeid.mogakgo.exception.code.ErrorCode403.USER_FORBIDDEN_OPERATION;
 
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
@@ -234,12 +233,6 @@ public class User {
             throw new UserException(ErrorCode400.USER_AVATAR_URL_NOT_NULL);
         }
         return avatarUrl;
-    }
-
-    public void validateUpdater(Long userId) {
-        if (!this.id.equals(userId)) {
-            throw new UserException(USER_FORBIDDEN_OPERATION);
-        }
     }
 
 }
