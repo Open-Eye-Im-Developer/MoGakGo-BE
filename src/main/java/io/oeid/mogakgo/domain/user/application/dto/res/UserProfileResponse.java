@@ -24,6 +24,7 @@ public class UserProfileResponse {
     private final Double jandiRate;
     private final Long achievementId;
     private final String achievementTitle;
+    private final String achievementImageUrl;
     private final List<DevelopLanguage> developLanguages;
     private final List<WantedJob> wantedJobs;
 
@@ -39,6 +40,7 @@ public class UserProfileResponse {
             user.getJandiRate(),
             achievement == null ? null : achievement.getId(),
             achievement == null ? null : achievement.getTitle(),
+            achievement == null ? null : achievement.getImgUrl(),
             user.getUserDevelopLanguageTags().stream().map(
                 UserDevelopLanguageTag::getDevelopLanguage).toList(),
             user.getUserWantedJobTags().stream().map(

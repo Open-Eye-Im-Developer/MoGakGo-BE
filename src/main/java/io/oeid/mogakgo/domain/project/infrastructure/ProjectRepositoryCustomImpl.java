@@ -62,6 +62,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                     project.getCreator().getJandiRate(),
                     project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getId() : null,
                     project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getTitle() : null,
+                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getImgUrl() : null,
                     project.getCreator().getUserDevelopLanguageTags().stream().map(
                         UserDevelopLanguageTag::getDevelopLanguage).map(String::valueOf).toList(),
                     project.getCreator().getUserWantedJobTags().stream().map(
