@@ -34,14 +34,6 @@ public class JwtHelper {
         this.jwtVerifier = require(algorithm).withIssuer(issuer).build();
     }
 
-    private static long hoursToMillis(int hour) {
-        return hour * HOUR_TO_MILLIS;
-    }
-
-    private static Date calculateExpirySeconds(Date now, long tokenExpirySeconds) {
-        return new Date(now.getTime() + tokenExpirySeconds);
-    }
-
     public JwtToken sign(long userId, String[] roles) {
         Date now = new Date();
         String accessToken = create()
@@ -78,9 +70,7 @@ public class JwtHelper {
         throws JWTVerificationException {
         DecodedJWT decodedJWT = jwtVerifier.verify(token);
         var claims = decodedJWT.getClaims();
-        Long userId = claims.get(USER_ID_STR).asLong();
-        var roles = claims.get(ROLES_STR).asArray(String.class);
-        if (userId == null || roles == null) {
+        if (!claims.containsKey(USER_ID_STR) || !claims.containsKey(ROLES_STR)) {
             throw new JWTVerificationException("Invalid token");
         }
         return claims;
@@ -92,7 +82,15 @@ public class JwtHelper {
         return verifier.verify(token).getClaims();
     }
 
-    public Map<String, Claim> verifyRefreshToken(String token){
+    public Map<String, Claim> verifyRefreshToken(String token) {
         return jwtVerifier.verify(token).getClaims();
+    }
+
+    private static long hoursToMillis(int hour) {
+        return hour * HOUR_TO_MILLIS;
+    }
+
+    private static Date calculateExpirySeconds(Date now, long tokenExpirySeconds) {
+        return new Date(now.getTime() + tokenExpirySeconds);
     }
 }
