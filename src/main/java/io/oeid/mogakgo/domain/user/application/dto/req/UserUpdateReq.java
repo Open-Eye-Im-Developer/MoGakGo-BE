@@ -15,15 +15,13 @@ public class UserUpdateReq {
     private final String bio;
     private final String avatarUrl;
     private List<WantedJob> wantedJobs;
-    private final Long achievementId;
 
     public static UserUpdateReq from(UserUpdateApiReq request) {
         return new UserUpdateReq(
             request.getUsername(),
             request.getBio(),
             request.getAvatarUrl(),
-            request.getWantedJobs().stream().map(WantedJob::valueOf).toList(),
-            request.getAchievementId()
+            request.getWantedJobs().stream().map(WantedJob::valueOf).toList()
         );
     }
 }
