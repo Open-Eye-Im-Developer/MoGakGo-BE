@@ -50,7 +50,8 @@ public class UserAchievementService {
 
     private void validateAchievement(Long achievementId) {
         achievementRepository.findById(achievementId)
-            .ifPresentOrElse(null, () -> {
+            .ifPresentOrElse(achievement -> {
+            }, () -> {
                 throw new AchievementException(ACHIEVEMENT_NOT_FOUND);
             });
     }
