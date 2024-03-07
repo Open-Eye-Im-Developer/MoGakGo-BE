@@ -96,7 +96,8 @@ public class ChatService {
         log.info("verifyChatUser - chatRoomId: {}, userId: {}", chatRoomIdStr, userId);
         UUID chatRoomId = UUID.fromString(chatRoomIdStr);
         chatUserRepository.findByChatRoomIdAndUserId(chatRoomId, userId)
-            .ifPresentOrElse(null,
+            .ifPresentOrElse(chatuser -> {
+                },
                 () -> {
                     throw new MatchingException(ErrorCode404.CHAT_USER_NOT_FOUND);
                 });
