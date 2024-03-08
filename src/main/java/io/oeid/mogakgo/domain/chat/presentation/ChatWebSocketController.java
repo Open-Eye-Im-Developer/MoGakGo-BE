@@ -2,8 +2,9 @@ package io.oeid.mogakgo.domain.chat.presentation;
 
 import io.oeid.mogakgo.domain.chat.application.ChatWebSocketService;
 import io.oeid.mogakgo.domain.chat.application.dto.req.ChatReq;
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
-import io.oeid.mogakgo.domain.chat.presentation.dto.ChatApiReq;
+import io.oeid.mogakgo.domain.chat.presentation.dto.req.ChatApiReq;
+import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
+import io.oeid.mogakgo.domain.notification.application.FCMNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -19,10 +20,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatWebSocketController {
 
     private final ChatWebSocketService chatWebSocketService;
+    private final FCMNotificationService fcmNotificationService;
+
     @MessageMapping("/chatroom/{chatRoomId}")
     @SendTo("/topic/chatroom/{chatRoomId}")
-    public ChatDataRes sendChatData(@DestinationVariable("chatRoomId") String chatRoomId, ChatApiReq request) {
+    public ChatDataApiRes sendChatData(@DestinationVariable("chatRoomId") String chatRoomId,
+        ChatApiReq request) {
         log.info("ChatWebSocketController - sendChatData start -> chatRoomId: {}", chatRoomId);
-        return chatWebSocketService.handleChatMessage(request.getUserId(), chatRoomId, ChatReq.from(request));
+        var response = chatWebSocketService.handleChatMessage(request.getUserId(), chatRoomId,
+            ChatReq.from(request));
+        fcmNotificationService.sendNotification(response.getReceiverId(),
+            response.getReceiverUsername(), response.getMessage());
+        return response.toApiResponse();
     }
 }

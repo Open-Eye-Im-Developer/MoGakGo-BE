@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.chat.presentation.dto;
+package io.oeid.mogakgo.domain.chat.presentation.dto.req;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
