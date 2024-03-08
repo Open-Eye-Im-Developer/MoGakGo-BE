@@ -20,7 +20,7 @@ public class AchievementController implements AchievementSwagger {
 
     private final AchievementService achievementService;
 
-    @GetMapping("/{id}/achieved")
+    @GetMapping("/{id}")
     public ResponseEntity<List<UserAchievementDetailAPIRes>> getUserAchievementDetail(
         @UserId Long userId, @PathVariable Long id
     ) {
