@@ -12,4 +12,7 @@ public interface ChatUserJpaRepository extends JpaRepository<ChatUser, Long> {
 
     @Query("select c from ChatUser c where c.chatRoom.id = ?1 and c.user.id = ?2 and c.availableYn = true")
     Optional<ChatUser> findByChatRoomIdAndUserId(UUID chatRoomId, Long userId);
+
+    @Query("select c from ChatUser c where c.chatRoom.id = ?1 and (c.user.id <> ?2 and c.availableYn = true)")
+    Optional<ChatUser> findReceiverByRoomIdAndUserId(UUID id, Long id1);
 }

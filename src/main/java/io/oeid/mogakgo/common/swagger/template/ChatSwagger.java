@@ -7,9 +7,9 @@ import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerChatErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
+import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -82,7 +82,7 @@ public interface ChatSwagger {
         @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
         @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
     })
-    ResponseEntity<CursorPaginationResult<ChatDataRes>> getChatData(
+    ResponseEntity<CursorPaginationResult<ChatDataApiRes>> getChatData(
         @Parameter(in = ParameterIn.PATH) String chatRoomId,
         @Parameter(hidden = true) Long userId,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable);

@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Schema(description = "사용자에 대한 진행중, 달성한 업적 상세 정보 조회 응답 DTO")
+@Schema(description = "사용자에 대한 업적 상세 정보 조회 응답 DTO")
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserAchievementDetailAPIRes {
