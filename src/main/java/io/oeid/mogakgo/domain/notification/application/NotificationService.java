@@ -2,13 +2,13 @@ package io.oeid.mogakgo.domain.notification.application;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
-import io.oeid.mogakgo.domain.notification.application.dto.req.NotificationCreateRequest;
+import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.notification.application.dto.res.NotificationCheckedRes;
-import io.oeid.mogakgo.domain.notification.application.dto.res.NotificationCreateResponse;
 import io.oeid.mogakgo.domain.notification.domain.Notification;
 import io.oeid.mogakgo.domain.notification.exception.NotificationException;
 import io.oeid.mogakgo.domain.notification.infrastructure.NotificationJpaRepository;
 import io.oeid.mogakgo.domain.notification.presentation.dto.res.NotificationPublicApiRes;
+import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
@@ -20,28 +20,58 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class NotificationService {
 
     private final UserCommonService userCommonService;
     private final NotificationJpaRepository notificationRepository;
 
-    @Transactional
-    public NotificationCreateResponse createNotification(NotificationCreateRequest request) {
-        log.info("createNotification request: {}", request);
-        User sender = userCommonService.getUserById(request.getSenderId());
-        User receiver = userCommonService.getUserById(request.getReceiverId());
-        Notification notification = notificationRepository.save(request.toEntity(sender, receiver));
-        return NotificationCreateResponse.from(notification);
+    public void createReviewRequestNotification(Long userId, User receiver, Project project) {
+        log.info("createReviewRequestNotification userId: {}, receiver: {}, project: {}", userId,
+            receiver.getId(), project.getId());
+        User user = userCommonService.getUserById(userId);
+        notificationRepository.save(
+            Notification.newReviewRequestNotification(user, receiver, project));
     }
 
+    public void createAchievementNotification(Long userId, Achievement achievement) {
+        log.info("createAchievementNotification userId: {}, achievement: {}", userId,
+            achievement.getId());
+        User user = userCommonService.getUserById(userId);
+        notificationRepository.save(Notification.newAchievementNotification(user, achievement));
+    }
+
+    public void createRequestArrivalNotification(Long userId) {
+        log.info("createRequestArrivalNotification userId: {}", userId);
+        User user = userCommonService.getUserById(userId);
+        notificationRepository.save(Notification.newRequestArrivalNotification(user));
+    }
+
+    public void createMatchingSuccessNotification(Long userId, Project project) {
+        log.info("createMatchingSuccessNotification userId: {}, project: {}", userId,
+            project.getId());
+        User user = userCommonService.getUserById(userId);
+        notificationRepository.save(Notification.newMatchingSuccessNotification(user, project));
+    }
+
+    public void createMatchingFailedNotification(Long userId, Project project) {
+        log.info("createMatchingFailedNotification userId: {}, project: {}", userId,
+            project.getId());
+        User user = userCommonService.getUserById(userId);
+        notificationRepository.save(Notification.newMatchingFailedNotification(user, project));
+    }
+
+    @Transactional(readOnly = true)
     public CursorPaginationResult<NotificationPublicApiRes> getNotifications(Long userId,
         CursorPaginationInfoReq pageable) {
         User user = userCommonService.getUserById(userId);
-        return notificationRepository.findByUserIdWithPagination(user.getId(), pageable);
+        var result = notificationRepository.findByUserIdWithPagination(user.getId(),
+            pageable.getCursorId(), pageable.getPageSize());
+        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(
+            result.stream().map(NotificationPublicApiRes::from).toList(),
+            pageable.getPageSize());
     }
 
-    @Transactional
     public NotificationCheckedRes checkedNotification(Long userId, Long notificationId) {
         User user = userCommonService.getUserById(userId);
         Notification notification = notificationRepository.findByIdAndReceiver(notificationId, user)

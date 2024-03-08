@@ -8,9 +8,13 @@ public enum ErrorCode400 implements ErrorCode {
     PATH_PARAMETER_BAD_REQUEST("E000001", "잘못된 경로 파라미터입니다."),
     INVALID_INPUT_VALUE("E000002", "기본 유효성 검사에 실패하였습니다."),
 
-    NOTIFICATION_TAG_NOT_NULL("E060001", "알림 태그는 필수값입니다."),
-    NOTIFICATION_DETAIL_DATA_NOT_NULL("E060002", "알림 상세 데이터는 필수값입니다."),
+    NOTIFICATION_TAG_SHOULD_LIKE_MATCHING("E060001", "매칭 관련 알림 태그를 사용해야합니다."),
+    NOTIFICATION_USER_NOT_NULL("E060002", "알림을 받는 유저 정보는 필수입니다."),
     NOTIFICATION_FCM_TOKEN_NOT_NULL("E060003", "FCM 토큰은 필수값입니다."),
+    NOTIFICATION_RECEIVER_NOT_NULL("E060004", "알림을 전송하기 위한 유저 정보가 존재하지 않습니다."),
+    NOTIFICATION_PROJECT_NOT_NULL("E060005", "알림을 전송하기 위한 프로젝트 정보가 존재하지 않습니다."),
+    NOTIFICATION_ACHIEVEMENT_NOT_NULL("E060006", "알림을 전송하기 위한 업적 정보가 존재하지 않습니다."),
+    NOTIFICATION_USER_RECEIVER_DUPLICATED("E060002", "리뷰 요청을 받는 유저와 알림을 전송하는 유저가 동일합니다."),
 
     INVALID_PROJECT_MEETING_TIME("E030101", "프로젝트 만남 시간이 유효하지 않습니다."),
     INVALID_PROJECT_TAG_COUNT("E030102", "프로젝트 태그 갯수가 유효하지 않습니다. 1개 이상 3개 이하로 입력해야 합니다."),
