@@ -4,6 +4,7 @@ package io.oeid.mogakgo.domain.chat.infrastructure;
 import static io.oeid.mogakgo.domain.chat.entity.QChatRoom.chatRoom;
 import static io.oeid.mogakgo.domain.chat.entity.QChatUser.chatUser;
 import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
+import static io.oeid.mogakgo.domain.user.domain.QUser.user;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -24,11 +25,10 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
 
     @Override
     public ChatRoomDataRes getChatDetailData(Long userId, UUID chatRoomId) {
-        return jpaQueryFactory
-            .select(
+        return jpaQueryFactory.select(
                 Projections.constructor(
                     ChatRoomDataRes.class,
-                    chatUser.chatRoom.project.meetingInfo,
+                    chatRoom.project.meetingInfo,
                     Projections.constructor(
                         ChatUserInfo.class,
                         chatUser.user.id,
@@ -39,9 +39,12 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
             )
             .from(chatUser)
             .leftJoin(chatUser.chatRoom, chatRoom)
+            .leftJoin(chatUser.user, user)
             .leftJoin(chatUser.chatRoom.project, project)
-            .where(chatUser.chatRoom.id.eq(chatRoomId).and(chatUser.user.id.ne(userId)))
-            .fetchOne();
+            .where(
+                chatRoomIdEq(chatRoomId),
+                userIdNotEq(userId)
+            ).fetchOne();
     }
 
     @Override
@@ -64,6 +67,15 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
     }
 
     private BooleanExpression userIdEq(Long userId) {
-        return userId == null ? null : chatUser.user.id.eq(userId).and(chatUser.availableYn.isTrue());
+        return userId == null ? null
+            : chatUser.user.id.eq(userId).and(chatUser.availableYn.isTrue());
+    }
+
+    private BooleanExpression chatRoomIdEq(UUID chatRoomId) {
+        return chatRoomId == null ? null : chatRoom.id.eq(chatRoomId);
+    }
+
+    private BooleanExpression userIdNotEq(Long userId) {
+        return userId == null ? null : chatUser.user.id.ne(userId);
     }
 }
