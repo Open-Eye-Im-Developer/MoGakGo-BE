@@ -5,9 +5,9 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.common.swagger.template.ChatSwagger;
 import io.oeid.mogakgo.domain.chat.application.ChatService;
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
+import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +38,7 @@ public class ChatController implements ChatSwagger {
     }
 
     @GetMapping("/{chatRoomId}")
-    public ResponseEntity<CursorPaginationResult<ChatDataRes>> getChatData(
+    public ResponseEntity<CursorPaginationResult<ChatDataApiRes>> getChatData(
         @PathVariable String chatRoomId,
         @UserId Long userId, @Valid @ModelAttribute CursorPaginationInfoReq pageable) {
         return ResponseEntity.ok(chatService.findAllChatInChatRoom(userId, chatRoomId, pageable));

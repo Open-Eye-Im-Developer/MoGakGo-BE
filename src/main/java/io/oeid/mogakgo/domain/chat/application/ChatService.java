@@ -2,13 +2,13 @@ package io.oeid.mogakgo.domain.chat.application;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatUserJpaRepository;
+import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
 import io.oeid.mogakgo.domain.matching.exception.MatchingException;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
@@ -71,7 +71,7 @@ public class ChatService {
     }
 
     // 채팅방 조회
-    public CursorPaginationResult<ChatDataRes> findAllChatInChatRoom(Long userId, String chatRoomId,
+    public CursorPaginationResult<ChatDataApiRes> findAllChatInChatRoom(Long userId, String chatRoomId,
         CursorPaginationInfoReq pageable) {
         verifyChatUser(chatRoomId, userId);
         return chatRepository.findAllByCollection(chatRoomId, pageable);

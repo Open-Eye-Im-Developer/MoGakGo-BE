@@ -28,13 +28,15 @@ public class ChatWebSocketService {
     public ChatDataRes handleChatMessage(Long userId, String roomId, ChatReq request) {
         log.info("handleChatMessage userId: {}, roomId: {}", userId, roomId);
         verifyChatRoomByRoomIdAndUser(roomId, userId);
+        var receiver = chatUserRepository.findReceiverByRoomIdAndUserId(UUID.fromString(roomId), userId)
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND));
         ChatMessage chatMessage = chatRepository.save(
             ChatMessage.builder().id(sequenceGeneratorService.generateSequence(roomId))
                 .senderId(userId)
                 .messageType(request.getMessageType())
                 .message(request.getMessage())
                 .build(), roomId);
-        return ChatDataRes.from(chatMessage);
+        return ChatDataRes.of(receiver.getUser(), chatMessage);
     }
 
     private void verifyChatRoomByRoomIdAndUser(String roomId, Long userId) {
