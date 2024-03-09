@@ -1,13 +1,13 @@
 package io.oeid.mogakgo.domain.matching.infrastructure;
 
 import static io.oeid.mogakgo.domain.matching.domain.entity.QMatching.matching;
-import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.domain.matching.domain.entity.enums.MatchingStatus;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingHistoryRes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class MatchingRepositoryCustomImpl implements MatchingRepositoryCustom {
 
     @Override
     public CursorPaginationResult<MatchingHistoryRes> getMyMatches(
-        Long userId, CursorPaginationInfoReq cursorPaginationInfoReq
+        Long userId, MatchingStatus matchingStatus, CursorPaginationInfoReq cursorPaginationInfoReq
     ) {
         List<MatchingHistoryRes> matchingHistoryResList = jpaQueryFactory
             .select(
@@ -40,6 +40,7 @@ public class MatchingRepositoryCustomImpl implements MatchingRepositoryCustom {
             .join(matching.project)
             .where(
                 participantInMatching(userId),
+                matchingStatusEq(matchingStatus),
                 cursorIdCondition(cursorPaginationInfoReq.getCursorId())
             )
             // 최근순
@@ -60,5 +61,8 @@ public class MatchingRepositoryCustomImpl implements MatchingRepositoryCustom {
             userId))) : null;
     }
 
+    private BooleanExpression matchingStatusEq(MatchingStatus matchingStatus) {
+        return matchingStatus != null ? matching.matchingStatus.eq(matchingStatus) : null;
+    }
 
 }
