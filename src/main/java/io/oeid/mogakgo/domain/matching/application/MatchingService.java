@@ -7,6 +7,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.chat.application.ChatService;
 import io.oeid.mogakgo.domain.matching.domain.entity.Matching;
+import io.oeid.mogakgo.domain.matching.domain.entity.enums.MatchingStatus;
 import io.oeid.mogakgo.domain.matching.exception.MatchingException;
 import io.oeid.mogakgo.domain.matching.infrastructure.MatchingJpaRepository;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingHistoryRes;
@@ -54,7 +55,7 @@ public class MatchingService {
     }
 
     public CursorPaginationResult<MatchingHistoryRes> getMyMatches(
-        Long tokenUserId, Long userId, CursorPaginationInfoReq cursorPaginationInfoReq
+        Long tokenUserId, Long userId, MatchingStatus matchingStatus, CursorPaginationInfoReq cursorPaginationInfoReq
     ) {
         User tokenUser = userCommonService.getUserById(tokenUserId);
         // 본인만 매칭 기록 조회 가능
@@ -62,7 +63,7 @@ public class MatchingService {
             throw new MatchingException(MATCHING_FORBIDDEN_OPERATION);
         }
 
-        return matchingJpaRepository.getMyMatches(tokenUserId, cursorPaginationInfoReq);
+        return matchingJpaRepository.getMyMatches(tokenUserId, matchingStatus, cursorPaginationInfoReq);
     }
 
     private Matching getMatching(Long matchingId) {
