@@ -179,6 +179,14 @@ public class ProjectService {
         return new ProjectDensityRankRes(regionRankList);
     }
 
+    public List<ProjectDetailAPIRes> getLastedProjectByUserId(Long userId, Long id) {
+        User user = getUser(userId);
+
+        validateProjectCardCreator(user, id);
+
+        return projectJpaRepository.findLatestProjectByUserId(id);
+    }
+
     private boolean isExistsNotEndProjectCard(User tokenUser) {
         return !projectJpaRepository.findNotEndProjectOneByCreatorId(tokenUser.getId(),
             PageRequest.of(0, 1)).isEmpty();

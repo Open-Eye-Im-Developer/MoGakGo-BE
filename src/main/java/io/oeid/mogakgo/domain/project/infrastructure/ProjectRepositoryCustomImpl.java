@@ -125,6 +125,48 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
             .fetch();
     }
 
+    @Override
+    public List<ProjectDetailAPIRes> findLatestProjectByUserId(Long userId) {
+
+        List<Project> entity = jpaQueryFactory.selectFrom(project)
+            .innerJoin(project.creator, user)
+            .on(project.creator.id.eq(user.id))
+            .where(
+                userIdEq(userId),
+                projectStatusEq(ProjectStatus.PENDING)
+            )
+            .fetch();
+
+        return entity.stream().map(
+            project -> new ProjectDetailAPIRes(
+                project.getId(),
+                new UserPublicApiResponse(
+                    project.getCreator().getId(),
+                    project.getCreator().getUsername(),
+                    project.getCreator().getGithubId(),
+                    project.getCreator().getAvatarUrl(),
+                    project.getCreator().getGithubUrl(),
+                    project.getCreator().getBio(),
+                    project.getCreator().getJandiRate(),
+                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getId() : null,
+                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getTitle() : null,
+                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getImgUrl() : null,
+                    project.getCreator().getUserDevelopLanguageTags().stream().map(
+                        UserDevelopLanguageTag::getDevelopLanguage).map(String::valueOf).toList(),
+                    project.getCreator().getUserWantedJobTags().stream().map(
+                        UserWantedJobTag::getWantedJob).map(String::valueOf).toList()
+                ),
+                project.getProjectStatus(),
+                project.getProjectTags().stream().map(ProjectTag::getContent).toList(),
+                new MeetingInfoResponse(
+                    project.getMeetingInfo().getMeetStartTime(),
+                    project.getMeetingInfo().getMeetEndTime(),
+                    project.getMeetingInfo().getMeetDetail()
+                )
+            )
+        ).toList();
+    }
+
     private BooleanExpression cursorIdCondition(Long cursorId) {
         return cursorId != null ? project.id.lt(cursorId) : null;
     }
