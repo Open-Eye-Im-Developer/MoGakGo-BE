@@ -19,4 +19,6 @@ public interface ProjectRepositoryCustom {
     );
 
     List<Region> getDensityRankProjectsByRegion(int limit);
+
+    List<ProjectDetailAPIRes> findLatestProjectByUserId(Long userId);
 }
