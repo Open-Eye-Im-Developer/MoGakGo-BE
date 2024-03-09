@@ -9,6 +9,7 @@ import io.oeid.mogakgo.domain.project.application.ProjectService;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDensityRankRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailInfoAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectIdRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
 import io.oeid.mogakgo.domain.project_join_req.presentation.dto.res.ProjectJoinRequestRes;
@@ -93,6 +94,12 @@ public class ProjectController implements ProjectSwagger {
         @UserId Long userId, @PathVariable Long projectId, @PathVariable Long id
         ) {
         return ResponseEntity.ok().body(projectService.getByProjectId(userId, id, projectId));
+    }
+
+    @GetMapping("/{id}/info")
+    public ResponseEntity<ProjectDetailInfoAPIRes> getByUserId(
+        @UserId Long userId, @PathVariable Long id) {
+        return ResponseEntity.ok().body(ProjectDetailInfoAPIRes.of(projectService.getLastedProjectByUserId(userId, id)));
     }
 
 }

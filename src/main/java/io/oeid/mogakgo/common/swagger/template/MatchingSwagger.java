@@ -5,6 +5,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerMatchingErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
+import io.oeid.mogakgo.domain.matching.domain.entity.enums.MatchingStatus;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingHistoryRes;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingId;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Matching", description = "매칭 관련 API")
 @SuppressWarnings("unused")
@@ -70,6 +72,7 @@ public interface MatchingSwagger {
     ResponseEntity<CursorPaginationResult<MatchingHistoryRes>> getMyMatches(
         @Parameter(hidden = true) Long tokenId,
         @Parameter(description = "유저 ID", required = true) Long userId,
+        @RequestParam(required = false) MatchingStatus matchingStatus,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable
     );
 
