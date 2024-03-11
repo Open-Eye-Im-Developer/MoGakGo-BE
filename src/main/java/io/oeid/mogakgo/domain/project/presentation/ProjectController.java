@@ -99,7 +99,7 @@ public class ProjectController implements ProjectSwagger {
     @GetMapping("/{id}/info")
     public ResponseEntity<ProjectDetailInfoAPIRes> getByUserId(
         @UserId Long userId, @PathVariable Long id) {
-        return ResponseEntity.ok().body(ProjectDetailInfoAPIRes.of(projectService.getLastedProjectByUserId(userId, id)));
+        return ResponseEntity.ok().body(projectService.getLastedProjectByUserId(userId, id));
     }
 
 }

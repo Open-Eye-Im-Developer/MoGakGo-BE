@@ -11,9 +11,10 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProjectDetailInfoAPIRes {
 
+    private final Long matchingId;
     private final List<ProjectDetailAPIRes> response;
 
-    public static ProjectDetailInfoAPIRes of(List<ProjectDetailAPIRes> response) {
-        return new ProjectDetailInfoAPIRes(response);
+    public static ProjectDetailInfoAPIRes of(Long matchingId, List<ProjectDetailAPIRes> response) {
+        return new ProjectDetailInfoAPIRes(matchingId, response);
     }
 }

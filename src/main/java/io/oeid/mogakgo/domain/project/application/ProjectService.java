@@ -22,6 +22,7 @@ import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDensityRankRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailInfoAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
 import io.oeid.mogakgo.domain.project_join_req.exception.ProjectJoinRequestException;
 import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequestJpaRepository;
@@ -179,7 +180,7 @@ public class ProjectService {
         return new ProjectDensityRankRes(regionRankList);
     }
 
-    public List<ProjectDetailAPIRes> getLastedProjectByUserId(Long userId, Long id) {
+    public ProjectDetailInfoAPIRes getLastedProjectByUserId(Long userId, Long id) {
         User user = getUser(userId);
 
         validateProjectCardCreator(user, id);
