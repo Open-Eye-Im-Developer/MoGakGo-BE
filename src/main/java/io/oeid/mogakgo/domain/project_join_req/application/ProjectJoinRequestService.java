@@ -1,5 +1,7 @@
 package io.oeid.mogakgo.domain.project_join_req.application;
 
+import static io.oeid.mogakgo.domain.notification.domain.enums.FCMNotificationType.MATCHING_SUCCEEDED;
+import static io.oeid.mogakgo.domain.notification.domain.enums.NotificationMessage.MATCHING_SUCCESS_MESSAGE;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_MATCHING_USER_TO_ACCEPT;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_SENDER_TO_ACCEPT;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.PROJECT_JOIN_REQUEST_SHOULD_BE_ONLY_ONE;
@@ -12,6 +14,8 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
+import io.oeid.mogakgo.domain.notification.application.FCMNotificationService;
+import io.oeid.mogakgo.domain.notification.application.NotificationService;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
@@ -38,8 +42,9 @@ public class ProjectJoinRequestService {
     private final ProjectJpaRepository projectRepository;
     private final UserMatchingService userMatchingService;
     private final MatchingService matchingService;
-
+    private final FCMNotificationService fcmNotificationService;
     private final UserCommonService userCommonService;
+    private final NotificationService notificationService;
 
     @Transactional
     public Long create(Long userId, ProjectJoinCreateReq request) {
@@ -95,7 +100,11 @@ public class ProjectJoinRequestService {
         } catch (ProjectJoinRequestException e) {
             // TODO: 로그 처리
         }
-
+        fcmNotificationService.sendNotification(projectJoinRequest.getSender().getId(),
+            MATCHING_SUCCESS_MESSAGE.getTitle(), MATCHING_SUCCESS_MESSAGE.getMessage(),
+            MATCHING_SUCCEEDED);
+        notificationService.createMatchingSuccessNotification(projectJoinRequest.getSender().getId(),
+            projectJoinRequest.getProject());
         return matchingId;
     }
 
