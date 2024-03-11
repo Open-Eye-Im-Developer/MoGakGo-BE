@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum FCMNotificationType {
-    ACHIEVEMENT("/mypage"),
     MATCHING_SUCCEEDED("/project"),
     REVIEW_REQUEST("/review"),
     ;
