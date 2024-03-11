@@ -15,6 +15,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.notification.application.FCMNotificationService;
+import io.oeid.mogakgo.domain.notification.application.NotificationService;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
@@ -43,6 +44,7 @@ public class ProjectJoinRequestService {
     private final MatchingService matchingService;
     private final FCMNotificationService fcmNotificationService;
     private final UserCommonService userCommonService;
+    private final NotificationService notificationService;
 
     @Transactional
     public Long create(Long userId, ProjectJoinCreateReq request) {
@@ -101,6 +103,8 @@ public class ProjectJoinRequestService {
         fcmNotificationService.sendNotification(projectJoinRequest.getSender().getId(),
             MATCHING_SUCCESS_MESSAGE.getTitle(), MATCHING_SUCCESS_MESSAGE.getMessage(),
             MATCHING_SUCCEEDED);
+        notificationService.createMatchingSuccessNotification(projectJoinRequest.getSender().getId(),
+            projectJoinRequest.getProject());
         return matchingId;
     }
 
