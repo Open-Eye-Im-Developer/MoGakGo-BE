@@ -6,6 +6,7 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.google.firebase.messaging.WebpushConfig;
 import com.google.firebase.messaging.WebpushFcmOptions;
+import io.oeid.mogakgo.domain.notification.domain.enums.FCMNotificationType;
 import io.oeid.mogakgo.domain.notification.domain.vo.FCMToken;
 import io.oeid.mogakgo.domain.notification.infrastructure.FCMTokenJpaRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -43,58 +45,73 @@ public class FCMNotificationService {
         log.info("manageToken End");
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void sendNotification(Long userId, String title, String body) {
-        log.info("sendNotification Start");
         getFCMToken(userId).ifPresent(
             fcmToken -> {
-                Message message = Message.builder()
-                    .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
-                        .build())
-                    .setToken(fcmToken)
-                    .build();
-                try {
-                    String response = firebaseMessaging.send(message);
-                    log.info("Successfully sent message: " + response);
-                } catch (FirebaseMessagingException e) {
-                    log.error("Error sending message: " + e.getMessage());
-                }
+                Message message = generateFirebaseMessage(title, body);
+                sendMessageToFCM(message);
             }
         );
-        // send notification
-        log.info("sendNotification End");
     }
 
-    public void sendNotification(Long userId, String title, String body, String redirectUri) {
-        log.info("sendNotification Start");
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public void sendNotification(Long userId, String title, String body,
+        FCMNotificationType notificationType) {
         getFCMToken(userId).ifPresent(
             fcmToken -> {
-                WebpushConfig webpushConfig = WebpushConfig.builder()
-                    .setFcmOptions(WebpushFcmOptions.builder()
-                        .setLink(clientUrl + redirectUri)
-                        .build())
-                    .build();
-                // send notification
-                Message message = Message.builder()
-                    .setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
-                        .build())
-                    .setToken(fcmToken)
-                    .setWebpushConfig(webpushConfig)
-                    .build();
-                try {
-                    String response = firebaseMessaging.send(message);
-                    log.info("Successfully sent message: " + response);
-                } catch (FirebaseMessagingException e) {
-                    log.error("Error sending message: " + e.getMessage());
-                }
+                Message message = generateFirebaseMessage(title, body,
+                    notificationType.getRedirectUri());
+                sendMessageToFCM(message);
             }
         );
-        log.info("sendNotification End");
     }
 
+    public void sendNotification(Long userId, String title, String body, Long receiverId,
+        Long projectId) {
+        String redirectUrl =
+            FCMNotificationType.REVIEW_REQUEST.getRedirectUri() + "?receiverId=" + receiverId
+                + "&projectId=" + projectId;
+        getFCMToken(userId).ifPresent(
+            fcmToken -> {
+                Message message = generateFirebaseMessage(title, body, redirectUrl);
+                sendMessageToFCM(message);
+            }
+        );
+    }
+
+    private void sendMessageToFCM(Message message) {
+        log.info("sendNotification Start");
+        try {
+            String response = firebaseMessaging.send(message);
+            log.info("Successfully sent message: " + response);
+        } catch (FirebaseMessagingException e) {
+            log.error("Error sending message: " + e.getMessage());
+        }
+    }
+
+    private Message generateFirebaseMessage(String title, String body) {
+        return Message.builder()
+            .setNotification(Notification.builder()
+                .setTitle(title)
+                .setBody(body)
+                .build())
+            .build();
+    }
+
+    private Message generateFirebaseMessage(String title, String body, String redirectUri) {
+        return Message.builder()
+            .setNotification(Notification.builder()
+                .setTitle(title)
+                .setBody(body)
+                .build())
+            .setWebpushConfig(WebpushConfig.builder()
+                .setFcmOptions(WebpushFcmOptions.builder()
+                    .setLink(clientUrl + redirectUri)
+                    .build())
+                .build())
+            .build();
+    }
 
     private Optional<String> getFCMToken(Long userId) {
         return fcmTokenRepository.findById(userId)
