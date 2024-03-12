@@ -65,6 +65,7 @@ public class ProfileCardLikeRepositoryCustomImpl implements ProfileCardLikeRepos
 
         List<UserProfileLikeInfoAPIRes> result = entities.stream().map(
             profileCardLike -> new UserProfileLikeInfoAPIRes(
+                profileCardLike.getReceiver().getId(),
                 profileCardLike.getReceiver().getUsername(),
                 profileCardLike.getReceiver().getAvatarUrl(),
                 profileCardLike.getCreatedAt()

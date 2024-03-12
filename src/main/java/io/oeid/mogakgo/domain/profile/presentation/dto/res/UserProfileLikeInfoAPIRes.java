@@ -9,6 +9,9 @@ import lombok.Getter;
 @Getter
 public class UserProfileLikeInfoAPIRes {
 
+    @Schema(description = "사용자가 찔러보기 요청을 보낸 사용자 ID")
+    private final Long id;
+
     @Schema(description = "사용자가 찔러보기 요청을 보낸 사용자 이름")
     private final String username;
 
@@ -19,15 +22,17 @@ public class UserProfileLikeInfoAPIRes {
     @NotNull
     private final LocalDateTime createdAt;
 
-    public UserProfileLikeInfoAPIRes(String username, String avatarUrl, LocalDateTime createdAt) {
+    public UserProfileLikeInfoAPIRes(Long id, String username, String avatarUrl,
+        LocalDateTime createdAt) {
+        this.id = id;
         this.username = username;
         this.avatarUrl = avatarUrl;
         this.createdAt = createdAt;
     }
 
-    public static UserProfileLikeInfoAPIRes from(
-        String username, String avatarUrl, LocalDateTime createdAt
+    public static UserProfileLikeInfoAPIRes from(Long id, String username, String avatarUrl,
+        LocalDateTime createdAt
     ) {
-        return new UserProfileLikeInfoAPIRes(username, avatarUrl, createdAt);
+        return new UserProfileLikeInfoAPIRes(id, username, avatarUrl, createdAt);
     }
 }
