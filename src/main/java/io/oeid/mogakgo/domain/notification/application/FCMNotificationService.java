@@ -52,7 +52,7 @@ public class FCMNotificationService {
     public void sendNotification(Long userId, String title, String body) {
         getFCMToken(userId).ifPresent(
             fcmToken -> {
-                Message message = generateFirebaseMessage(title, body);
+                Message message = generateFirebaseMessage(title, body, fcmToken.getToken());
                 sendMessageToFCM(message);
             }
         );
@@ -64,7 +64,7 @@ public class FCMNotificationService {
         getFCMToken(userId).ifPresent(
             fcmToken -> {
                 Message message = generateFirebaseMessage(title, body,
-                    notificationType.getRedirectUri());
+                    notificationType.getRedirectUri(), fcmToken.getToken());
                 sendMessageToFCM(message);
             }
         );
@@ -78,7 +78,8 @@ public class FCMNotificationService {
         getFCMToken(userId).ifPresent(
             fcmToken -> {
                 Message message = generateFirebaseMessage(REVIEW_REQUEST_MESSAGE.getTitle(),
-                    receiver.getUsername()+ REVIEW_REQUEST_MESSAGE.getMessage(), redirectUrl);
+                    receiver.getUsername() + REVIEW_REQUEST_MESSAGE.getMessage(), redirectUrl,
+                    fcmToken.getToken());
                 sendMessageToFCM(message);
             }
         );
@@ -94,16 +95,18 @@ public class FCMNotificationService {
         }
     }
 
-    private Message generateFirebaseMessage(String title, String body) {
+    private Message generateFirebaseMessage(String title, String body, String token) {
         return Message.builder()
             .setNotification(Notification.builder()
                 .setTitle(title)
                 .setBody(body)
                 .build())
+            .setToken(token)
             .build();
     }
 
-    private Message generateFirebaseMessage(String title, String body, String redirectUri) {
+    private Message generateFirebaseMessage(String title, String body, String redirectUri,
+        String token) {
         return Message.builder()
             .setNotification(Notification.builder()
                 .setTitle(title)
@@ -114,11 +117,11 @@ public class FCMNotificationService {
                     .setLink(clientUrl + redirectUri)
                     .build())
                 .build())
+            .setToken(token)
             .build();
     }
 
-    private Optional<String> getFCMToken(Long userId) {
-        return fcmTokenRepository.findById(userId)
-            .map(FCMToken::getToken);
+    private Optional<FCMToken> getFCMToken(Long userId) {
+        return fcmTokenRepository.findById(userId);
     }
 }
