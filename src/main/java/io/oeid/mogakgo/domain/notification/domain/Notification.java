@@ -74,6 +74,7 @@ public class Notification {
         this.message = message;
         this.receiver = validateReceiver(user, receiver);
         this.project = validateProject(project);
+        this.checkedYn = false;
     }
 
     private Notification(String message, User user, Achievement achievement) {
@@ -81,12 +82,14 @@ public class Notification {
         this.user = validateUser(user);
         this.message = message;
         this.achievement = validateAchievement(achievement);
+        this.checkedYn = false;
     }
 
     private Notification(String message, User user) {
         this.notificationTag = NotificationTag.REQUEST_ARRIVAL;
         this.user = validateUser(user);
         this.message = message;
+        this.checkedYn = false;
     }
 
     private Notification(NotificationTag notificationTag, String message, User user,
@@ -95,6 +98,7 @@ public class Notification {
         this.user = validateUser(user);
         this.message = message;
         this.project = validateProject(project);
+        this.checkedYn = false;
     }
 
     public static Notification newReviewRequestNotification(User user, User receiver,
