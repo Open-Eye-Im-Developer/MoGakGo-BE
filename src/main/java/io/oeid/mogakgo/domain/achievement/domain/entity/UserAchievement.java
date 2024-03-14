@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.achievement.domain.entity;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.ACHIEVEMENT_ALREADY_COMPLETED;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.NON_ACHIEVED_USER_ACHIEVEMENT;
 
 import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
@@ -15,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -57,4 +59,21 @@ public class UserAchievement {
         }
     }
 
+    public void validateAvailableComplete() {
+        if (this.completed.equals(Boolean.TRUE)) {
+            throw new UserAchievementException(ACHIEVEMENT_ALREADY_COMPLETED);
+        }
+    }
+
+    public void updateCompleted() {
+        validateAvailableComplete();
+        this.completed = Boolean.TRUE;
+    }
+
+    @Builder
+    private UserAchievement(User user, Achievement achievement, Boolean completed) {
+        this.user = user;
+        this.achievement = achievement;
+        this.completed = completed;
+    }
 }
