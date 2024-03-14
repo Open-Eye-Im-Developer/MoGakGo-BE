@@ -37,76 +37,77 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
     public List<UserAchievementInfoRes> getAchievementInfoAboutUser(Long userId) {
 
         List<Tuple> sql1 = jpaQueryFactory.select(
-            Expressions.numberPath(Long.class, String.valueOf(userId)),
-            achievement.id,
-            achievement.title,
-            achievement.imgUrl,
-            achievement.description,
-            achievement.requirementType,
-            achievement.requirementValue,
-            Expressions.numberPath(Long.class, String.valueOf(0)),
-            Expressions.booleanPath(String.valueOf(false))
-        )
-        .from(achievement)
-        .leftJoin(userAchievement)
+                Expressions.numberPath(Long.class, String.valueOf(userId)),
+                achievement.id,
+                achievement.title,
+                achievement.imgUrl,
+                achievement.description,
+                achievement.requirementType,
+                achievement.requirementValue,
+                Expressions.numberPath(Long.class, String.valueOf(0)),
+                Expressions.booleanPath(String.valueOf(false))
+            )
+            .from(achievement)
+            .leftJoin(userAchievement)
             .on(userAchievement.achievement.id.eq(achievement.id),
                 userAchievement.user.id.eq(userId))
-        .where(
-            userAchievement.user.id.isNull(),
-            achievement.id.in(
-                JPAExpressions.select(achievement1.id.min())
-                    .from(achievement1)
-                    .groupBy(achievement1.activityType)
+            .where(
+                userAchievement.user.id.isNull(),
+                achievement.id.in(
+                    JPAExpressions.select(achievement1.id.min())
+                        .from(achievement1)
+                        .groupBy(achievement1.activityType)
+                )
             )
-        )
-        .fetch();
+            .fetch();
 
         List<Tuple> sql2 = jpaQueryFactory.select(
-            userAchievement1.user.id,
-            achievement2.id,
-            achievement2.title,
-            achievement2.imgUrl,
-            achievement2.description,
-            achievement2.requirementType,
-            achievement2.requirementValue,
-            Expressions.numberPath(Long.class, String.valueOf(userActivity.createdAt.count())),
-            userAchievement1.completed
-        )
-        .from(achievement2)
-        .innerJoin(userAchievement1).on(
-            userAchievement1.achievement.id.eq(achievement2.id),
-            userAchievement1.user.id.eq(userId)
-        )
-        .innerJoin(userActivity).on(userActivity.activityType.eq(achievement2.activityType))
-        .where(
-            achievement2.id.in(
-                JPAExpressions.select(achievement3.id.max())
-                    .from(userActivity1)
-                    .innerJoin(achievement3)
+                userAchievement1.user.id,
+                achievement2.id,
+                achievement2.title,
+                achievement2.imgUrl,
+                achievement2.description,
+                achievement2.requirementType,
+                achievement2.requirementValue,
+                Expressions.numberPath(Long.class, String.valueOf(userActivity.createdAt.count())),
+                userAchievement1.completed
+            )
+            .from(achievement2)
+            .innerJoin(userAchievement1).on(
+                userAchievement1.achievement.id.eq(achievement2.id),
+                userAchievement1.user.id.eq(userId)
+            )
+            .innerJoin(userActivity).on(userActivity.activityType.eq(achievement2.activityType))
+            .where(
+                achievement2.requirementType.eq(RequirementType.ACCUMULATE),
+                achievement2.id.in(
+                    JPAExpressions.select(achievement3.id.max())
+                        .from(userActivity1)
+                        .innerJoin(achievement3)
                         .on(achievement3.activityType.eq(userActivity1.activityType),
                             userActivity.user.id.eq(userId))
-                    .innerJoin(userAchievement2).
+                        .innerJoin(userAchievement2).
                         on(userAchievement2.achievement.id.eq(achievement3.id))
-                    .groupBy(userActivity1.activityType)
+                        .groupBy(userActivity1.activityType)
+                )
             )
-        )
-        .fetch();
+            .fetch();
 
         sql1.addAll(sql2);
 
         return sql1.stream()
             .sorted(Comparator.comparing(tuple -> tuple.get(1, Long.class))).map(
-            tuple -> new UserAchievementInfoRes(
-                userId,
-                tuple.get(1, Long.class),
-                tuple.get(2, String.class),
-                tuple.get(3, String.class),
-                tuple.get(4, String.class),
-                tuple.get(5, RequirementType.class),
-                tuple.get(6, Integer.class),
-                Integer.valueOf(String.valueOf(tuple.get(6, Long.class))),
-                tuple.get(8, Boolean.class)
-            )
-        ).toList();
+                tuple -> new UserAchievementInfoRes(
+                    userId,
+                    tuple.get(1, Long.class),
+                    tuple.get(2, String.class),
+                    tuple.get(3, String.class),
+                    tuple.get(4, String.class),
+                    tuple.get(5, RequirementType.class),
+                    tuple.get(6, Integer.class),
+                    Integer.valueOf(String.valueOf(tuple.get(6, Long.class))),
+                    tuple.get(8, Boolean.class)
+                )
+            ).toList();
     }
 }
