@@ -94,7 +94,6 @@ public class AchievementEventAspect {
             ActivityType.NOMAD_CODER, matchingService.getRegionCountByMatching(userId));
 
         Long participantId = getParticipantIdFromJoinRequest(projectRequestId);
-
         achievementEventService.publishCompletedEventWithVerify(userId,
             ActivityType.MY_DESTINY, matchingService.getDuplicateMatching(userId, participantId));
 
@@ -134,6 +133,6 @@ public class AchievementEventAspect {
     private Long getParticipantIdFromJoinRequest(Long projectRequestId) {
         return projectJoinRequestRepository.findByIdWithProject(projectRequestId)
             .orElseThrow(() -> new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_NOT_FOUND))
-            .getId();
+            .getSender().getId();
     }
 }

@@ -69,7 +69,8 @@ public class AchievementService {
 
         // Sequence 타입 업적에 대해, 사용자가 현재 달성해야 하는 업적 ID
         List<Long> achievementIds = sequenceList.stream().map(
-            activityType -> findAvailableAchievement(userId, activityType)).toList();
+            activityType -> achievementFacadeService.findAvailableAchievement(userId, activityType)
+        ).toList();
 
         Map<ActivityType, Integer> map = getProgressCountMap(userId, sequenceList);
 
@@ -88,12 +89,6 @@ public class AchievementService {
                 userAchievement.getCompleted()
             );
         }).toList();
-    }
-
-    // 사용자가 해당 activityType에 대해 현재 달성할 수 있는 업적 ID
-    private Long findAvailableAchievement(Long userId, ActivityType activityType) {
-        return userAchievementRepository
-            .findAvailableAchievementByActivityType(userId, activityType);
     }
 
     public Map<ActivityType, Integer> getProgressCountMap(Long userId, List<ActivityType> activityList) {
@@ -115,11 +110,6 @@ public class AchievementService {
         return validateContinuous(today, 0, activityList, 0);
     }
 
-    private UserAchievement getByUserAndAchievementId(Long userId, Long achievementId) {
-        return userAchievementRepository.findByUserAndAchievementId(userId, achievementId)
-            .orElseThrow(() -> new UserAchievementException(NON_ACHIEVED_USER_ACHIEVEMENT));
-    }
-
     private int validateContinuous(LocalDate date, int idx, List<UserActivity> activityList, int count) {
         if (idx == activityList.size() || !equalToLocalDate(date, activityList.get(idx).getCreatedAt())) {
             return count;
@@ -129,6 +119,11 @@ public class AchievementService {
 
     private boolean equalToLocalDate(LocalDate target, LocalDateTime comparison) {
         return target.equals(comparison.toLocalDate());
+    }
+
+    private UserAchievement getByUserAndAchievementId(Long userId, Long achievementId) {
+        return userAchievementRepository.findByUserAndAchievementId(userId, achievementId)
+            .orElseThrow(() -> new UserAchievementException(NON_ACHIEVED_USER_ACHIEVEMENT));
     }
 
     private User validateToken(Long userId) {

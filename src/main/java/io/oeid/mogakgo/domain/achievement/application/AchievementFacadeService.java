@@ -31,15 +31,16 @@ public class AchievementFacadeService {
             .orElseThrow(() -> new AchievementException(ACHIEVEMENT_NOT_FOUND));
     }
 
-    public Boolean getUserAchievementByAchievementId(Long userId, Long achievementId) {
-        return userAchievementRepository
-            .findByUserAndAchievementId(userId, achievementId).isPresent();
+    public Boolean validateAchivementAlreadyInProgress(Long userId, Long achievementId) {
+        return userAchievementRepository.findByUserAndAchievementId(userId, achievementId)
+            .isPresent();
     }
 
     public Long getMinAchievementByActivityType(ActivityType activityType) {
         return userAchievementRepository.findMinAchievementIdByActivityType(activityType);
     }
 
+    // 사용자가 해당 activityType에 대해 현재 달성할 수 있는 업적 ID
     public Long findAvailableAchievement(Long userId, ActivityType activityType) {
         return userAchievementRepository
             .findAvailableAchievementByActivityType(userId, activityType);
