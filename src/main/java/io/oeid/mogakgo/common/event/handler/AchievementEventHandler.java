@@ -27,7 +27,7 @@ import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AchievementEventHandler {
 
@@ -36,6 +36,7 @@ public class AchievementEventHandler {
     private final UserActivityJpaRepository userActivityRepository;
     private final UserCommonService userCommonService;
 
+    @Transactional
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeActivity(final UserActivityEvent event) {
         User user = userCommonService.getUserById(event.getUserId());
@@ -45,6 +46,7 @@ public class AchievementEventHandler {
             .build());
     }
 
+    @Transactional
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeEvent(final SequenceAchievementEvent event) {
         User user = userCommonService.getUserById(event.getUserId());
@@ -59,6 +61,7 @@ public class AchievementEventHandler {
         );
     }
 
+    @Transactional
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeEvent(final AccumulateAchievementEvent event) {
         User user = userCommonService.getUserById(event.getUserId());
@@ -73,6 +76,7 @@ public class AchievementEventHandler {
         );
     }
 
+    @Transactional
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeEvent(final AccumulateAchievementUpdateEvent event) {
 
@@ -81,6 +85,7 @@ public class AchievementEventHandler {
         userAchievement.updateCompleted();
     }
 
+    @Transactional
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeEvent(final SequenceAchievementUpdateEvent event) {
 
