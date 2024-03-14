@@ -21,12 +21,12 @@ import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class AchievementEventHandler {
 
@@ -35,7 +35,7 @@ public class AchievementEventHandler {
     private final UserActivityJpaRepository userActivityRepository;
     private final UserCommonService userCommonService;
 
-    @EventListener
+    @TransactionalEventListener
     public void executeActivity(final UserActivityEvent event) {
         User user = userCommonService.getUserById(event.getUserId());
         userActivityRepository.save(UserActivity.builder()
@@ -44,7 +44,7 @@ public class AchievementEventHandler {
             .build());
     }
 
-    @EventListener
+    @TransactionalEventListener
     public void executeEvent(final SequenceAchievementEvent event) {
         User user = userCommonService.getUserById(event.getUserId());
         Achievement achievement = getById(event.getAchievementId());
@@ -58,7 +58,7 @@ public class AchievementEventHandler {
         );
     }
 
-    @EventListener
+    @TransactionalEventListener
     public void executeEvent(final AccumulateAchievementEvent event) {
         User user = userCommonService.getUserById(event.getUserId());
         Achievement achievement = getById(event.getAchievementId());
@@ -72,7 +72,7 @@ public class AchievementEventHandler {
         );
     }
 
-    @EventListener
+    @TransactionalEventListener
     public void executeEvent(final AccumulateAchievementUpdateEvent event) {
 
         // 진행중인 업적에 대해 '달성' 업데이트
@@ -80,7 +80,7 @@ public class AchievementEventHandler {
         userAchievement.updateCompleted();
     }
 
-    @EventListener
+    @TransactionalEventListener
     public void executeEvent(final SequenceAchievementUpdateEvent event) {
 
         // 진행중인 업적에 대해 '달성' 업데이트
