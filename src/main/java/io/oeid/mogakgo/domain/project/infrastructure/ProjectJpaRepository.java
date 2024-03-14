@@ -21,4 +21,9 @@ public interface ProjectJpaRepository extends JpaRepository<Project, Long>, Proj
     @Query("select p from Project p "
         + "where p.creator.id = :creatorId and p.projectStatus in ('PENDING', 'MATCHED')")
     List<Project> findNotEndProjectOneByCreatorId(Long creatorId, Pageable pageable);
+
+    @Query(value = """
+        select sum(if(p.region, 1, 0)) from project_tb as p where p.creator_id = :userId
+    """, nativeQuery = true)
+    Integer getRegionCountByUserId(Long userId);
 }
