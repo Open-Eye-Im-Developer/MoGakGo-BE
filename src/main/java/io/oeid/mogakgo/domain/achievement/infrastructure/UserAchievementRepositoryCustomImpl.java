@@ -5,13 +5,16 @@ import static io.oeid.mogakgo.domain.achievement.domain.entity.QUserActivity.use
 import static io.oeid.mogakgo.domain.achievement.domain.entity.QAchievement.achievement;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.domain.entity.QAchievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.QUserAchievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.QUserActivity;
+import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
 import java.util.Comparator;
 import java.util.List;
@@ -109,5 +112,70 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                     tuple.get(8, Boolean.class)
                 )
             ).toList();
+    }
+
+    @Override
+    public Long findAvailableAchievementByActivityType(Long userId, ActivityType activityType) {
+
+        Tuple result = jpaQueryFactory.select(
+                userAchievement.achievement.id.max(),
+                userAchievement.completed,
+                findAvailableNextStep(userAchievement.achievement.id.max(), activityType)
+            )
+            .from(userAchievement)
+            .innerJoin(userActivity).on(userAchievement.user.id.eq(userActivity.user.id))
+            .innerJoin(userAchievement.achievement).on(userActivity.activityType.eq(userAchievement.achievement.activityType))
+            .where(
+                userAchievement.user.id.eq(userId),
+                userAchievement.achievement.activityType.eq(activityType)
+            )
+            .groupBy(userActivity.activityType)
+            .fetchOne();
+
+        if (result == null) {
+            return findMinAchievementIdByActivityType(activityType);
+        }
+
+        Long latestId = result.get(0, Long.class);
+        Boolean isCompleted = result.get(1, Boolean.class);
+        Boolean hasNext = result.get(2, Boolean.class);
+
+        if (Boolean.FALSE.equals(isCompleted)) return latestId;
+        return Boolean.TRUE.equals(hasNext) ? latestId + 1L : null;
+    }
+
+    @Override
+    public Integer getAccumulatedProgressCountByActivity(Long userId, ActivityType activityType) {
+        Long result = jpaQueryFactory.select(userActivity.createdAt.count())
+            .from(userActivity)
+            .innerJoin(achievement).on(achievement.activityType.eq(userActivity.activityType))
+            .where(
+                userActivity.user.id.eq(userId),
+                achievement.requirementType.eq(RequirementType.ACCUMULATE),
+                userActivity.activityType.eq(activityType)
+            )
+            .fetchOne();
+
+        return result != null ? Math.toIntExact(result) : 0;
+    }
+
+    @Override
+    public Long findMinAchievementIdByActivityType(ActivityType activityType) {
+        return jpaQueryFactory.select(achievement.id.min())
+            .from(achievement)
+            .where(achievement.activityType.eq(activityType))
+            .fetchOne();
+    }
+
+    private BooleanExpression findAvailableNextStep(NumberExpression<Long> achievementId,
+        ActivityType activityType) {
+
+        return jpaQueryFactory.selectOne()
+            .from(achievement)
+            .where(
+                achievement.activityType.eq(activityType),
+                achievement.id.gt(achievementId)
+            )
+            .exists();
     }
 }
