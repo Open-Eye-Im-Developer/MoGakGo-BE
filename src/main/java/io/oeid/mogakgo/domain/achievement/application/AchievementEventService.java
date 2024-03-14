@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AchievementEventService {
 
@@ -24,6 +24,7 @@ public class AchievementEventService {
     private final AchievementFacadeService achievementFacadeService;
     private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishCompletedEventWithoutVerify(Long userId, ActivityType activityType) {
 
         Long achievementId = achievementFacadeService.findAvailableAchievement(userId, activityType);
@@ -49,6 +50,7 @@ public class AchievementEventService {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishSequenceEventWithVerify(Long userId, ActivityType activityType) {
 
         // 사용자가 현재 달성할 수 있는 업적 ID
@@ -101,6 +103,7 @@ public class AchievementEventService {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishCompletedEventWithVerify(Long userId, ActivityType activityType,
         Object target) {
 
@@ -134,6 +137,7 @@ public class AchievementEventService {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishAccumulateEventWithVerify(Long userId, ActivityType activityType,
         Integer progressCount) {
 
