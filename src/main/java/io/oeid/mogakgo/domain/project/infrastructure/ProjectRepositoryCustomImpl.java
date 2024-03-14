@@ -2,6 +2,7 @@ package io.oeid.mogakgo.domain.project.infrastructure;
 
 import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
 import static io.oeid.mogakgo.domain.user.domain.QUser.user;
+import static io.oeid.mogakgo.domain.matching.domain.entity.QMatching.matching;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,6 +14,7 @@ import io.oeid.mogakgo.domain.project.domain.entity.ProjectTag;
 import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.MeetingInfoResponse;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
+import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailInfoAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
 import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
 import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
@@ -126,7 +128,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     }
 
     @Override
-    public List<ProjectDetailAPIRes> findLatestProjectByUserId(Long userId) {
+    public ProjectDetailInfoAPIRes findLatestProjectByUserId(Long userId) {
 
         List<Project> entity = jpaQueryFactory.selectFrom(project)
             .innerJoin(project.creator, user)
@@ -134,10 +136,17 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
             .where(
                 userIdEq(userId),
                 projectStatusEq(ProjectStatus.PENDING)
+                    .or(projectStatusEq(ProjectStatus.MATCHED)),
+                createdAtEq(LocalDate.now())
             )
             .fetch();
 
-        return entity.stream().map(
+        Long matchingId = entity.isEmpty() ? null : jpaQueryFactory.select(matching.id)
+            .from(matching)
+            .where(matching.project.id.eq(entity.get(0).getId()))
+            .fetchOne();
+
+        List<ProjectDetailAPIRes> result = entity.stream().map(
             project -> new ProjectDetailAPIRes(
                 project.getId(),
                 new UserPublicApiResponse(
@@ -165,6 +174,8 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                 )
             )
         ).toList();
+
+        return ProjectDetailInfoAPIRes.of(matchingId, result);
     }
 
     private BooleanExpression cursorIdCondition(Long cursorId) {
@@ -180,7 +191,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     }
 
     private BooleanExpression projectStatusEq(ProjectStatus projectStatus) {
-        return projectStatus != null ? project.projectStatus.eq(projectStatus) : null;
+        return project.projectStatus.eq(projectStatus);
     }
 
     private BooleanExpression createdAtEq(LocalDate today) {

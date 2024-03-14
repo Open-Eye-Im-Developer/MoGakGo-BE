@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.notification.domain;
 
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
+import io.oeid.mogakgo.domain.notification.domain.enums.NotificationMessage;
 import io.oeid.mogakgo.domain.notification.domain.enums.NotificationTag;
 import io.oeid.mogakgo.domain.notification.exception.NotificationException;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
@@ -32,12 +33,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @EntityListeners(AuditingEntityListener.class)
 public class Notification {
-
-    private static final String REVIEW_REQUEST_MESSAGE = " 님과의 만남 후기를 작성해주세요!";
-    private static final String ACHIEVEMENT_MESSAGE = " 업적을 달성했습니다!";
-    private static final String REQUEST_ARRIVAL_MESSAGE = "매칭 참여 요청이 도착했습니다!";
-    private static final String MATCHING_SUCCESS_MESSAGE = "매칭이 성공적으로 이루어졌습니다!";
-    private static final String MATCHING_FAILED_MESSAGE = "매칭 요청이 거절되었어요 ㅠㅠ";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,6 +74,7 @@ public class Notification {
         this.message = message;
         this.receiver = validateReceiver(user, receiver);
         this.project = validateProject(project);
+        this.checkedYn = false;
     }
 
     private Notification(String message, User user, Achievement achievement) {
@@ -86,12 +82,14 @@ public class Notification {
         this.user = validateUser(user);
         this.message = message;
         this.achievement = validateAchievement(achievement);
+        this.checkedYn = false;
     }
 
     private Notification(String message, User user) {
         this.notificationTag = NotificationTag.REQUEST_ARRIVAL;
         this.user = validateUser(user);
         this.message = message;
+        this.checkedYn = false;
     }
 
     private Notification(NotificationTag notificationTag, String message, User user,
@@ -100,30 +98,34 @@ public class Notification {
         this.user = validateUser(user);
         this.message = message;
         this.project = validateProject(project);
+        this.checkedYn = false;
     }
 
     public static Notification newReviewRequestNotification(User user, User receiver,
         Project project) {
-        return new Notification(receiver.getUsername() + REVIEW_REQUEST_MESSAGE, user, receiver,
-            project);
+        return new Notification(
+            receiver.getUsername() + NotificationMessage.REVIEW_REQUEST_MESSAGE.getMessage(), user,
+            receiver, project);
     }
 
     public static Notification newAchievementNotification(User user, Achievement achievement) {
-        return new Notification(achievement.getTitle() + ACHIEVEMENT_MESSAGE, user, achievement);
+        return new Notification(
+            achievement.getTitle() + NotificationMessage.ACHIEVEMENT_MESSAGE.getMessage(), user,
+            achievement);
     }
 
     public static Notification newRequestArrivalNotification(User user) {
-        return new Notification(REQUEST_ARRIVAL_MESSAGE, user);
+        return new Notification(NotificationMessage.REQUEST_ARRIVAL_MESSAGE.getMessage(), user);
     }
 
     public static Notification newMatchingSuccessNotification(User user, Project project) {
-        return new Notification(NotificationTag.MATCHING_SUCCEEDED, MATCHING_SUCCESS_MESSAGE, user,
-            project);
+        return new Notification(NotificationTag.MATCHING_SUCCEEDED,
+            NotificationMessage.MATCHING_SUCCESS_MESSAGE.getMessage(), user, project);
     }
 
     public static Notification newMatchingFailedNotification(User user, Project project) {
-        return new Notification(NotificationTag.MATCHING_FAILED, MATCHING_FAILED_MESSAGE, user,
-            project);
+        return new Notification(NotificationTag.MATCHING_FAILED,
+            NotificationMessage.MATCHING_FAILED_MESSAGE.getMessage(), user, project);
     }
 
     private NotificationTag validateNotificationTag(NotificationTag notificationTag) {
