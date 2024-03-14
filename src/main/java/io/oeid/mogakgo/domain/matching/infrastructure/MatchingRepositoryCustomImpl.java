@@ -52,6 +52,23 @@ public class MatchingRepositoryCustomImpl implements MatchingRepositoryCustom {
             cursorPaginationInfoReq.getPageSize());
     }
 
+    @Override
+    public Integer findDuplicateMatching(Long userId, Long participantId) {
+
+        Long result = jpaQueryFactory.select(matching.id.count())
+            .from(matching)
+            .join(matching.project)
+            .where(
+                participantInMatching(userId),
+                participantInMatching(participantId),
+                matchingStatusEq(MatchingStatus.FINISHED)
+            )
+            .fetchOne();
+
+        return result != null ? Math.toIntExact(result) : 0;
+    }
+
+
     private BooleanExpression cursorIdCondition(Long cursorId) {
         return cursorId != null ? matching.id.lt(cursorId) : null;
     }
