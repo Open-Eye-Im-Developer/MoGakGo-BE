@@ -42,29 +42,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken =
             request.getHeader(header) != null ? URLDecoder.decode(request.getHeader(header),
                 StandardCharsets.UTF_8) : null;
-        if (accessToken != null) {
-            if (!accessToken.contains(IDENTIFICATION_TYPE)) {
-                request.setAttribute("exception",
-                    new JWTVerificationException("Invalid token type"));
-            } else {
-                accessToken = accessToken.substring(7);
-                try {
-                    var claims = jwtHelper.verify(accessToken);
-                    long userId = claims.get(JwtHelper.USER_ID_STR).asLong();
-                    List<GrantedAuthority> authorities = getAuthorities(
-                        claims.get(JwtHelper.ROLES_STR).asArray(String.class));
-                    var authentication = new JwtAuthenticationToken(
-                        JwtToken.of(userId, accessToken), "", authorities);
-                    authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
-                    request.setAttribute(JwtHelper.USER_ID_STR, userId);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } catch (Exception e) {
-                    log.warn(e.getMessage());
-                    request.setAttribute("exception", e);
-                }
+        if (accessToken == null || !accessToken.contains(IDENTIFICATION_TYPE)) {
+            request.setAttribute("exception", new JWTVerificationException("Invalid token type"));
+        } else {
+            accessToken = accessToken.substring(7);
+            try {
+                var claims = jwtHelper.verify(accessToken);
+                long userId = claims.get(JwtHelper.USER_ID_STR).asLong();
+                List<GrantedAuthority> authorities = getAuthorities(
+                    claims.get(JwtHelper.ROLES_STR).asArray(String.class));
+                var authentication = new JwtAuthenticationToken(
+                    JwtToken.of(userId, accessToken), "", authorities);
+                authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request));
+                request.setAttribute(JwtHelper.USER_ID_STR, userId);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception e) {
+                log.warn(e.getMessage());
+                request.setAttribute("exception", e);
             }
         }
+
         filterChain.doFilter(request, response);
     }
 
