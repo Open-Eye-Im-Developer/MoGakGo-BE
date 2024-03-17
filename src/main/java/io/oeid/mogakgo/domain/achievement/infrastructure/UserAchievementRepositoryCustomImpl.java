@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 public class UserAchievementRepositoryCustomImpl implements UserAchievementRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
+    private static final int ACHIEVEMENT_SIZE = 14;
 
     QAchievement achievement1 = new QAchievement("achievement1");
     QAchievement achievement2 = new QAchievement("achievement2");
@@ -92,7 +93,9 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
         )
         .fetch();
 
-        sql1.addAll(sql2);
+        if (sql1.size() < ACHIEVEMENT_SIZE) {
+            sql1.addAll(sql2);
+        }
 
         return sql1.stream()
             .sorted(Comparator.comparing(tuple -> tuple.get(1, Long.class))).map(
