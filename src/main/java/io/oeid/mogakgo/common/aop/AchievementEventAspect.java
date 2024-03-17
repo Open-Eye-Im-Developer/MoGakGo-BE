@@ -112,6 +112,8 @@ public class AchievementEventAspect {
             ActivityType.MY_DESTINY, matchingService.getDuplicateMatching(participantId, userId));
     }
 
+    @Retryable(retryFor = {EventListenerProcessingException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @AfterReturning(pointcut = "createLikeExecution() && args(userId, request)")
     public void publishEventAboutLike(JoinPoint joinPoint, Long userId, UserProfileLikeCreateAPIReq request) {
 
