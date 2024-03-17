@@ -1,7 +1,9 @@
 package io.oeid.mogakgo.common.aop;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_EVENT_LISTENER_REQUEST;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_JOIN_REQUEST_NOT_FOUND;
 
+import io.oeid.mogakgo.common.event.exception.EventListenerProcessingException;
 import io.oeid.mogakgo.domain.achievement.application.AchievementEventService;
 import io.oeid.mogakgo.domain.achievement.application.AchievementFacadeService;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
@@ -15,15 +17,23 @@ import io.oeid.mogakgo.domain.project_join_req.infrastructure.ProjectJoinRequest
 import io.oeid.mogakgo.domain.review.application.dto.req.ReviewCreateReq;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
+import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Aspect
 @Component
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AchievementEventAspect {
 
@@ -49,6 +59,8 @@ public class AchievementEventAspect {
     @Pointcut("execution(public * io.oeid.mogakgo.domain.profile.application.ProfileCardLikeService.create(Long, ..))")
     public void createLikeExecution() {}
 
+    @Retryable(retryFor = {EventListenerProcessingException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @AfterReturning(pointcut = "updateJandiRateExecution() && args(userId, request)")
     public void publishCompletedEvent(JoinPoint joinPoint, Long userId, ReviewCreateReq request) {
 
@@ -58,17 +70,27 @@ public class AchievementEventAspect {
             ActivityType.FRESH_DEVELOPER, user.getJandiRate());
     }
 
+    @Retryable(retryFor = {EventListenerProcessingException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @AfterReturning(pointcut = "createProjectExecution() && args(userId, request)")
     public void publishSequenceEvent(JoinPoint joinPoint, Long userId, ProjectCreateReq request) {
 
-        // -- '생성자' 프로젝트를 생성한 사용자에 대한 업적 이벤트 발행
-        achievementEventService.publishSequenceEventWithVerify(userId,
-            ActivityType.PLEASE_GIVE_ME_MOGAK);
+        try {
 
-        achievementEventService.publishCompletedEventWithVerify(userId,
-            ActivityType.BRAVE_EXPLORER, projectRepository.getRegionCountByUserId(userId));
+            // -- '생성자' 프로젝트를 생성한 사용자에 대한 업적 이벤트 발행
+            achievementEventService.publishSequenceEventWithVerify(userId,
+                ActivityType.PLEASE_GIVE_ME_MOGAK);
+
+            achievementEventService.publishCompletedEventWithVerify(userId,
+                ActivityType.BRAVE_EXPLORER, projectRepository.getRegionCountByUserId(userId));
+
+        } catch (ExecutionException | InterruptedException e) {
+            throw new EventListenerProcessingException(INVALID_EVENT_LISTENER_REQUEST);
+        }
     }
 
+    @Retryable(retryFor = {EventListenerProcessingException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @AfterReturning(pointcut = "createJoinRequestExecution() && args(userId, request)")
     public void publishAccumulateEvent(JoinPoint joinPoint, Long userId, ProjectJoinCreateReq request) {
 
@@ -79,37 +101,48 @@ public class AchievementEventAspect {
         );
     }
 
+    @Retryable(retryFor = {EventListenerProcessingException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @AfterReturning(pointcut = "acceptJoinRequestExecution() && args(userId, projectRequestId)")
     public void publishEventAboutMatching(JoinPoint joinPoint, Long userId, Long projectRequestId) {
 
-        // -- '생성자' 매칭 요청을 수락한 사용자에 대한 업적 이벤트 발행
-        achievementEventService.publishAccumulateEventWithVerify(userId,
-            ActivityType.GOOD_PERSON_GOOD_MEETUP,
-            getAccumulatedProgressCount(userId, ActivityType.GOOD_PERSON_GOOD_MEETUP)
-        );
+        try {
 
-        achievementEventService.publishSequenceEventWithVerify(userId, ActivityType.LIKE_E);
+            // -- '생성자' 매칭 요청을 수락한 사용자에 대한 업적 이벤트 발행
+            achievementEventService.publishAccumulateEventWithVerify(userId,
+                ActivityType.GOOD_PERSON_GOOD_MEETUP,
+                getAccumulatedProgressCount(userId, ActivityType.GOOD_PERSON_GOOD_MEETUP)
+            );
 
-        achievementEventService.publishCompletedEventWithVerify(userId,
-            ActivityType.NOMAD_CODER, matchingService.getRegionCountByMatching(userId));
+            achievementEventService.publishSequenceEventWithVerify(userId, ActivityType.LIKE_E);
 
-        Long participantId = getParticipantIdFromJoinRequest(projectRequestId);
-        achievementEventService.publishCompletedEventWithVerify(userId,
-            ActivityType.MY_DESTINY, matchingService.getDuplicateMatching(userId, participantId));
+            achievementEventService.publishCompletedEventWithVerify(userId,
+                ActivityType.NOMAD_CODER, matchingService.getRegionCountByMatching(userId));
 
-        // -- '참여자' 매칭 요청을 생성한 사용자에 대한 업적 이벤트 발행
-        achievementEventService.publishAccumulateEventWithVerify(participantId,
-            ActivityType.GOOD_PERSON_GOOD_MEETUP,
-            getAccumulatedProgressCount(participantId, ActivityType.GOOD_PERSON_GOOD_MEETUP)
-        );
+            Long participantId = getParticipantIdFromJoinRequest(projectRequestId);
+            achievementEventService.publishCompletedEventWithVerify(userId,
+                ActivityType.MY_DESTINY,
+                matchingService.getDuplicateMatching(userId, participantId));
 
-        achievementEventService.publishSequenceEventWithVerify(participantId, ActivityType.LIKE_E);
+            // -- '참여자' 매칭 요청을 생성한 사용자에 대한 업적 이벤트 발행
+            achievementEventService.publishAccumulateEventWithVerify(participantId,
+                ActivityType.GOOD_PERSON_GOOD_MEETUP,
+                getAccumulatedProgressCount(participantId, ActivityType.GOOD_PERSON_GOOD_MEETUP)
+            );
 
-        achievementEventService.publishCompletedEventWithVerify(participantId,
-            ActivityType.NOMAD_CODER, matchingService.getRegionCountByMatching(participantId));
+            achievementEventService.publishSequenceEventWithVerify(participantId,
+                ActivityType.LIKE_E);
 
-        achievementEventService.publishCompletedEventWithVerify(participantId,
-            ActivityType.MY_DESTINY, matchingService.getDuplicateMatching(participantId, userId));
+            achievementEventService.publishCompletedEventWithVerify(participantId,
+                ActivityType.NOMAD_CODER, matchingService.getRegionCountByMatching(participantId));
+
+            achievementEventService.publishCompletedEventWithVerify(participantId,
+                ActivityType.MY_DESTINY,
+                matchingService.getDuplicateMatching(participantId, userId));
+
+        } catch (ExecutionException | InterruptedException e) {
+            throw new EventListenerProcessingException(INVALID_EVENT_LISTENER_REQUEST);
+        }
     }
 
     @Retryable(retryFor = {EventListenerProcessingException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
