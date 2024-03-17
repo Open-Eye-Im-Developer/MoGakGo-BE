@@ -9,14 +9,17 @@ import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class AchievementEventService {
 
@@ -25,7 +28,8 @@ public class AchievementEventService {
     private final ApplicationEventPublisher eventPublisher;
 
     // 달성 자격요건의 검증 없이 한 번에 달성 가능한 업적에 대한 이벤트 발행
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    // -- 이력 저장 이벤트와 업적 달성 이벤트가 비동기적으로 처리되어도 문제 X
+    @Async
     public void publishCompletedEventWithoutVerify(Long userId, ActivityType activityType) {
 
         Long achievementId = achievementFacadeService.findAvailableAchievement(userId, activityType);
@@ -52,7 +56,8 @@ public class AchievementEventService {
     }
 
     // 달성 자격요건의 검증과 함께 한 번에 달성 가능한 업적에 대한 이벤트 발행
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    // -- 이력 저장 이벤트와 업적 달성 이벤트가 비동기적으로 처리되어도 문제 X
+    @Async
     public void publishCompletedEventWithVerify(Long userId, ActivityType activityType,
         Object target) {
 
@@ -87,7 +92,8 @@ public class AchievementEventService {
     }
 
     // 달성 자격요건의 검증과 함께 여러 번에 걸쳐 달성 가능한 업적에 대한 이벤트 발행
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    // -- 업적 진행 이벤트와 업적 달성 이벤트가 비동기적으로 처리될 경우 고려해야 함
+    @Async
     public void publishAccumulateEventWithVerify(Long userId, ActivityType activityType,
         Integer progressCount) {
 
@@ -110,7 +116,6 @@ public class AchievementEventService {
             Boolean isExist = achievementFacadeService
                 .validateAchivementAlreadyInProgress(userId, achievementId);
 
-            // 업적 진행에 대한 이벤트 발행 - UserAchievement
             if (isExist.equals(Boolean.FALSE)) {
                 eventPublisher.publishEvent(
                     AccumulateAchievementEvent.builder()
@@ -122,7 +127,7 @@ public class AchievementEventService {
             }
 
             // 해당 업적에 대한 달성 조건을 만족했을 경우
-            if (validateAvailabilityToAchieve(progressCount, achievementId)) {
+            if (validateAvailabilityToAchieve(progressCount + 1, achievementId)) {
 
                 // 업적 달성에 대한 이벤트 발행 - UserAchievement
                 eventPublisher.publishEvent(
@@ -131,49 +136,56 @@ public class AchievementEventService {
                         .achievementId(achievementId)
                         .build()
                 );
+
+                log.info("업적 달성 이벤트 구독 완료 on Thread={}", Thread.currentThread().getName());
             }
         }
     }
 
     // 달성 자격요건의 검증과 함께 여러 번에 걸쳐 달성 가능한 연속성 업적에 대한 이벤트 발행
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void publishSequenceEventWithVerify(Long userId, ActivityType activityType) {
+    // -- 이력 저장 이벤트와 업적 달성 이벤트가 비동기적으로 처리되면 문제 O (오늘을 제외한 업적 달성 조건을 검증 O)
+    // -- 1. 연속 업적의 경우, 달성과 동시에 이력을 삭제하기 떄문에 이력이 저장된 후에 처리되어야 함
+    // -- 업적 진행 이벤트와 업적 달성 이벤트가 비동기적으로 처리될 경우
+    // -- 1. 업적 진행과 동시에 업적이 달성될 수 있는가?
+    @Async
+    public void publishSequenceEventWithVerify(Long userId, ActivityType activityType)
+        throws ExecutionException, InterruptedException {
 
-        // 사용자가 현재 달성할 수 있는 업적 ID
-        // -- 현재 사용자가 달성할 수 있는 업적이 없는 경우 이벤트 발행 X
-        Long achievementId = achievementFacadeService
-            .findAvailableAchievement(userId, activityType);
+                // 사용자가 현재 달성할 수 있는 업적 ID
+                // -- 현재 사용자가 달성할 수 있는 업적이 없는 경우 이벤트 발행 X
+                Long achievementId = achievementFacadeService
+                    .findAvailableAchievement(userId, activityType);
 
-        // 오늘을 제외한, 업적의 진행도 조회
-        Map<ActivityType, Integer> map = achievementService
-            .getProgressCountMap(userId, List.of(activityType));
+                // 오늘을 제외한, 업적의 진행도 조회
+                Map<ActivityType, Integer> map = achievementService
+                    .getProgressCountMap(userId, List.of(activityType));
 
-        if (achievementId != null) {
+                if (achievementId != null) {
 
-            // 업적에 대한 이벤트 발행 - UserActivity
-            // -- 연속 횟수 이벤트
-            if (achievementFacadeService.validateActivityDuplicate(userId, activityType)) {
-                eventPublisher.publishEvent(
-                    UserActivityEvent.builder()
-                        .userId(userId)
-                        .activityType(activityType)
-                        .build()
-                );
-            }
+                    // 업적에 대한 이벤트 발행 - UserActivity
+                    // -- 연속 횟수 이벤트
+                    if (achievementFacadeService.validateActivityDuplicate(userId, activityType)) {
+                        eventPublisher.publishEvent(
+                            UserActivityEvent.builder()
+                                .userId(userId)
+                                .activityType(activityType)
+                                .build()
+                        );
+                    }
 
-            Boolean isExist = achievementFacadeService
-                .validateAchivementAlreadyInProgress(userId, achievementId);
+                    Boolean isExist = achievementFacadeService
+                        .validateAchivementAlreadyInProgress(userId, achievementId);
 
-            // 업적 진행에 대한 이벤트 발행 - UserAchievement
-            if (isExist.equals(Boolean.FALSE)) {
-                eventPublisher.publishEvent(
-                    AccumulateAchievementEvent.builder()
-                        .userId(userId)
-                        .achievementId(achievementId)
-                        .completed(Boolean.FALSE)
-                        .build()
-                );
-            }
+                    // 업적 진행에 대한 이벤트 발행 - UserAchievement
+                    if (isExist.equals(Boolean.FALSE)) {
+                        eventPublisher.publishEvent(
+                            AccumulateAchievementEvent.builder()
+                                .userId(userId)
+                                .achievementId(achievementId)
+                                .completed(Boolean.FALSE)
+                                .build()
+                        );
+                    }
 
             // 해당 업적에 대한 달성 조건을 만족했을 경우
             if (validateAvailabilityToAchieve(map.get(activityType) + 1, achievementId)) {
