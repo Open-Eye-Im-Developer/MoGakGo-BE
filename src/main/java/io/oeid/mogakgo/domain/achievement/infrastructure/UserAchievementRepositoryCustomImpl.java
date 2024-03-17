@@ -97,6 +97,10 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
             sql1.addAll(sql2);
         }
 
+        if (sql2.size() == ACHIEVEMENT_SIZE) {
+            sql1 = sql2;
+        }
+
         return sql1.stream()
             .sorted(Comparator.comparing(tuple -> tuple.get(1, Long.class))).map(
             tuple -> new UserAchievementInfoRes(
