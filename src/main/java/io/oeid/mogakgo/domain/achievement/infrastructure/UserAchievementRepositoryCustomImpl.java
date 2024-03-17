@@ -16,6 +16,8 @@ import io.oeid.mogakgo.domain.achievement.domain.entity.QUserAchievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.QUserActivity;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -151,15 +153,17 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
         return Boolean.TRUE.equals(hasNext) ? latestId + 1L : null;
     }
 
+    // 오늘 날짜를 제외한, Accumulate 타입 업적의 진행 횟수 조회
     @Override
     public Integer getAccumulatedProgressCountByActivity(Long userId, ActivityType activityType) {
         Long result = jpaQueryFactory.select(userActivity.createdAt.count())
             .from(userActivity)
             .innerJoin(achievement).on(achievement.activityType.eq(userActivity.activityType))
             .where(
-                userActivity.user.id.eq(userId),
-                achievement.requirementType.eq(RequirementType.ACCUMULATE),
-                userActivity.activityType.eq(activityType)
+                userIdEq(userId),
+                requirementTypeEq(RequirementType.ACCUMULATE),
+                activityTypeEq(activityType),
+                createdAtNotEq()
             )
             .fetchOne();
 
@@ -184,5 +188,23 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                 achievement.id.gt(achievementId)
             )
             .exists();
+    }
+
+    private BooleanExpression userIdEq(Long userId) {
+        return userId != null ? userActivity.user.id.eq(userId) : null;
+    }
+
+    private BooleanExpression requirementTypeEq(RequirementType requirementType) {
+        return requirementType != null ? achievement.requirementType.eq(requirementType) : null;
+    }
+
+    private BooleanExpression activityTypeEq(ActivityType activityType) {
+        return activityType != null ? userActivity.activityType.eq(activityType) : null;
+    }
+
+    private BooleanExpression createdAtNotEq() {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1);
+        return userActivity.createdAt.before(startOfDay).or(userActivity.createdAt.after(endOfDay));
     }
 }
