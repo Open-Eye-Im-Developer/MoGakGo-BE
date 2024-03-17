@@ -21,7 +21,7 @@ public class UserActivityRepositoryCustomImpl implements UserActivityRepositoryC
             .where(
                 userActivity.user.id.eq(userId),
                 userActivity.activityType.eq(activityType),
-                userActivity.deletedAt.isNotNull()
+                userActivity.deletedAt.isNull()
             )
             .orderBy(userActivity.createdAt.desc())
             .limit(limit)
