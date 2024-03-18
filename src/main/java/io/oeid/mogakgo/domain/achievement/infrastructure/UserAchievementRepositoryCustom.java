@@ -7,7 +7,8 @@ import java.util.List;
 public interface UserAchievementRepositoryCustom {
 
     List<UserAchievementInfoRes> getAchievementInfoAboutUser(Long userId);
-    Long findAvailableAchievementByActivityType(Long userId, ActivityType activityType);
+    Long getAvailableAchievementWithNull(Long userId, ActivityType activityType);
     Long findMinAchievementIdByActivityType(ActivityType activityType);
+    Long getAvailableAchievementWithoutNull(Long userId, ActivityType activityType);
     Integer getAccumulatedProgressCountByActivity(Long userId, ActivityType activityType);
 }

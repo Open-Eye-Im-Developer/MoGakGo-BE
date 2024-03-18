@@ -1,16 +1,13 @@
 package io.oeid.mogakgo.domain.achievement.application;
 
-import static io.oeid.mogakgo.exception.code.ErrorCode400.NON_ACHIEVED_USER_ACHIEVEMENT;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.ACHIEVEMENT_FORBIDDEN_OPERATION;
 
 import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
-import io.oeid.mogakgo.domain.achievement.domain.entity.UserAchievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.UserActivity;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
 import io.oeid.mogakgo.domain.achievement.exception.AchievementException;
-import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserActivityJpaRepository;
@@ -23,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,10 +46,9 @@ public class AchievementService {
         // 사용자의 Sequence 타입 업적에 대한 상세 조회
         List<UserAchievementInfoRes> seqResult = getSequenceAchievementInfoAboutUser(userId);
 
-        result.addAll(seqResult);
-        return seqResult.isEmpty() ? result : result.stream()
-            .sorted(Comparator.comparing(UserAchievementInfoRes::getAchievementId))
-            .toList();
+        return Stream
+            .concat(result.stream(), seqResult.stream())
+            .sorted(Comparator.comparing(UserAchievementInfoRes::getAchievementId)).toList();
     }
 
     private List<UserAchievementInfoRes> getNonAchievedAndAccumulateAchiementInfo(Long userId) {
@@ -69,14 +66,13 @@ public class AchievementService {
 
         // Sequence 타입 업적에 대해, 사용자가 현재 달성해야 하는 업적 ID
         List<Long> achievementIds = sequenceList.stream().map(
-            activityType -> achievementFacadeService.findAvailableAchievement(userId, activityType)
+            activityType -> achievementFacadeService.getAvailableAchievementIdWithoutNull(userId, activityType)
         ).toList();
 
         Map<ActivityType, Integer> map = getProgressCountMap(userId, sequenceList);
 
         return achievementIds.stream().map(achievementId -> {
             Achievement achievement = achievementFacadeService.getById(achievementId);
-            UserAchievement userAchievement = getByUserAndAchievementId(userId, achievementId);
             return new UserAchievementInfoRes(
                 userId,
                 achievementId,
@@ -86,7 +82,7 @@ public class AchievementService {
                 achievement.getRequirementType(),
                 achievement.getRequirementValue(),
                 map.get(achievement.getActivityType()),
-                userAchievement.getCompleted()
+                verifyCompleted(achievement, map)
             );
         }).toList();
     }
@@ -121,9 +117,9 @@ public class AchievementService {
         return target.equals(comparison.toLocalDate());
     }
 
-    private UserAchievement getByUserAndAchievementId(Long userId, Long achievementId) {
-        return userAchievementRepository.findByUserAndAchievementId(userId, achievementId)
-            .orElseThrow(() -> new UserAchievementException(NON_ACHIEVED_USER_ACHIEVEMENT));
+    private boolean verifyCompleted(Achievement achievement, Map<ActivityType, Integer> map) {
+        return achievement.getRequirementValue().equals(map.get(achievement.getActivityType()))
+            ? Boolean.TRUE : Boolean.FALSE;
     }
 
     private User validateToken(Long userId) {

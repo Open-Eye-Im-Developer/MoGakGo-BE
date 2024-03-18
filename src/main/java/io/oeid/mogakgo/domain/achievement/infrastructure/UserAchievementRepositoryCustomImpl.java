@@ -31,12 +31,7 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
     private static final int ACHIEVEMENT_SIZE = 14;
 
     QAchievement achievement1 = new QAchievement("achievement1");
-    QAchievement achievement2 = new QAchievement("achievement2");
-    QAchievement achievement3 = new QAchievement("achievement3");
-
     QUserAchievement userAchievement1 = new QUserAchievement("userAchievement1");
-    QUserAchievement userAchievement2 = new QUserAchievement("userAchievement2");
-
     QUserActivity userActivity1 = new QUserActivity("userActivity1");
 
     @Override
@@ -68,34 +63,39 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
             .fetch();
 
         List<Tuple> sql2 = jpaQueryFactory.select(
-                userAchievement1.user.id,
-                achievement2.id,
-                achievement2.title,
-                achievement2.imgUrl,
-                achievement2.description,
-                achievement2.requirementType,
-                achievement2.requirementValue,
+                userAchievement.user.id,
+                userAchievement.achievement.id,
+                userAchievement.achievement.title,
+                userAchievement.achievement.imgUrl,
+                userAchievement.achievement.description,
+                userAchievement.achievement.requirementType,
+                userAchievement.achievement.requirementValue,
                 Expressions.numberPath(Long.class, String.valueOf(userActivity.createdAt.count())),
-                userAchievement1.completed
+                userAchievement.completed
             )
-            .from(achievement2)
-            .innerJoin(userAchievement1).on(
-                userAchievement1.achievement.id.eq(achievement2.id),
-                userAchievement1.user.id.eq(userId)
-            )
-            .innerJoin(userActivity).on(userActivity.activityType.eq(achievement2.activityType))
+            .from(userAchievement)
+            .innerJoin(userAchievement.achievement).on(userAchievement.achievement.id.eq(achievement.id))
+            .innerJoin(userActivity).on(userActivity.activityType.eq(userAchievement.achievement.activityType))
             .where(
-                achievement2.requirementType.eq(RequirementType.ACCUMULATE),
-                achievement2.id.in(
-                    JPAExpressions.select(achievement3.id.max())
-                        .from(userActivity1)
-                        .innerJoin(achievement3)
-                        .on(achievement3.activityType.eq(userActivity1.activityType),
-                            userActivity.user.id.eq(userId))
-                        .innerJoin(userAchievement2).
-                        on(userAchievement2.achievement.id.eq(achievement3.id))
+                userAchievement.user.id.eq(userId),
+                userAchievement.achievement.id.in(
+                    JPAExpressions.select(achievement1.id.max())
+                        .from(userAchievement1)
+                        .innerJoin(achievement1).on(achievement1.id.eq(userAchievement1.achievement.id))
+                        .innerJoin(userActivity1).on(achievement1.activityType.eq(userActivity1.activityType))
+                        .where(userAchievement1.achievement.requirementType.eq(RequirementType.ACCUMULATE))
                         .groupBy(userActivity1.activityType)
                 )
+            )
+            .groupBy(
+                userAchievement.user.id,
+                userAchievement.achievement.id,
+                userAchievement.achievement.title,
+                userAchievement.achievement.imgUrl,
+                userAchievement.achievement.description,
+                userAchievement.achievement.requirementType,
+                userAchievement.achievement.requirementValue,
+                userAchievement.completed
             )
             .fetch();
 
@@ -117,29 +117,16 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                     tuple.get(4, String.class),
                     tuple.get(5, RequirementType.class),
                     tuple.get(6, Integer.class),
-                    Integer.valueOf(String.valueOf(tuple.get(6, Long.class))),
+                    Integer.valueOf(String.valueOf(tuple.get(7, Long.class))),
                     tuple.get(8, Boolean.class)
                 )
             ).toList();
     }
 
     @Override
-    public Long findAvailableAchievementByActivityType(Long userId, ActivityType activityType) {
+    public Long getAvailableAchievementWithNull(Long userId, ActivityType activityType) {
 
-        Tuple result = jpaQueryFactory.select(
-                userAchievement.achievement.id.max(),
-                userAchievement.completed,
-                findAvailableNextStep(userAchievement.achievement.id.max(), activityType)
-            )
-            .from(userAchievement)
-            .innerJoin(userActivity).on(userAchievement.user.id.eq(userActivity.user.id))
-            .innerJoin(userAchievement.achievement).on(userActivity.activityType.eq(userAchievement.achievement.activityType))
-            .where(
-                userAchievement.user.id.eq(userId),
-                userAchievement.achievement.activityType.eq(activityType)
-            )
-            .groupBy(userActivity.activityType)
-            .fetchOne();
+        Tuple result = findAvailableAchievementByActivityType(userId, activityType);
 
         if (result == null) {
             return findMinAchievementIdByActivityType(activityType);
@@ -153,6 +140,41 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
         return Boolean.TRUE.equals(hasNext) ? latestId + 1L : null;
     }
 
+    @Override
+    public Long getAvailableAchievementWithoutNull(Long userId, ActivityType activityType) {
+
+        Tuple result = findAvailableAchievementByActivityType(userId, activityType);
+
+        if (result == null) {
+            return findMinAchievementIdByActivityType(activityType);
+        }
+
+        Long latestId = result.get(0, Long.class);
+        Boolean isCompleted = result.get(1, Boolean.class);
+        Boolean hasNext = result.get(2, Boolean.class);
+
+        if (Boolean.FALSE.equals(isCompleted)) return latestId;
+        return Boolean.TRUE.equals(hasNext) ? latestId + 1L : latestId;
+    }
+
+    private Tuple findAvailableAchievementByActivityType(Long userId, ActivityType activityType) {
+
+        return jpaQueryFactory.select(
+                userAchievement.achievement.id.max(),
+                userAchievement.completed,
+                findAvailableNextStep(userAchievement.achievement.id.max(), activityType)
+            )
+            .from(userAchievement)
+            .innerJoin(userActivity).on(userAchievement.user.id.eq(userActivity.user.id))
+            .innerJoin(userAchievement.achievement).on(userActivity.activityType.eq(userAchievement.achievement.activityType))
+            .where(
+                userAchievement.user.id.eq(userId),
+                userAchievement.achievement.activityType.eq(activityType)
+            )
+            .groupBy(userActivity.activityType)
+            .fetchOne();
+    }
+
     // 오늘 날짜를 제외한, Accumulate 타입 업적의 진행 횟수 조회
     @Override
     public Integer getAccumulatedProgressCountByActivity(Long userId, ActivityType activityType) {
@@ -163,7 +185,7 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                 userIdEq(userId),
                 requirementTypeEq(RequirementType.ACCUMULATE),
                 activityTypeEq(activityType),
-                createdAtNotEq()
+                createdAtCondition()
             )
             .fetchOne();
 
@@ -202,7 +224,7 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
         return activityType != null ? userActivity.activityType.eq(activityType) : null;
     }
 
-    private BooleanExpression createdAtNotEq() {
+    private BooleanExpression createdAtCondition() {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1);
         return userActivity.createdAt.before(startOfDay).or(userActivity.createdAt.after(endOfDay));
