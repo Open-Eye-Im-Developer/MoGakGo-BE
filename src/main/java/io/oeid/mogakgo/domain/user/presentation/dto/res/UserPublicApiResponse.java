@@ -30,16 +30,12 @@ public class UserPublicApiResponse {
     private final double jandiRate;
     @Schema(description = "업적 ID", example = "1")
     private final Long achievementId;
-    @Schema(description = "업적 제목", example = "이세계 개발자")
-    private final String achievementTitle;
-    @Schema(description = "업적 이미지")
-    private final String achievementImageUrl;
     @Schema(description = "개발 언어", example = "[\"JAVA\", \"KOTLIN\"]")
     private final List<String> developLanguages;
     @Schema(description = "원하는 직군", example = "[\"BACKEND\", \"FRONTEND\"]")
     private final List<String> wantedJobs;
 
-    public static UserPublicApiResponse fromByUserProfile(UserProfileResponse response) {
+    public static UserPublicApiResponse from(UserProfileResponse response) {
         return new UserPublicApiResponse(
             response.getId(),
             response.getUsername(),
@@ -49,8 +45,6 @@ public class UserPublicApiResponse {
             response.getBio(),
             response.getJandiRate(),
             response.getAchievementId(),
-            response.getAchievementTitle(),
-            response.getAchievementImageUrl(),
             response.getDevelopLanguages().stream().map(Enum::name).toList(),
             response.getWantedJobs().stream().map(Enum::name).toList()
         );
@@ -66,8 +60,6 @@ public class UserPublicApiResponse {
             user.getBio(),
             user.getJandiRate(),
             user.getAchievement() != null ? user.getAchievement().getId() : null,
-            user.getAchievement() != null ? user.getAchievement().getTitle() : null,
-            user.getAchievement() != null ? user.getAchievement().getImgUrl() : null,
             user.getUserDevelopLanguageTags().stream()
                 .map(UserDevelopLanguageTag::getDevelopLanguage).map(Enum::name).toList(),
             user.getUserWantedJobTags().stream()

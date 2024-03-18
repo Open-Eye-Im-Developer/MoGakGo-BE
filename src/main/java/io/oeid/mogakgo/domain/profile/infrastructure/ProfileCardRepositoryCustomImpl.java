@@ -12,8 +12,6 @@ import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCard;
 import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCardLike;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileInfoAPIRes;
-import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
-import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.List;
 import java.util.Optional;
@@ -47,22 +45,7 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
 
         List<UserProfileInfoAPIRes> result = entities.stream().map(
             profileCard -> new UserProfileInfoAPIRes(
-                new UserPublicApiResponse(
-                    profileCard.getUser().getId(),
-                    profileCard.getUser().getUsername(),
-                    profileCard.getUser().getGithubId(),
-                    profileCard.getUser().getAvatarUrl(),
-                    profileCard.getUser().getGithubUrl(),
-                    profileCard.getUser().getBio(),
-                    profileCard.getUser().getJandiRate(),
-                    profileCard.getUser().getAchievement() != null ? profileCard.getUser().getAchievement().getId() : null,
-                    profileCard.getUser().getAchievement() != null ? profileCard.getUser().getAchievement().getTitle() : null,
-                    profileCard.getUser().getAchievement() != null ? profileCard.getUser().getAchievement().getImgUrl() : null,
-                    profileCard.getUser().getUserDevelopLanguageTags().stream().map(
-                        UserDevelopLanguageTag::getDevelopLanguage).map(String::valueOf).toList(),
-                    profileCard.getUser().getUserWantedJobTags().stream().map(
-                        UserWantedJobTag::getWantedJob).map(String::valueOf).toList()
-                ),
+                UserPublicApiResponse.from(profileCard.getUser()),
                 findProfileCardLikeBySenderId(profileCard.getUser().getId(), userId)
                     .isPresent() ? Boolean.TRUE : Boolean.FALSE
             )
