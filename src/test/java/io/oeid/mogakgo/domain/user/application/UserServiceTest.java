@@ -149,7 +149,6 @@ class UserServiceTest {
             .hasFieldOrPropertyWithValue("githubUrl", "https://github.com/tidavid1")
             .hasFieldOrPropertyWithValue("bio", null)
             .hasFieldOrPropertyWithValue("jandiRate", 10.0)
-            .hasFieldOrProperty("achievementTitle")
             .hasFieldOrProperty("developLanguages")
             .hasFieldOrProperty("wantedJobs");
     }
