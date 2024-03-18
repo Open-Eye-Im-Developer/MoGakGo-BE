@@ -15,9 +15,11 @@ public class UserDevelopLanguageApiRes {
     private final String language;
     @Schema(description = "언어별 바이트 크기", example = "1000")
     private final Integer byteSize;
+    @Schema(description = "언어 이미지 URL", example = "https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/6c518db0-1bda-4826-a505-250dbd8810e9")
+    private final String imageUrl;
 
     public static UserDevelopLanguageApiRes from(UserDevelopLanguageRes response) {
         return new UserDevelopLanguageApiRes(response.getLanguage().getLanguage(),
-            response.getByteSize());
+            response.getByteSize(), response.getLanguage().getImageUrl());
     }
 }
