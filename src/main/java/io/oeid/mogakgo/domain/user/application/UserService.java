@@ -21,7 +21,9 @@ import io.oeid.mogakgo.domain.user.util.UserGithubUtil;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,7 +60,8 @@ public class UserService {
     public List<UserDevelopLanguageRes> updateUserDevelopLanguages(long userId) {
         User user = userCommonService.getUserById(userId);
         user.deleteAllDevelopLanguageTags();
-        var languages = userGithubUtil.updateUserDevelopLanguage(user.getRepositoryUrl());
+        var languageMap = userGithubUtil.updateUserDevelopLanguage(user.getRepositoryUrl());
+        var languages = sortDevelopLanguageMap(languageMap);
         languages.forEach((key, value) -> {
             UserDevelopLanguageTag developLanguageTag = UserDevelopLanguageTag.builder()
                 .user(user)
@@ -109,6 +112,14 @@ public class UserService {
         if (wantedJobSet.size() != wantedJobs.size()) {
             throw new UserException(ErrorCode400.USER_WANTED_JOB_DUPLICATE);
         }
+    }
+
+    private Map<String, Integer> sortDevelopLanguageMap(Map<String, Integer> languageMap){
+        List<String> languageKeys = new ArrayList<>(languageMap.keySet());
+        languageKeys.sort((o1, o2) -> languageMap.get(o2).compareTo(languageMap.get(o1)));
+        Map<String, Integer> result = new LinkedHashMap<>();
+        languageKeys.subList(0, 3).forEach(key -> result.put(key, languageMap.get(key)));
+        return result;
     }
 
 }

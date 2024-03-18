@@ -3,7 +3,6 @@ package io.oeid.mogakgo.core.configuration;
 import io.oeid.mogakgo.domain.auth.jwt.JwtAccessDeniedHandler;
 import io.oeid.mogakgo.domain.auth.jwt.JwtAuthenticationEntryPoint;
 import io.oeid.mogakgo.domain.auth.jwt.JwtAuthenticationFilter;
-import io.oeid.mogakgo.domain.auth.oauth.OAuth2AuthenticationSuccessHandler;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -23,16 +21,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
 
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(OAuth2AuthenticationSuccessHandler authenticationSuccessHandler,
-        JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
         JwtAccessDeniedHandler jwtAccessDeniedHandler,
         JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -70,16 +65,6 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Bean
-    public SecurityFilterChain filterChainOAuth2(HttpSecurity http) throws Exception {
-        configureCommonSecuritySettings(http);
-        return http
-            .oauth2Login(oauth2 -> oauth2.successHandler(authenticationSuccessHandler))
-            .authorizeHttpRequests(
-                requests -> requests.anyRequest().permitAll())
-            .build();
     }
 
     private void configureCommonSecuritySettings(HttpSecurity httpSecurity) throws Exception {

@@ -1,8 +1,8 @@
 package io.oeid.mogakgo.domain.project.infrastructure;
 
+import static io.oeid.mogakgo.domain.matching.domain.entity.QMatching.matching;
 import static io.oeid.mogakgo.domain.project.domain.entity.QProject.project;
 import static io.oeid.mogakgo.domain.user.domain.QUser.user;
-import static io.oeid.mogakgo.domain.matching.domain.entity.QMatching.matching;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,8 +16,6 @@ import io.oeid.mogakgo.domain.project.presentation.dto.res.MeetingInfoResponse;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectDetailInfoAPIRes;
 import io.oeid.mogakgo.domain.project.presentation.dto.res.ProjectInfoAPIRes;
-import io.oeid.mogakgo.domain.user.domain.UserDevelopLanguageTag;
-import io.oeid.mogakgo.domain.user.domain.UserWantedJobTag;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.time.LocalDate;
 import java.util.List;
@@ -54,22 +52,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
         List<ProjectDetailAPIRes> result = entities.stream().map(
             project -> new ProjectDetailAPIRes(
                 project.getId(),
-                new UserPublicApiResponse(
-                    project.getCreator().getId(),
-                    project.getCreator().getUsername(),
-                    project.getCreator().getGithubId(),
-                    project.getCreator().getAvatarUrl(),
-                    project.getCreator().getGithubUrl(),
-                    project.getCreator().getBio(),
-                    project.getCreator().getJandiRate(),
-                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getId() : null,
-                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getTitle() : null,
-                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getImgUrl() : null,
-                    project.getCreator().getUserDevelopLanguageTags().stream().map(
-                        UserDevelopLanguageTag::getDevelopLanguage).map(String::valueOf).toList(),
-                    project.getCreator().getUserWantedJobTags().stream().map(
-                        UserWantedJobTag::getWantedJob).map(String::valueOf).toList()
-                ),
+                UserPublicApiResponse.from(project.getCreator()),
                 project.getProjectStatus(),
                 project.getProjectTags().stream().map(ProjectTag::getContent).toList(),
                 new MeetingInfoResponse(
@@ -149,22 +132,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
         List<ProjectDetailAPIRes> result = entity.stream().map(
             project -> new ProjectDetailAPIRes(
                 project.getId(),
-                new UserPublicApiResponse(
-                    project.getCreator().getId(),
-                    project.getCreator().getUsername(),
-                    project.getCreator().getGithubId(),
-                    project.getCreator().getAvatarUrl(),
-                    project.getCreator().getGithubUrl(),
-                    project.getCreator().getBio(),
-                    project.getCreator().getJandiRate(),
-                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getId() : null,
-                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getTitle() : null,
-                    project.getCreator().getAchievement() != null ? project.getCreator().getAchievement().getImgUrl() : null,
-                    project.getCreator().getUserDevelopLanguageTags().stream().map(
-                        UserDevelopLanguageTag::getDevelopLanguage).map(String::valueOf).toList(),
-                    project.getCreator().getUserWantedJobTags().stream().map(
-                        UserWantedJobTag::getWantedJob).map(String::valueOf).toList()
-                ),
+                UserPublicApiResponse.from(project.getCreator()),
                 project.getProjectStatus(),
                 project.getProjectTags().stream().map(ProjectTag::getContent).toList(),
                 new MeetingInfoResponse(

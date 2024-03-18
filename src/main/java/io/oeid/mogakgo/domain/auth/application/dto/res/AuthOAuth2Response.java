@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.domain.user.application.dto.res;
+package io.oeid.mogakgo.domain.auth.application.dto.res;
 
 import io.oeid.mogakgo.domain.user.domain.User;
 import java.util.Collection;
@@ -9,13 +9,13 @@ import org.springframework.security.core.GrantedAuthority;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserOAuth2Response {
+public class AuthOAuth2Response {
 
     private final Long userId;
     private final Collection<GrantedAuthority> authorities;
     private final Boolean signUpComplete;
 
-    public static UserOAuth2Response from(User user) {
-        return new UserOAuth2Response(user.getId(), user.getAuthorities(), user.getSignupYn());
+    public static AuthOAuth2Response from(User user) {
+        return new AuthOAuth2Response(user.getId(), user.getAuthorities(), user.getSignupYn());
     }
 }
