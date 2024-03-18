@@ -38,8 +38,6 @@ dependencies {
     implementation 'org.locationtech.jts:jts-core'
     // Spring Boot Security
     implementation 'org.springframework.boot:spring-boot-starter-security:3.1.8'
-    // Spring Boot OAuth2 Client
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:3.1.8'
     // Feign Client
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.6'
     // Firebase Admin
