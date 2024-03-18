@@ -30,6 +30,8 @@ public class UserPublicApiResponse {
     private final double jandiRate;
     @Schema(description = "업적 ID", example = "1")
     private final Long achievementId;
+    @Schema(description = "인증 지역 정보", example = "서울특별시 종로구", nullable = true)
+    private final String region;
     @Schema(description = "개발 언어", example = "[\"JAVA\", \"KOTLIN\"]")
     private final List<String> developLanguages;
     @Schema(description = "원하는 직군", example = "[\"BACKEND\", \"FRONTEND\"]")
@@ -45,12 +47,15 @@ public class UserPublicApiResponse {
             response.getBio(),
             response.getJandiRate(),
             response.getAchievementId(),
+            response.getRegion(),
             response.getDevelopLanguages().stream().map(Enum::name).toList(),
             response.getWantedJobs().stream().map(Enum::name).toList()
         );
     }
 
     public static UserPublicApiResponse from(User user) {
+        String region = user.getRegion() == null ? ""
+            : user.getRegion().getDepth1() + " " + user.getRegion().getDepth2();
         return new UserPublicApiResponse(
             user.getId(),
             user.getUsername(),
@@ -60,6 +65,7 @@ public class UserPublicApiResponse {
             user.getBio(),
             user.getJandiRate(),
             user.getAchievement() != null ? user.getAchievement().getId() : null,
+            region,
             user.getUserDevelopLanguageTags().stream()
                 .map(UserDevelopLanguageTag::getDevelopLanguage).map(Enum::name).toList(),
             user.getUserWantedJobTags().stream()
