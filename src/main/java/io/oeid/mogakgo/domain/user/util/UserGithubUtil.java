@@ -1,13 +1,16 @@
 package io.oeid.mogakgo.domain.user.util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import static reactor.core.publisher.Flux.merge;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Component
 public class UserGithubUtil {
@@ -15,35 +18,56 @@ public class UserGithubUtil {
     private final String accessToken;
 
     public UserGithubUtil(@Value("${auth.github-access-token}") String accessToken) {
-        this.accessToken = accessToken;
+        this.accessToken = "Bearer " + accessToken;
     }
 
     public Map<String, Integer> updateUserDevelopLanguage(String repositoryUrl) {
-        WebClient webClient = WebClient.builder()
-            .defaultHeader("Authorization", "Bearer " + accessToken)
-            .baseUrl(repositoryUrl).build();
-        Map<String, Integer> languageMap = new HashMap<>();
-        List<Object> response = webClient.get().retrieve().bodyToMono(List.class).block();
-        if (response == null) {
+        var repositoriesData = getRepositoriesData(repositoryUrl);
+        if (repositoriesData == null) {
             return Map.of();
         }
-        response.forEach(o -> {
-            Map<String, Object> json = (Map<String, Object>) o;
-            var languageWebClient = WebClient.builder()
-                .defaultHeader("Authorization", "Bearer " + accessToken)
-                .baseUrl((String) json.get("languages_url")).build();
-            Map<String, Integer> languages = languageWebClient.get().retrieve()
-                .bodyToMono(Map.class).block();
-            if (languages == null) {
-                return;
+        var monoList = repositoriesData.stream().map(
+            map -> {
+                var languageUrl = String.valueOf(map.get("languages_url"));
+                return generateMonoByLanguageUrl(languageUrl);
             }
-            languages.forEach(
-                (lang, size) -> languageMap.put(lang, languageMap.getOrDefault(lang, 0) + size));
-        });
-        List<String> languageKeys = new ArrayList<>(languageMap.keySet());
-        languageKeys.sort((o1, o2) -> languageMap.get(o2).compareTo(languageMap.get(o1)));
-        Map<String, Integer> result = new LinkedHashMap<>();
-        languageKeys.subList(0, 3).forEach(key -> result.put(key, languageMap.get(key)));
-        return result;
+        ).toList();
+        Map<String, Integer> lanugaeMap = new ConcurrentHashMap<>();
+        merge(monoList).doOnEach(
+            mono -> {
+                var map = mono.get();
+                if (map == null) {
+                    return;
+                }
+                for (Entry<String, Integer> entry : map.entrySet()) {
+                    String key = entry.getKey();
+                    int value = entry.getValue();
+                    lanugaeMap.put(key, lanugaeMap.getOrDefault(key, 0) + value);
+                }
+            }
+        ).blockLast();
+        return lanugaeMap;
+    }
+
+    private List<Map<String, Object>> getRepositoriesData(String repositoryUrl) {
+        var webClient = WebClient.builder()
+            .defaultHeader("Authorization", accessToken)
+            .baseUrl(repositoryUrl)
+            .build();
+        return webClient.get().retrieve().bodyToMono(
+            new ParameterizedTypeReference<List<Map<String, Object>>>() {
+            }
+        ).block();
+    }
+
+    private Mono<Map<String, Integer>> generateMonoByLanguageUrl(String languageUrl) {
+        var webClient = WebClient.builder()
+            .defaultHeader("Authorization", accessToken)
+            .baseUrl(languageUrl)
+            .build();
+        return webClient.get().retrieve().bodyToMono(
+            new ParameterizedTypeReference<>() {
+            }
+        );
     }
 }
