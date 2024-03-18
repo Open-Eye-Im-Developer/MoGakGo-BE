@@ -40,10 +40,13 @@ public class AchievementFacadeService {
         return userAchievementRepository.findMinAchievementIdByActivityType(activityType);
     }
 
-    // 사용자가 해당 activityType에 대해 현재 달성할 수 있는 업적 ID
-    public Long findAvailableAchievement(Long userId, ActivityType activityType) {
+    public Long getAvailableAchievementId(Long userId, ActivityType activityType) {
         return userAchievementRepository
-            .findAvailableAchievementByActivityType(userId, activityType);
+            .getAvailableAchievementWithNull(userId, activityType);
+    }
+
+    public Long getAvailableAchievementIdWithoutNull(Long userId, ActivityType activityType) {
+        return userAchievementRepository.getAvailableAchievementWithoutNull(userId, activityType);
     }
 
     public Integer getAccumulatedProgressCount(Long userId, ActivityType activityType) {
