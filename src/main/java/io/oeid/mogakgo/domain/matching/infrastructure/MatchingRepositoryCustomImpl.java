@@ -69,9 +69,8 @@ public class MatchingRepositoryCustomImpl implements MatchingRepositoryCustom {
             )
             .fetchOne();
 
-        return result != null ? Math.toIntExact(result) : 0;
+        return result != null ? Math.toIntExact(result) - 1 : 0;
     }
-
 
     private BooleanExpression cursorIdCondition(Long cursorId) {
         return cursorId != null ? matching.id.lt(cursorId) : null;
