@@ -30,12 +30,11 @@ public class AchievementEventService {
     private final ApplicationEventPublisher eventPublisher;
 
     // 달성 자격요건의 검증 없이 한 번에 달성 가능한 업적에 대한 이벤트 발행
-    // -- 이력 저장 이벤트와 업적 달성 이벤트가 비동기적으로 처리되어도 문제 X
     @Async
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
     public void publishCompletedEventWithoutVerify(Long userId, ActivityType activityType) {
 
-        Long achievementId = achievementFacadeService.findAvailableAchievement(userId, activityType);
+        Long achievementId = achievementFacadeService.getAvailableAchievementId(userId, activityType);
 
         if (achievementId != null) {
 
@@ -59,7 +58,6 @@ public class AchievementEventService {
     }
 
     // 달성 자격요건의 검증과 함께 한 번에 달성 가능한 업적에 대한 이벤트 발행
-    // -- 이력 저장 이벤트와 업적 달성 이벤트가 비동기적으로 처리되어도 문제 X
     @Async
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
     public void publishCompletedEventWithVerify(Long userId, ActivityType activityType,
@@ -67,7 +65,7 @@ public class AchievementEventService {
 
         // 사용자가 현재 달성할 수 있는 업적 ID
         // -- 현재 사용자가 달성할 수 있는 없적이 없다면 이벤트 발행 X --
-        Long achievementId = achievementFacadeService.findAvailableAchievement(userId, activityType);
+        Long achievementId = achievementFacadeService.getAvailableAchievementId(userId, activityType);
 
         if (achievementId != null) {
 
@@ -96,7 +94,6 @@ public class AchievementEventService {
     }
 
     // 달성 자격요건의 검증과 함께 여러 번에 걸쳐 달성 가능한 업적에 대한 이벤트 발행
-    // -- 업적 진행 이벤트와 업적 달성 이벤트가 비동기적으로 처리될 경우 고려해야 함
     @Async
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
     public void publishAccumulateEventWithVerify(Long userId, ActivityType activityType,
@@ -105,7 +102,7 @@ public class AchievementEventService {
         // 사용자가 현재 달성할 수 있는 업적 ID
         // -- 현재 사용자가 달성할 수 있는 업적이 없는 경우 이벤트 발행 X
         Long achievementId = achievementFacadeService
-            .findAvailableAchievement(userId, activityType);
+            .getAvailableAchievementId(userId, activityType);
 
         if (achievementId != null) {
 
@@ -146,10 +143,6 @@ public class AchievementEventService {
     }
 
     // 달성 자격요건의 검증과 함께 여러 번에 걸쳐 달성 가능한 연속성 업적에 대한 이벤트 발행
-    // -- 이력 저장 이벤트와 업적 달성 이벤트가 비동기적으로 처리되면 문제 O (오늘을 제외한 업적 달성 조건을 검증 O)
-    // -- 1. 연속 업적의 경우, 달성과 동시에 이력을 삭제하기 떄문에 이력이 저장된 후에 처리되어야 함
-    // -- 업적 진행 이벤트와 업적 달성 이벤트가 비동기적으로 처리될 경우
-    // -- 1. 업적 진행과 동시에 업적이 달성될 수 있는가?
     @Async
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
     public void publishSequenceEventWithVerify(Long userId, ActivityType activityType) {
@@ -157,7 +150,7 @@ public class AchievementEventService {
         // 사용자가 현재 달성할 수 있는 업적 ID
         // -- 현재 사용자가 달성할 수 있는 업적이 없는 경우 이벤트 발행 X
         Long achievementId = achievementFacadeService
-            .findAvailableAchievement(userId, activityType);
+            .getAvailableAchievementId(userId, activityType);
 
         // 오늘을 제외한, 업적의 진행도 조회
         Map<ActivityType, Integer> map = achievementService
