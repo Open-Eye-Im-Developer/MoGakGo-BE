@@ -40,7 +40,7 @@ public class UserController implements UserSwagger {
     @GetMapping
     public ResponseEntity<UserPublicApiResponse> userGetApi(@UserId Long userId) {
         var response = userService.getUserProfile(userId);
-        return ResponseEntity.ok(UserPublicApiResponse.fromByUserProfile(response));
+        return ResponseEntity.ok(UserPublicApiResponse.from(response));
     }
 
     @GetMapping("/develop-language")
