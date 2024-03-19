@@ -28,6 +28,7 @@ import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,6 +101,11 @@ public class ProjectJoinRequestService {
         } catch (ProjectJoinRequestException e) {
             // TODO: 로그 처리
         }
+
+        // TODO: 무한 대기로 인해 Batch로 일괄 거절 처리되는 경우, 이벤트 발행 어떻게 할 것인지?
+        List<ProjectJoinRequest> rejectedList = projectJoinRequestRepository
+            .findRejectedRequestByProjectId(projectJoinRequest.getProject().getId());
+
         fcmNotificationService.sendNotification(projectJoinRequest.getSender().getId(),
             MATCHING_SUCCESS_MESSAGE.getTitle(), MATCHING_SUCCESS_MESSAGE.getMessage(),
             MATCHING_SUCCEEDED);

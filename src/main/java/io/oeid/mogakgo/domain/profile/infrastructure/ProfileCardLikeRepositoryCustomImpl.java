@@ -27,7 +27,7 @@ public class ProfileCardLikeRepositoryCustomImpl implements ProfileCardLikeRepos
         QUser sender = new QUser("sender");
         QUser receiver = new QUser("receiver");
 
-        return jpaQueryFactory
+        Long result = jpaQueryFactory
             .select(profileCardLike.count())
             .from(profileCardLike)
             .innerJoin(profileCardLike.sender, sender)
@@ -37,15 +37,19 @@ public class ProfileCardLikeRepositoryCustomImpl implements ProfileCardLikeRepos
                 receiveridEq(receiverId)
             )
             .fetchOne();
+
+        return result != null ? result : 0;
     }
 
     @Override
     public Long getReceivedLikeCount(Long userId) {
-        return jpaQueryFactory.select(profileCard.totalLikeAmount)
+        Long result = jpaQueryFactory.select(profileCard.totalLikeAmount)
             .from(profileCard)
             .innerJoin(profileCard.user, user)
             .where(profileCard.user.id.eq(userId))
             .fetchOne();
+
+        return result != null ? result : 0;
     }
 
     @Override

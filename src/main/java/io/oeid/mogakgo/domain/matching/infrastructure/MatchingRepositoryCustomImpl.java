@@ -9,6 +9,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.matching.domain.entity.enums.MatchingStatus;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingHistoryRes;
+import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -50,6 +51,25 @@ public class MatchingRepositoryCustomImpl implements MatchingRepositoryCustom {
 
         return CursorPaginationResult.fromDataWithExtraItemForNextCheck(matchingHistoryResList,
             cursorPaginationInfoReq.getPageSize());
+    }
+
+    @Override
+    public Integer findDuplicateMatching(Long userId, Long participantId) {
+
+        Long result = jpaQueryFactory.select(matching.id.count())
+            .from(matching)
+            .join(matching.project)
+            .where(
+                participantInMatching(userId),
+                participantInMatching(participantId),
+                matching.matchingStatus.eq(MatchingStatus.FINISHED)
+                        .or(matching.matchingStatus.eq(MatchingStatus.PROGRESS)),
+                matching.project.projectStatus.eq(ProjectStatus.FINISHED)
+                    .or(matching.project.projectStatus.eq(ProjectStatus.MATCHED))
+            )
+            .fetchOne();
+
+        return result != null ? Math.toIntExact(result) - 1 : 0;
     }
 
     private BooleanExpression cursorIdCondition(Long cursorId) {
