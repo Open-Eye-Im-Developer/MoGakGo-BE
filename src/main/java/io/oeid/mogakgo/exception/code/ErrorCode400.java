@@ -76,6 +76,7 @@ public enum ErrorCode400 implements ErrorCode {
     ACHIEVEMENT_ALREADY_COMPLETED("E140103", "이미 달성한 업적입니다,"),
 
     INVALID_EVENT_LISTENER_REQUEST("E150101", "요청한 이벤트 처리에 실패하였습니다."),
+    EVENT_LISTENER_REQUEST_FAILED("150102", "요청한 이벤트가 예상치 못한 오류로 실패하였습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
