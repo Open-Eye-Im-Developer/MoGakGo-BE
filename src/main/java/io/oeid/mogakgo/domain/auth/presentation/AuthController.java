@@ -1,13 +1,11 @@
 package io.oeid.mogakgo.domain.auth.presentation;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 import io.oeid.mogakgo.common.swagger.template.AuthSwagger;
 import io.oeid.mogakgo.domain.auth.application.AuthService;
-import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthAccessTokenApiResponse;
+import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthTokenApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,33 +22,19 @@ public class AuthController implements AuthSwagger {
     private final AuthService authService;
 
     @PostMapping("/reissue")
-    public ResponseEntity<AuthAccessTokenApiResponse> reissue(
+    public ResponseEntity<AuthTokenApiResponse> reissue(
         @RequestHeader(AUTHORIZATION) String accessToken,
         @CookieValue(value = "refreshToken") String refreshToken) {
         var accessTokenDto = authService.reissue(accessToken, refreshToken);
         return ResponseEntity.ok(
-            AuthAccessTokenApiResponse.of(accessTokenDto.getAccessToken(), null));
+            AuthTokenApiResponse.of(accessTokenDto.getAccessToken(), null, null));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthAccessTokenApiResponse> login(@RequestParam String code) {
+    public ResponseEntity<AuthTokenApiResponse> login(@RequestParam String code) {
         var response = authService.loginViaGithubCode(code);
-        ResponseCookie responseCookie = generateCookieHeader(response.getRefreshToken(),
-            response.getRefreshTokenExpirySeconds());
-        return ResponseEntity.ok()
-            .header(SET_COOKIE, responseCookie.toString())
-            .body(AuthAccessTokenApiResponse.of(response.getAccessToken(),
-                response.getSignUpCompleteYn()));
+        return ResponseEntity.ok(
+            AuthTokenApiResponse.of(response.getAccessToken(), response.getRefreshToken(), response.getSignUpCompleteYn()));
     }
 
-    private ResponseCookie generateCookieHeader(String refreshToken,
-        int refreshTokenExpirySeconds) {
-        return ResponseCookie.from("refreshToken", refreshToken)
-            .maxAge(refreshTokenExpirySeconds)
-            .httpOnly(true)
-            .path("/")
-            .sameSite("None")
-            .secure(true)
-            .build();
-    }
 }
