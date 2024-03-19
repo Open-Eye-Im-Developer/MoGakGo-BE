@@ -33,7 +33,7 @@ public class AchievementEventService {
     private final ApplicationEventPublisher eventPublisher;
 
     // 달성 자격요건의 검증 없이 한 번에 달성 가능한 업적에 대한 이벤트 발행
-    @Async
+    @Async("threadPoolTaskExecutor")
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
     public void publishCompletedEventWithoutVerify(Long userId, ActivityType activityType) {
 
@@ -67,7 +67,7 @@ public class AchievementEventService {
     }
 
     // 달성 자격요건의 검증과 함께 한 번에 달성 가능한 업적에 대한 이벤트 발행
-    @Async
+    @Async("threadPoolTaskExecutor")
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
     public void publishCompletedEventWithVerify(Long userId, ActivityType activityType,
         Object target) {
@@ -111,7 +111,7 @@ public class AchievementEventService {
     }
 
     // 달성 자격요건의 검증과 함께 여러 번에 걸쳐 달성 가능한 업적에 대한 이벤트 발행
-    @Async
+    @Async("threadPoolTaskExecutor")
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
     public void publishAccumulateEventWithVerify(Long userId, ActivityType activityType,
         Integer progressCount) {
@@ -167,7 +167,7 @@ public class AchievementEventService {
     }
 
     // 달성 자격요건의 검증과 함께 여러 번에 걸쳐 달성 가능한 연속성 업적에 대한 이벤트 발행
-    @Async
+    @Async("threadPoolTaskExecutor")
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
     public void publishSequenceEventWithVerify(Long userId, ActivityType activityType) {
 
@@ -187,6 +187,10 @@ public class AchievementEventService {
                 // 업적에 대한 이벤트 발행 - UserActivity
                 // -- 연속 횟수 이벤트
                 if (achievementFacadeService.validateActivityDuplicate(userId, activityType)) {
+
+                    log.info("call publishEvent for history of {} on thread:{}",
+                        activityType, Thread.currentThread().getName());
+
                     eventPublisher.publishEvent(
                         UserActivityEvent.builder()
                             .userId(userId)
@@ -195,6 +199,9 @@ public class AchievementEventService {
                             .progressCount(map.get(activityType) + 1)
                             .build()
                     );
+
+                    log.info("call completed publishEvent for history of {} on thread:{}",
+                        activityType, Thread.currentThread().getName());
                 }
 
                 Boolean isExist = achievementFacadeService
@@ -214,6 +221,9 @@ public class AchievementEventService {
                 // 해당 업적에 대한 달성 조건을 만족했을 경우
                 if (validateAvailabilityToAchieve(map.get(activityType) + 1, achievementId)) {
 
+                    log.info("call publishEvent for completionn of {} on thread:{}",
+                        achievementId, Thread.currentThread().getName());
+
                     // 업적 달성에 대한 이벤트 발행 - UserAchievement
                     eventPublisher.publishEvent(
                         SequenceAchievementUpdateEvent.builder()
@@ -221,6 +231,9 @@ public class AchievementEventService {
                             .achievementId(achievementId)
                             .build()
                     );
+
+                    log.info("call completed publishEvent for completionn of {} on thread:{}",
+                        achievementId, Thread.currentThread().getName());
                 }
             } catch (RuntimeException e) {
                 throw new EventListenerProcessingException(e.getMessage());
