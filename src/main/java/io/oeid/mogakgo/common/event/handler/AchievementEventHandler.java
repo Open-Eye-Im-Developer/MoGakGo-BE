@@ -156,16 +156,18 @@ public class AchievementEventHandler {
             event.getUserId(), achievement.getActivityType(), achievement.getRequirementValue());
         history.forEach(UserActivity::delete);
 
-//        log.info("call socket for event {} completion", event.getAchievementId());
-//
-//        // 업적 달성 후, 클라이언트에게 socket 통신
-//        achievementSocketService.sendMessageAboutAchievmentCompletion(
-//            event.getUserId(), AchievementMessage.builder()
-//                .userId(event.getUserId())
-//                .achievementId(event.getAchievementId())
-//                .completed(Boolean.TRUE)
-//                .build()
-//        );
+        log.info("call socket for event {} completion", event.getAchievementId());
+
+        // 업적 달성 후, 클라이언트에게 socket 통신
+        achievementSocketService.sendMessageAboutAchievmentCompletion(
+            event.getUserId(), AchievementMessage.builder()
+                .userId(event.getUserId())
+                .achievementId(event.getAchievementId())
+                .completed(Boolean.TRUE)
+                .build()
+        );
+
+        log.info("call socket completion");
     }
 
     private boolean isPossibleToAchieve(Achievement achievement, Integer progressCount) {

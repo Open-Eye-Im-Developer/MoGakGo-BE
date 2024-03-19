@@ -33,7 +33,9 @@ public class AchievementSocketService {
     @Async
     public void sendMessageAboutAchievmentCompletion(Long userId, AchievementMessage message) {
 
-        achievementSessionRepository.getSession(userId).forEach(session -> {
+        WebSocketSession session = achievementSessionRepository.getSession(userId);
+
+        if (session != null) {
             try {
                 String jsonMessage = objectMapper.writeValueAsString(message);
                 TextMessage textMessage = new TextMessage(jsonMessage);
@@ -44,7 +46,6 @@ public class AchievementSocketService {
                 log.error("sendMessageToSocket: {}", e.getMessage());
                 throw new AchievementException(ACHIEVEMENT_WEB_SOCKET_ERROR);
             }
-        });
+        }
     }
-
 }
