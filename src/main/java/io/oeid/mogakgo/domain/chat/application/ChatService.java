@@ -5,11 +5,11 @@ import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
+import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatUserJpaRepository;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
-import io.oeid.mogakgo.domain.matching.exception.MatchingException;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
@@ -71,7 +71,8 @@ public class ChatService {
     }
 
     // 채팅방 조회
-    public CursorPaginationResult<ChatDataApiRes> findAllChatInChatRoom(Long userId, String chatRoomId,
+    public CursorPaginationResult<ChatDataApiRes> findAllChatInChatRoom(Long userId,
+        String chatRoomId,
         CursorPaginationInfoReq pageable) {
         verifyChatUser(chatRoomId, userId);
         return chatRepository.findAllByCollection(chatRoomId, pageable);
@@ -83,9 +84,17 @@ public class ChatService {
         return chatRoomRepository.getChatDetailData(userId, UUID.fromString(chatRoomId));
     }
 
+    public String findChatRoomIdByProjectId(Long userId, Long projectId) {
+        var user = findUserById(userId);
+        var chatRoom = chatRoomRepository.findByProject_Id(projectId)
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
+        verifyChatUser(chatRoom.getId().toString(), user.getId());
+        return chatRoom.getId().toString();
+    }
+
     private ChatRoom findChatRoomById(String chatRoomId) {
         return chatRoomRepository.findById(chatRoomId)
-            .orElseThrow(() -> new MatchingException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
     }
 
     private User findUserById(Long userId) {
@@ -99,7 +108,7 @@ public class ChatService {
             .ifPresentOrElse(chatuser -> {
                 },
                 () -> {
-                    throw new MatchingException(ErrorCode404.CHAT_USER_NOT_FOUND);
+                    throw new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND);
                 });
     }
 
