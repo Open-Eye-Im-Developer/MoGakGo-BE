@@ -5,13 +5,12 @@ import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 import io.oeid.mogakgo.common.swagger.template.AuthSwagger;
 import io.oeid.mogakgo.domain.auth.application.AuthService;
-import io.oeid.mogakgo.domain.auth.presentation.dto.req.AuthReissueApiRequest;
 import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthAccessTokenApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,8 +26,8 @@ public class AuthController implements AuthSwagger {
     @PostMapping("/reissue")
     public ResponseEntity<AuthAccessTokenApiResponse> reissue(
         @RequestHeader(AUTHORIZATION) String accessToken,
-        @RequestBody AuthReissueApiRequest request) {
-        var accessTokenDto = authService.reissue(accessToken, request.getRefreshToken());
+        @CookieValue(value = "refreshToken") String refreshToken) {
+        var accessTokenDto = authService.reissue(accessToken, refreshToken);
         return ResponseEntity.ok(
             AuthAccessTokenApiResponse.of(accessTokenDto.getAccessToken(), null));
     }
@@ -36,15 +35,21 @@ public class AuthController implements AuthSwagger {
     @PostMapping("/login")
     public ResponseEntity<AuthAccessTokenApiResponse> login(@RequestParam String code) {
         var response = authService.loginViaGithubCode(code);
-        ResponseCookie responseCookie = ResponseCookie.from("refreshToken",
-                response.getRefreshToken())
-            .httpOnly(true)
-            .maxAge(response.getRefreshTokenExpirySeconds())
-            .path("/")
-            .build();
+        ResponseCookie responseCookie = generateCookieHeader(response.getRefreshToken(),
+            response.getRefreshTokenExpirySeconds());
         return ResponseEntity.ok()
             .header(SET_COOKIE, responseCookie.toString())
             .body(AuthAccessTokenApiResponse.of(response.getAccessToken(),
                 response.getSignUpCompleteYn()));
+    }
+
+    private ResponseCookie generateCookieHeader(String refreshToken,
+        int refreshTokenExpirySeconds) {
+        return ResponseCookie.from("refreshToken", refreshToken)
+            .maxAge(refreshTokenExpirySeconds)
+            .path("/")
+            .sameSite("None")
+            .secure(true)
+            .build();
     }
 }

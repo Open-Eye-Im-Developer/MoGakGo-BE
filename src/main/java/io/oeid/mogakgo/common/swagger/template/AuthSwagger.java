@@ -3,7 +3,6 @@ package io.oeid.mogakgo.common.swagger.template;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerAuthErrorExamples;
-import io.oeid.mogakgo.domain.auth.presentation.dto.req.AuthReissueApiRequest;
 import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthAccessTokenApiResponse;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +32,7 @@ public interface AuthSwagger {
     })
     ResponseEntity<AuthAccessTokenApiResponse> reissue(
         @Parameter(in = ParameterIn.HEADER, hidden = true) String accessToken,
-        AuthReissueApiRequest refreshToken);
+        @Parameter(in = ParameterIn.COOKIE, required = true) String refreshToken);
 
     @Operation(summary = "Github 로그인", description = "Github 로그인을 위한 API")
     @ApiResponses(
