@@ -10,6 +10,7 @@ import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
+import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatRoomIdApiRes;
 import io.oeid.mogakgo.exception.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,7 +38,7 @@ public interface ChatSwagger {
                 examples = @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
             ))
     })
-    @Parameters({
+    @Parameters(value = {
         @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),
         @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
         @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
@@ -56,7 +57,8 @@ public interface ChatSwagger {
                 examples = {
                     @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND),
                     @ExampleObject(name = "E030301", value = SwaggerProjectErrorExamples.PROJECT_NOT_FOUND),
-                    @ExampleObject(name = "E110301", value = SwaggerChatErrorExamples.CHAT_ROOM_NOT_FOUND)
+                    @ExampleObject(name = "E110301", value = SwaggerChatErrorExamples.CHAT_ROOM_NOT_FOUND),
+                    @ExampleObject(name = "E110302", value = SwaggerChatErrorExamples.CHAT_USER_NOT_FOUND)
                 }
             ))
     })
@@ -73,11 +75,12 @@ public interface ChatSwagger {
                 schema = @Schema(implementation = ErrorResponse.class),
                 examples = {
                     @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND),
-                    @ExampleObject(name = "E110301", value = SwaggerChatErrorExamples.CHAT_ROOM_NOT_FOUND)
+                    @ExampleObject(name = "E110301", value = SwaggerChatErrorExamples.CHAT_ROOM_NOT_FOUND),
+                    @ExampleObject(name = "E110302", value = SwaggerChatErrorExamples.CHAT_USER_NOT_FOUND)
                 }
             ))
     })
-    @Parameters({
+    @Parameters(value = {
         @Parameter(name = "cursorId", description = "기준이 되는 커서 ID", example = "1"),
         @Parameter(name = "pageSize", description = "요청할 데이터 크기", example = "5", required = true),
         @Parameter(name = "sortOrder", description = "정렬 방향", example = "ASC"),
@@ -86,6 +89,24 @@ public interface ChatSwagger {
         @Parameter(in = ParameterIn.PATH) String chatRoomId,
         @Parameter(hidden = true) Long userId,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable);
+
+    @Operation(summary = "프로젝트 채팅방 조회", description = "프로젝트에 해당하는 채팅방을 조회하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "프로젝트 채팅방 조회 성공"),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 유효하지 않음",
+            content = @Content(
+                mediaType = APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = {
+                    @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND),
+                    @ExampleObject(name = "E110301", value = SwaggerChatErrorExamples.CHAT_ROOM_NOT_FOUND),
+                    @ExampleObject(name = "E110302", value = SwaggerChatErrorExamples.CHAT_USER_NOT_FOUND)
+                }
+            ))
+    })
+    ResponseEntity<ChatRoomIdApiRes> getChatRoomByProjectId(
+        @Parameter(hidden = true) Long userId,
+        @Parameter(in = ParameterIn.PATH, required = true) Long projectId);
 
     @Operation(summary = "채팅방 나가기", description = "채팅방에 참여중인 사용자가 채팅방을 나가기 위해 사용하는 API")
     @ApiResponses(value = {
