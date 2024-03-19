@@ -8,6 +8,7 @@ import io.oeid.mogakgo.domain.chat.application.ChatService;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
+import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatRoomIdApiRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,8 @@ public class ChatController implements ChatSwagger {
     private final ChatService chatService;
 
     @GetMapping
-    public ResponseEntity<CursorPaginationResult<ChatRoomPublicRes>> getChatRoomList(@UserId Long userId, CursorPaginationInfoReq pageable) {
+    public ResponseEntity<CursorPaginationResult<ChatRoomPublicRes>> getChatRoomList(
+        @UserId Long userId, CursorPaginationInfoReq pageable) {
         return ResponseEntity.ok(chatService.findAllChatRoomByUserId(userId, pageable));
     }
 
@@ -42,6 +44,13 @@ public class ChatController implements ChatSwagger {
         @PathVariable String chatRoomId,
         @UserId Long userId, @Valid @ModelAttribute CursorPaginationInfoReq pageable) {
         return ResponseEntity.ok(chatService.findAllChatInChatRoom(userId, chatRoomId, pageable));
+    }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<ChatRoomIdApiRes> getChatRoomByProjectId(@UserId Long userId,
+        @PathVariable Long projectId) {
+        var chatRoomId = chatService.findChatRoomIdByProjectId(userId, projectId);
+        return ResponseEntity.ok(ChatRoomIdApiRes.from(chatRoomId));
     }
 
     @PatchMapping("/{chatRoomId}")

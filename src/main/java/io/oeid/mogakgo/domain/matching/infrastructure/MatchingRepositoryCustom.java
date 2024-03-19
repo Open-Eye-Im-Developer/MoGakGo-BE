@@ -11,4 +11,5 @@ public interface MatchingRepositoryCustom {
         Long userId, MatchingStatus matchingStatus, CursorPaginationInfoReq cursorPaginationInfoReq
     );
 
+    Integer findDuplicateMatching(Long userId, Long participantId);
 }

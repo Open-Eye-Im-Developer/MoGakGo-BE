@@ -66,6 +66,14 @@ public class MatchingService {
         return matchingJpaRepository.getMyMatches(tokenUserId, matchingStatus, cursorPaginationInfoReq);
     }
 
+    public Integer getDuplicateMatching(Long userId, Long participantId) {
+        return matchingJpaRepository.findDuplicateMatching(userId, participantId);
+    }
+
+    public Integer getRegionCountByMatching(Long userId) {
+        return matchingJpaRepository.findRegionCountByMatching(userId);
+    }
+
     private Matching getMatching(Long matchingId) {
         return matchingJpaRepository.findById(matchingId)
             .orElseThrow(() -> new MatchingException(MATCHING_NOT_FOUND));
