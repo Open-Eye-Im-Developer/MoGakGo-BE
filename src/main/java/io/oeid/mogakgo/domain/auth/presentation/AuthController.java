@@ -35,15 +35,22 @@ public class AuthController implements AuthSwagger {
     @PostMapping("/login")
     public ResponseEntity<AuthAccessTokenApiResponse> login(@RequestParam String code) {
         var response = authService.loginViaGithubCode(code);
-        ResponseCookie responseCookie = ResponseCookie.from("refreshToken",
-                response.getRefreshToken())
-            .httpOnly(true)
-            .maxAge(response.getRefreshTokenExpirySeconds())
-            .path("/")
-            .build();
+        ResponseCookie responseCookie = generateCookieHeader(response.getRefreshToken(),
+            response.getRefreshTokenExpirySeconds());
         return ResponseEntity.ok()
             .header(SET_COOKIE, responseCookie.toString())
             .body(AuthAccessTokenApiResponse.of(response.getAccessToken(),
                 response.getSignUpCompleteYn()));
+    }
+
+    private ResponseCookie generateCookieHeader(String refreshToken,
+        int refreshTokenExpirySeconds) {
+        return ResponseCookie.from("refreshToken", refreshToken)
+            .httpOnly(true)
+            .maxAge(refreshTokenExpirySeconds)
+            .path("/")
+            .sameSite("None")
+            .secure(true)
+            .build();
     }
 }
