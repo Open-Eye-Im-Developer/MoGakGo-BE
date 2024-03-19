@@ -47,6 +47,7 @@ public class AuthController implements AuthSwagger {
         int refreshTokenExpirySeconds) {
         return ResponseCookie.from("refreshToken", refreshToken)
             .maxAge(refreshTokenExpirySeconds)
+            .httpOnly(true)
             .path("/")
             .sameSite("None")
             .secure(true)
