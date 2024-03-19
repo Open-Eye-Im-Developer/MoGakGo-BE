@@ -68,12 +68,16 @@ public class AchievementEventAspect {
     @AfterReturning(pointcut = "createProjectExecution() && args(userId, request)")
     public void publishSequenceEvent(JoinPoint joinPoint, Long userId, ProjectCreateReq request) {
 
+        log.info("AOP 호출 on Thread={}", Thread.currentThread().getName());
+
         // -- '생성자' 프로젝트를 생성한 사용자에 대한 업적 이벤트 발행
         achievementEventService.publishSequenceEventWithVerify(userId,
             ActivityType.PLEASE_GIVE_ME_MOGAK);
 
         achievementEventService.publishCompletedEventWithVerify(userId,
             ActivityType.BRAVE_EXPLORER, projectRepository.getRegionCountByUserId(userId));
+
+        log.info("AOP 호출 완료 on Thread={}", Thread.currentThread().getName());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
