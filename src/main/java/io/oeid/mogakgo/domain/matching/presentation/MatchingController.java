@@ -8,6 +8,7 @@ import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.matching.domain.entity.enums.MatchingStatus;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingHistoryRes;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingId;
+import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingProjectRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,13 @@ public class MatchingController implements MatchingSwagger {
     ) {
         return ResponseEntity.ok(
             matchingService.getMyMatches(tokenId, userId, status, pageable));
+    }
+
+    @GetMapping("/my/{userId}/now")
+    public ResponseEntity<MatchingProjectRes> getMyNowMatch(
+        @UserId Long tokenId, @PathVariable Long userId
+    ) {
+        return ResponseEntity.ok(matchingService.getMyNowMatch(tokenId, userId));
     }
 
 }
