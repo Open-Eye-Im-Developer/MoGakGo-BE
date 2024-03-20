@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.oeid.mogakgo.domain.achievement.domain.entity.AchievementMessage;
 import io.oeid.mogakgo.domain.achievement.exception.AchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.session.AchievementSessionRepository;
+import io.oeid.mogakgo.domain.user.application.UserCommonService;
+import io.oeid.mogakgo.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -20,6 +22,7 @@ import org.springframework.web.socket.WebSocketSession;
 public class AchievementSocketService {
 
     private final ObjectMapper objectMapper;
+    private final UserCommonService userCommonService;
     private final AchievementSessionRepository achievementSessionRepository;
 
     public void addSession(Long userId, WebSocketSession session) {
@@ -47,5 +50,9 @@ public class AchievementSocketService {
                 throw new AchievementException(ACHIEVEMENT_WEB_SOCKET_ERROR);
             }
         }
+    }
+
+    public User validateUser(Long userId) {
+        return userCommonService.getUserById(userId);
     }
 }
