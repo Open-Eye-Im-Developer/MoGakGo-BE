@@ -160,11 +160,13 @@ public class AchievementEventHandler {
             log.info("call socket for event {} completion", event.getAchievementId());
 
             // 업적 달성 후, 클라이언트에게 socket 통신
+            Achievement achievement = getById(event.getAchievementId());
             achievementSocketService.sendMessageForAchievementCompletion(
                 achievementSessionRepository.getSession(event.getUserId()),
                 AchievementMessage.builder()
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())
+                    .progressCount(achievement.getRequirementValue())
                     .completed(Boolean.TRUE)
                     .build()
             );
@@ -200,6 +202,7 @@ public class AchievementEventHandler {
                 AchievementMessage.builder()
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())
+                    .progressCount(achievement.getRequirementValue())
                     .completed(Boolean.TRUE)
                     .build()
             );

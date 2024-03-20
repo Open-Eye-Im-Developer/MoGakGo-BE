@@ -4,6 +4,7 @@ import static io.oeid.mogakgo.exception.code.ErrorCode500.ACHIEVEMENT_WEB_SOCKET
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.oeid.mogakgo.domain.achievement.application.AchievementSocketService;
+import io.oeid.mogakgo.domain.achievement.domain.entity.vo.UserId;
 import io.oeid.mogakgo.domain.achievement.exception.AchievementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +32,12 @@ public class AchievementSocketHandler extends TextWebSocketHandler {
     public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
         TextMessage textMessage = (TextMessage) message;
         String payload = textMessage.getPayload();
-        Long userId = objectMapper.readValue(payload, Long.class);
+        UserId id = objectMapper.readValue(payload, UserId.class);
+        Long userId = id.getUserId();
+        log.info("extract userId {} from payload", userId);
         achievementSocketService.validateUser(userId);
         achievementSocketService.addSession(userId, session);
+        log.info("session {} saved completely from userId {}", session.getId(), userId);
     }
 
     @Override
