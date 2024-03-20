@@ -3,6 +3,7 @@ package io.oeid.mogakgo.domain.project.presentation.dto.res;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.domain.entity.ProjectTag;
 import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
+import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -43,6 +44,19 @@ public class ProjectDetailAPIRes {
         return new ProjectDetailAPIRes(
             projectId,
             creator,
+            projectStatus,
+            projectTags,
+            meetingInfo
+        );
+    }
+
+    public static ProjectDetailAPIRes of(
+        Long projectId, User creator,
+        ProjectStatus projectStatus, List<String> projectTags, MeetingInfoResponse meetingInfo
+    ) {
+        return new ProjectDetailAPIRes(
+            projectId,
+            UserPublicApiResponse.from(creator),
             projectStatus,
             projectTags,
             meetingInfo
