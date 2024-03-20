@@ -44,6 +44,7 @@ public class AchievementSocketService {
                 String jsonMessage = objectMapper.writeValueAsString(message);
                 TextMessage textMessage = new TextMessage(jsonMessage);
                 session.sendMessage(textMessage);
+                log.info("send message to session {} completely", session.getId());
             } catch (JsonProcessingException e) {
                 log.error("failed to convert Json message from object: {}", e.getMessage());
             } catch (Exception e) {
@@ -55,6 +56,8 @@ public class AchievementSocketService {
 
     @Async
     public void sendMessageForAchievementCompletion(WebSocketSession session, AchievementMessage message) {
+
+        log.info("session {} is opened: ", session.getId(), session.isOpen());
 
         if (session != null && session.isOpen()) {
             try {
