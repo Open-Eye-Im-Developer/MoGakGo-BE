@@ -37,6 +37,7 @@ public class AchievementSocketService {
     public void sendMessageAboutAchievmentCompletion(Long userId, AchievementMessage message) {
 
         WebSocketSession session = achievementSessionRepository.getSession(userId);
+        log.info("session:{}, session open:{}", session, session.isOpen());
 
         if (session != null) {
             try {
