@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleCustomException(
         CustomException e, HttpServletRequest request
     ) {
-        log.debug("Custom Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
+        log.info("Custom Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(e.getErrorCode());
     }
 
@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
         BindException e,
         HttpServletRequest request
     ) {
-        log.debug("Validation Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
+        log.info("Validation Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         BindingResult bindingResult = e.getBindingResult();
 
         StringBuilder builder = new StringBuilder();
@@ -72,7 +72,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> missingPathVariableException(
         Exception e, HttpServletRequest request
     ) {
-        log.debug("Missing Path Variable Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
+        log.info("Missing Path Variable Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(PATH_PARAMETER_BAD_REQUEST);
     }
 
@@ -80,7 +80,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleTokenExpiredException(
         TokenExpiredException e, HttpServletRequest request
     ) {
-        log.debug("Token Expiry Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
+        log.info("Token Expiry Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(AUTH_TOKEN_EXPIRED);
     }
 
@@ -88,8 +88,8 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleAuthenticationException(
         AuthenticationException e, HttpServletRequest request
     ) {
-        log.debug("AuthenticationException Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
-        log.debug("Token: {}", request.getHeader(AUTHORIZATION));
+        log.info("AuthenticationException Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
+        log.info("Token: {}", request.getHeader(AUTHORIZATION));
         return ErrorResponse.from(AUTH_MISSING_CREDENTIALS);
     }
 
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleAccessDeniedException(
         AccessDeniedException e, HttpServletRequest request
     ) {
-        log.debug("Access Denied: {}, Path: {}", e.getMessage(), request.getPathInfo());
+        log.info("Access Denied: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(AUTH_ACCESS_DENIED);
     }
 
@@ -105,7 +105,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleException(
         Exception e, HttpServletRequest request
     ) {
-        log.debug("Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
+        log.info("Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(INTERNAL_SERVER_ERROR);
     }
 }
