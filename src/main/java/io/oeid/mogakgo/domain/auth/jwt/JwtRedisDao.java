@@ -5,11 +5,13 @@ import io.oeid.mogakgo.domain.auth.exception.AuthException;
 import io.oeid.mogakgo.exception.code.ErrorCode401;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class JwtRedisDao {
 
@@ -36,6 +38,9 @@ public class JwtRedisDao {
     @Transactional(readOnly = true)
     public String getRefreshTokenByAccessToken(String accessToken) {
         var result = Optional.ofNullable(redisTemplate.opsForValue().get(accessToken));
-        return result.orElseThrow(() -> new AuthException(ErrorCode401.AUTH_MISSING_CREDENTIALS));
+        return result.orElseThrow(() -> {
+            log.debug("refreshToken not found");
+            return new AuthException(ErrorCode401.AUTH_MISSING_CREDENTIALS);
+        });
     }
 }

@@ -55,6 +55,25 @@ public class AchievementSocketService {
         }
     }
 
+    @Async
+    public void sendMessageForAchievementCompletion(WebSocketSession session, AchievementMessage message) {
+
+        if (session != null && session.isOpen()) {
+            try {
+                String jsonMessage = objectMapper.writeValueAsString(message);
+                TextMessage textMessage = new TextMessage(jsonMessage);
+                session.sendMessage(textMessage);
+            } catch (JsonProcessingException e) {
+                log.error("failed to convert Json message from object: {}", e.getMessage());
+            } catch (Exception e) {
+                log.error("sendMessageToSocket: {}", e.getMessage());
+                throw new AchievementException(ACHIEVEMENT_WEB_SOCKET_ERROR);
+            }
+        } else if (session != null && !session.isOpen()){
+            log.info("session closed: {}", session.getId());
+        }
+    }
+
     public User validateUser(Long userId) {
         return userCommonService.getUserById(userId);
     }

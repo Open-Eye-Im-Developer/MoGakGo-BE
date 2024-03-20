@@ -28,9 +28,13 @@ public class AuthService {
     private final GithubOAuth2Manager githubOAuth2Manager;
 
     public AuthReissueResponse reissue(String expiredAccessToken, String refreshToken) {
+        log.debug("reissue expiredAccessToken: {}", expiredAccessToken);
+        log.debug("reissue refreshToken: {}", refreshToken);
         expiredAccessToken = expiredAccessToken.substring(7); // remove "Bearer " (7 characters)
         String verifyRefreshToken = jwtRedisDao.getRefreshTokenByAccessToken(expiredAccessToken);
+        log.debug("verifyRefreshToken: {}", verifyRefreshToken);
         if (!refreshToken.equals(verifyRefreshToken)) {
+            log.debug("refreshToken not matched");
             throw new AuthException(ErrorCode401.AUTH_MISSING_CREDENTIALS);
         }
         String accessToken = generateAccessToken(expiredAccessToken);
