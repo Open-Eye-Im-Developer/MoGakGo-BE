@@ -1,5 +1,7 @@
 package io.oeid.mogakgo.scheduler;
 
+import io.oeid.mogakgo.domain.notification.application.FCMNotificationService;
+import io.oeid.mogakgo.domain.notification.application.NotificationService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,14 +22,18 @@ public class FinishedProjectScheduler {
 
     private final JdbcTemplate jdbcTemplate;
     private final Resource[] sqlStatements;
+    private final NotificationService notificationService;
+    private final FCMNotificationService fcmNotificationService;
 
-    private FinishedProjectScheduler(
-        JdbcTemplate jdbcTemplate,
+    protected FinishedProjectScheduler(JdbcTemplate jdbcTemplate,
         @Qualifier("webApplicationContext") ResourcePatternResolver resourcePatternResolver,
-        @Value("${path.schedule.sql}") String sqlStatementsPath
+        @Value("${path.schedule.sql}") String sqlStatementsPath,
+        NotificationService notificationService, FCMNotificationService fcmNotificationService
     ) throws IOException {
         this.jdbcTemplate = jdbcTemplate;
         this.sqlStatements = resourcePatternResolver.getResources(sqlStatementsPath);
+        this.notificationService = notificationService;
+        this.fcmNotificationService = fcmNotificationService;
     }
 
     @Scheduled(cron = "* * * * * ?") // 매일 자정에 실행
@@ -36,6 +42,8 @@ public class FinishedProjectScheduler {
             String sql = loadSqlFromFile(statement);
             jdbcTemplate.execute(sql);
         }
+        sendReviewNotification();
+
     }
 
     private String loadSqlFromFile(Resource resource) {
@@ -46,6 +54,21 @@ public class FinishedProjectScheduler {
             log.error("sql 스케쥴링 실행 중 오류 발생 : " + resource.getFilename(), e);
             return "";
         }
+    }
+
+    private void sendReviewNotification() {
+        jdbcTemplate.query(
+            "SELECT mt.sender_id, pt.id, pt.creator_id FROM matching_tb mt left JOIN project_tb pt on mt.project_id = pt.id WHERE mt.matching_status = 'FINISHED' and DATE(pt.meet_start_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+            rch -> {
+                Long senderId = rch.getLong("sender_id");
+                Long projectId = rch.getLong("id");
+                Long creatorId = rch.getLong("creator_id");
+                notificationService.createReviewRequestNotification(senderId, creatorId, projectId);
+                fcmNotificationService.sendNotification(senderId, creatorId, projectId);
+                notificationService.createReviewRequestNotification(creatorId, senderId, projectId);
+                fcmNotificationService.sendNotification(creatorId, senderId, projectId);
+            }
+        );
     }
 
 }

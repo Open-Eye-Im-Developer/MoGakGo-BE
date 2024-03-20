@@ -12,7 +12,6 @@ import io.oeid.mogakgo.domain.notification.domain.enums.FCMNotificationType;
 import io.oeid.mogakgo.domain.notification.domain.vo.FCMToken;
 import io.oeid.mogakgo.domain.notification.infrastructure.FCMTokenJpaRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
-import io.oeid.mogakgo.domain.user.domain.User;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,15 +70,14 @@ public class FCMNotificationService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public void sendNotification(Long userId, User receiver, Long projectId) {
+    public void sendNotification(Long userId, Long receiverId, Long projectId) {
         String redirectUrl =
-            FCMNotificationType.REVIEW_REQUEST.getRedirectUri() + "?receiverId=" + receiver.getId()
+            FCMNotificationType.REVIEW_REQUEST.getRedirectUri() + "?receiverId=" + receiverId
                 + "&projectId=" + projectId;
         getFCMToken(userId).ifPresent(
             fcmToken -> {
                 Message message = generateFirebaseMessage(REVIEW_REQUEST_MESSAGE.getTitle(),
-                    receiver.getUsername() + REVIEW_REQUEST_MESSAGE.getMessage(), redirectUrl,
-                    fcmToken.getToken());
+                    REVIEW_REQUEST_MESSAGE.getMessage(), redirectUrl, fcmToken.getToken());
                 sendMessageToFCM(message);
             }
         );

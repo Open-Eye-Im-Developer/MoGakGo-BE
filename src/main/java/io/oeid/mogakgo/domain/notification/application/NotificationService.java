@@ -9,6 +9,7 @@ import io.oeid.mogakgo.domain.notification.exception.NotificationException;
 import io.oeid.mogakgo.domain.notification.infrastructure.NotificationJpaRepository;
 import io.oeid.mogakgo.domain.notification.presentation.dto.res.NotificationPublicApiRes;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
+import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
@@ -25,11 +26,15 @@ public class NotificationService {
 
     private final UserCommonService userCommonService;
     private final NotificationJpaRepository notificationRepository;
+    private final ProjectJpaRepository projectRepository;
 
-    public void createReviewRequestNotification(Long userId, User receiver, Project project) {
+    public void createReviewRequestNotification(Long userId, Long receiverId, Long projectId) {
         log.info("createReviewRequestNotification userId: {}, receiver: {}, project: {}", userId,
-            receiver.getId(), project.getId());
+            receiverId, projectId);
         User user = userCommonService.getUserById(userId);
+        User receiver = userCommonService.getUserById(receiverId);
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new NotificationException(ErrorCode404.PROJECT_NOT_FOUND));
         notificationRepository.save(
             Notification.newReviewRequestNotification(user, receiver, project));
     }
