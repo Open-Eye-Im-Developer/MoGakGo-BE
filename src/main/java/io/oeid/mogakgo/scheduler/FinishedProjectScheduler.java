@@ -44,7 +44,6 @@ public class FinishedProjectScheduler {
         }
         sendReviewNotification();
         sendMatchFailNotification();
-
     }
 
     private String loadSqlFromFile(Resource resource) {
@@ -59,15 +58,15 @@ public class FinishedProjectScheduler {
 
     private void sendReviewNotification() {
         jdbcTemplate.query(
-            "SELECT mt.sender_id, pt.id, pt.creator_id FROM matching_tb mt LEFT JOIN project_tb pt on mt.project_id = pt.id WHERE mt.matching_status = 'FINISHED' and DATE(pt.meet_start_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+            "SELECT pt.id, mt.sender_id, pt.creator_id FROM matching_tb mt LEFT JOIN project_tb pt on mt.project_id = pt.id WHERE mt.matching_status = 'FINISHED' and DATE(pt.meet_start_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
             rch -> {
                 Long senderId = rch.getLong("sender_id");
                 Long projectId = rch.getLong("id");
                 Long creatorId = rch.getLong("creator_id");
                 notificationService.createReviewRequestNotification(senderId, creatorId, projectId);
-                fcmNotificationService.sendNotification(senderId, creatorId, projectId);
+                //fcmNotificationService.sendNotification(senderId, creatorId, projectId);
                 notificationService.createReviewRequestNotification(creatorId, senderId, projectId);
-                fcmNotificationService.sendNotification(creatorId, senderId, projectId);
+                //fcmNotificationService.sendNotification(creatorId, senderId, projectId);
             }
         );
     }
