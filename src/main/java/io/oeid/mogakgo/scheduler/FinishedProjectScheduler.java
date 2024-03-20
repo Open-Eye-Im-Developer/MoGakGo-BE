@@ -36,7 +36,7 @@ public class FinishedProjectScheduler {
         this.fcmNotificationService = fcmNotificationService;
     }
 
-    @Scheduled(cron = "* * * * * ?") // 매일 자정에 실행
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
     public void executeSqlFile() {
         for (Resource statement : sqlStatements) {
             String sql = loadSqlFromFile(statement);
@@ -64,9 +64,9 @@ public class FinishedProjectScheduler {
                 Long projectId = rch.getLong("id");
                 Long creatorId = rch.getLong("creator_id");
                 notificationService.createReviewRequestNotification(senderId, creatorId, projectId);
-                //fcmNotificationService.sendNotification(senderId, creatorId, projectId);
+                fcmNotificationService.sendNotification(senderId, creatorId, projectId);
                 notificationService.createReviewRequestNotification(creatorId, senderId, projectId);
-                //fcmNotificationService.sendNotification(creatorId, senderId, projectId);
+                fcmNotificationService.sendNotification(creatorId, senderId, projectId);
             }
         );
     }

@@ -84,7 +84,7 @@ public class FCMNotificationService {
     }
 
     private void sendMessageToFCM(Message message) {
-        log.info("sendNotification Start");
+        log.info("sendNotification Start: {}", message);
         try {
             String response = firebaseMessaging.send(message);
             log.info("Successfully sent message: " + response);
