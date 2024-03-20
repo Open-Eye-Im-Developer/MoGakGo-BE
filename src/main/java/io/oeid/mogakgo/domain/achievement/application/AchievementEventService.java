@@ -32,6 +32,9 @@ public class AchievementEventService {
     private final AchievementFacadeService achievementFacadeService;
     private final ApplicationEventPublisher eventPublisher;
 
+    // 작업과 동시에 업적 달성이 가능한, progressCount 최솟값
+    private final Integer MIN_PROGRESS_COUNT = 1;
+
     // 달성 자격요건의 검증 없이 한 번에 달성 가능한 업적에 대한 이벤트 발행
     @Async("threadPoolTaskExecutor")
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
@@ -48,6 +51,8 @@ public class AchievementEventService {
                     UserActivityEvent.builder()
                         .userId(userId)
                         .activityType(activityType)
+                        .achievementId(achievementId)
+                        .progressCount(MIN_PROGRESS_COUNT)
                         .build()
                 );
 
@@ -91,6 +96,8 @@ public class AchievementEventService {
                         UserActivityEvent.builder()
                             .userId(userId)
                             .activityType(activityType)
+                            .achievementId(achievementId)
+                            .progressCount((Integer) target)
                             .build()
                     );
 
@@ -131,6 +138,8 @@ public class AchievementEventService {
                     UserActivityEvent.builder()
                         .userId(userId)
                         .activityType(activityType)
+                        .achievementId(achievementId)
+                        .progressCount(progressCount)
                         .build()
                 );
 
@@ -244,6 +253,18 @@ public class AchievementEventService {
     @Recover
     public void recoverForEventListenerProcess(
         EventListenerProcessingException e, Long userId, ActivityType activityType) {
+        throw new AchievementException(ErrorCode400.EVENT_LISTENER_REQUEST_FAILED);
+    }
+
+    @Recover
+    public void recoverForEventListenerProcess(
+        EventListenerProcessingException e, Long userId, ActivityType activityType, Integer progressCount) {
+        throw new AchievementException(ErrorCode400.EVENT_LISTENER_REQUEST_FAILED);
+    }
+
+    @Recover
+    public void recoverForEventListenerProcess(
+        EventListenerProcessingException e, Long userId, ActivityType activityType, Object target) {
         throw new AchievementException(ErrorCode400.EVENT_LISTENER_REQUEST_FAILED);
     }
 
