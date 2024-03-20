@@ -25,6 +25,7 @@ public class ProjectJoinRequestRepositoryCustomImpl implements ProjectJoinReques
     public CursorPaginationResult<ProjectJoinRequestRes> findByConditionWithPagination(
         Long senderId, Long projectId, RequestStatus requestStatus, CursorPaginationInfoReq pageable
     ) {
+        // 배치 사이즈가 작동하지 않는 이슈로 인해 주석 처리
 //        List<projectJoinRequestRes> result = jpaQueryFactory.select(
 //                Projections.constructor(
 //                    projectJoinRequestRes.class,
