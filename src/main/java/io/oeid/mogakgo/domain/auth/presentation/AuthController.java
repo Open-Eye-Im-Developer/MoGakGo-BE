@@ -4,6 +4,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import io.oeid.mogakgo.common.swagger.template.AuthSwagger;
 import io.oeid.mogakgo.domain.auth.application.AuthService;
+import io.oeid.mogakgo.domain.auth.presentation.dto.req.AuthReissueApiRequest;
 import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthTokenApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +26,8 @@ public class AuthController implements AuthSwagger {
     @PostMapping("/reissue")
     public ResponseEntity<AuthTokenApiResponse> reissue(
         @RequestHeader(AUTHORIZATION) String accessToken,
-        @RequestBody @NonNull String refreshToken) {
-        var accessTokenDto = authService.reissue(accessToken, refreshToken);
+        @RequestBody @NonNull AuthReissueApiRequest request) {
+        var accessTokenDto = authService.reissue(accessToken, request.getRefreshToken());
         return ResponseEntity.ok(
             AuthTokenApiResponse.of(accessTokenDto.getAccessToken(), null, null));
     }
