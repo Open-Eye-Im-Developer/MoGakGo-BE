@@ -9,31 +9,30 @@ import io.oeid.mogakgo.domain.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Schema(description = "사용자가 매칭 된 프로젝트 DTO")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MatchingProjectRes {
 
     private Long matchingId;
     private ProjectDetailAPIRes response;
+    private Long projectRequesterId;
 
     public MatchingProjectRes(
         Long matchingId, Long id, User creator, ProjectStatus status, List<ProjectTag> tags,
-        LocalDateTime projectStartTime, LocalDateTime projectEndTime, String locationDetail
+        LocalDateTime projectStartTime, LocalDateTime projectEndTime, String locationDetail,
+        Long projectRequesterId
     ) {
         var tagString = tags.stream().map(ProjectTag::getContent).toList();
         this.matchingId = matchingId;
         this.response = ProjectDetailAPIRes.of(
             id, creator, status, tagString,
             new MeetingInfoResponse(projectStartTime, projectEndTime, locationDetail));
-    }
-
-    public MatchingProjectRes(Long matchingId, ProjectDetailAPIRes response) {
-        this.matchingId = matchingId;
-        this.response = response;
+        this.projectRequesterId = projectRequesterId;
     }
 
     public static MatchingProjectRes from(
@@ -50,11 +49,12 @@ public class MatchingProjectRes {
             matching.getProject().getProjectTags(),
             matching.getProject().getMeetingInfo().getMeetStartTime(),
             matching.getProject().getMeetingInfo().getMeetEndTime(),
-            matching.getProject().getMeetingInfo().getMeetDetail()
+            matching.getProject().getMeetingInfo().getMeetDetail(),
+            matching.getSender().getId()
         );
     }
 
     public static MatchingProjectRes createNoMatchingRes() {
-        return new MatchingProjectRes(null, null);
+        return new MatchingProjectRes();
     }
 }
