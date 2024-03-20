@@ -102,26 +102,12 @@ public class ProjectJoinRequestService {
             // TODO: 로그 처리
         }
 
-        // TODO: 무한 대기로 인해 Batch로 일괄 거절 처리되는 경우, 이벤트 발행 어떻게 할 것인지?
-        List<ProjectJoinRequest> rejectedList = projectJoinRequestRepository
-            .findRejectedRequestByProjectId(projectJoinRequest.getProject().getId());
-
         fcmNotificationService.sendNotification(projectJoinRequest.getSender().getId(),
             MATCHING_SUCCESS_MESSAGE.getTitle(), MATCHING_SUCCESS_MESSAGE.getMessage(),
             MATCHING_SUCCEEDED);
         notificationService.createMatchingSuccessNotification(projectJoinRequest.getSender().getId(),
             projectJoinRequest.getProject());
         return matchingId;
-    }
-
-    private void cancelMyPendingProjectJoinRequest(User sender) {
-        projectJoinRequestRepository.findPendingBySenderId(sender.getId())
-            .ifPresent(pendingProjectJoinRequest -> pendingProjectJoinRequest.cancel(sender));
-    }
-
-    private ProjectJoinRequest getProjectJoinRequestWithProject(Long projectRequestId) {
-        return projectJoinRequestRepository.findByIdWithProject(projectRequestId)
-            .orElseThrow(() -> new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_NOT_FOUND));
     }
 
     public CursorPaginationResult<ProjectJoinRequestDetailAPIRes> getBySenderIdWithPagination(
@@ -134,6 +120,16 @@ public class ProjectJoinRequestService {
         return projectJoinRequestRepository.getBySenderIdWithPagination(
             senderId, null, null, pageable
         );
+    }
+
+    private void cancelMyPendingProjectJoinRequest(User sender) {
+        projectJoinRequestRepository.findPendingBySenderId(sender.getId())
+            .ifPresent(pendingProjectJoinRequest -> pendingProjectJoinRequest.cancel(sender));
+    }
+
+    private ProjectJoinRequest getProjectJoinRequestWithProject(Long projectRequestId) {
+        return projectJoinRequestRepository.findByIdWithProject(projectRequestId)
+            .orElseThrow(() -> new ProjectJoinRequestException(PROJECT_JOIN_REQUEST_NOT_FOUND));
     }
 
     private User validateToken(Long userId) {

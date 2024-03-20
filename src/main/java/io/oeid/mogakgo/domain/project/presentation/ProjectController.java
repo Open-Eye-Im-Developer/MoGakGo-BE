@@ -89,7 +89,8 @@ public class ProjectController implements ProjectSwagger {
             .body(projectService.getByCreatorId(userId, creatorId, pageable));
     }
 
-    @GetMapping("{projectId}/{id}")
+    // TODO: 유저 id 따로 받는 이유?
+    @GetMapping("/{projectId}/{id}")
     public ResponseEntity<ProjectDetailAPIRes> getById(
         @UserId Long userId, @PathVariable Long projectId, @PathVariable Long id
         ) {

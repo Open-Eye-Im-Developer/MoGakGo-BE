@@ -7,8 +7,9 @@ import io.oeid.mogakgo.domain.auth.application.AuthService;
 import io.oeid.mogakgo.domain.auth.presentation.dto.res.AuthTokenApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,7 +25,7 @@ public class AuthController implements AuthSwagger {
     @PostMapping("/reissue")
     public ResponseEntity<AuthTokenApiResponse> reissue(
         @RequestHeader(AUTHORIZATION) String accessToken,
-        @CookieValue(value = "refreshToken") String refreshToken) {
+        @RequestBody @NonNull String refreshToken) {
         var accessTokenDto = authService.reissue(accessToken, refreshToken);
         return ResponseEntity.ok(
             AuthTokenApiResponse.of(accessTokenDto.getAccessToken(), null, null));

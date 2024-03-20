@@ -17,6 +17,7 @@ public class ProjectJoinRequestDetailAPIRes {
     @NotNull
     private final Long projectId;
 
+    // TODO: creatorAvatorUrl -> creatorAvatarUrl
     @Schema(description = "프로젝트 생성자 아바타 URL", example = "https://avatars.githubusercontent.com/u/85854384?v=4")
     private final String creatorAvatorUrl;
 
