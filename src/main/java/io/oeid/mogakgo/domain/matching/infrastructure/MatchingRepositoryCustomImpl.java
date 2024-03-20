@@ -7,8 +7,10 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.domain.matching.domain.entity.Matching;
 import io.oeid.mogakgo.domain.matching.domain.entity.enums.MatchingStatus;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingHistoryRes;
+import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingProjectRes;
 import io.oeid.mogakgo.domain.project.domain.entity.enums.ProjectStatus;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +72,26 @@ public class MatchingRepositoryCustomImpl implements MatchingRepositoryCustom {
             .fetchOne();
 
         return result != null ? Math.toIntExact(result) - 1 : 0;
+    }
+
+    @Override
+    public MatchingProjectRes getProgressMatchingProjectInfo(Long userId) {
+
+        Matching userNowMatchingProject = jpaQueryFactory.selectFrom(matching)
+            .join(matching.project).fetchJoin()
+            .join(matching.project.creator).fetchJoin()
+            .where(
+                matching.matchingStatus.eq(MatchingStatus.PROGRESS),
+                participantInMatching(userId)
+            )
+            .fetchOne();
+
+        if (userNowMatchingProject == null) {
+            return MatchingProjectRes.createNoMatchingRes();
+        }
+
+        return MatchingProjectRes.from(userNowMatchingProject);
+
     }
 
     private BooleanExpression cursorIdCondition(Long cursorId) {

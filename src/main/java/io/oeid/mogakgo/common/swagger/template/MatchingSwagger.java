@@ -8,6 +8,7 @@ import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
 import io.oeid.mogakgo.domain.matching.domain.entity.enums.MatchingStatus;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingHistoryRes;
 import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingId;
+import io.oeid.mogakgo.domain.matching.presentation.dto.MatchingProjectRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -74,6 +75,25 @@ public interface MatchingSwagger {
         @Parameter(description = "유저 ID", required = true) Long userId,
         @RequestParam(required = false) MatchingStatus matchingStatus,
         @Parameter(hidden = true) CursorPaginationInfoReq pageable
+    );
+
+    @Operation(summary = "본인의 현재 매칭 가져오기", description = "회원이 본인의 현재 매칭을 가져올때 사용하는 API")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공"),
+        @ApiResponse(responseCode = "403", description = "요청을 보낸 사람이 매칭 기록을 요구한 사람과 다름",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @ExampleObject(name = "E090201", value = SwaggerMatchingErrorExamples.MATCHING_FORBIDDEN_OPERATION))),
+        @ApiResponse(responseCode = "404", description = "요청한 데이터가 존재하지 않음",
+            content = @Content(
+                mediaType = "application/json",
+                examples = {
+                    @ExampleObject(name = "E020301", value = SwaggerUserErrorExamples.USER_NOT_FOUND)
+                })),
+    })
+    ResponseEntity<MatchingProjectRes> getMyNowMatch(
+        @Parameter(hidden = true) Long tokenId,
+        @Parameter(description = "유저 ID", required = true) Long userId
     );
 
 }
