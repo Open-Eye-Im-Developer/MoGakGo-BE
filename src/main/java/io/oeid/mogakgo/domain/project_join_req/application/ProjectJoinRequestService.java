@@ -28,7 +28,6 @@ import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.domain.user.exception.UserException;
 import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +58,8 @@ public class ProjectJoinRequestService {
         // 프로젝트 매칭 요청 생성
         ProjectJoinRequest joinRequest = request.toEntity(tokenUser, project);
         projectJoinRequestRepository.save(joinRequest);
-
+        // 매칭 요청 생성시 프로젝트 생성자에게 알림 전달
+        notificationService.createRequestArrivalNotification(project.getCreator().getId());
         return joinRequest.getId();
     }
 
