@@ -21,6 +21,7 @@ import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserActivityJpaRepository;
+import io.oeid.mogakgo.domain.achievement.infrastructure.session.AchievementSessionRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import java.util.List;
@@ -45,6 +46,7 @@ public class AchievementEventHandler {
     private final UserActivityJpaRepository userActivityRepository;
     private final UserCommonService userCommonService;
     private final AchievementSocketService achievementSocketService;
+    private final AchievementSessionRepository achievementSessionRepository;
 
     @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
     @Transactional
@@ -66,8 +68,9 @@ public class AchievementEventHandler {
 
                 log.info("call socket for event {} in progress", event.getAchievementId());
 
-                achievementSocketService.sendMessageAboutAchievmentCompletion(
-                    event.getUserId(), AchievementMessage.builder()
+                achievementSocketService.sendMessageForAchievementCompletion(
+                    achievementSessionRepository.getSession(event.getUserId()),
+                    AchievementMessage.builder()
                         .userId(event.getUserId())
                         .achievementId(event.getAchievementId())
                         .progressCount(event.getProgressCount())
@@ -127,8 +130,9 @@ public class AchievementEventHandler {
 
                 log.info("call socket for event {} completion", event.getAchievementId());
 
-                achievementSocketService.sendMessageAboutAchievmentCompletion(
-                    event.getUserId(), AchievementMessage.builder()
+                achievementSocketService.sendMessageForAchievementCompletion(
+                    achievementSessionRepository.getSession(event.getUserId()),
+                    AchievementMessage.builder()
                         .userId(event.getUserId())
                         .achievementId(event.getAchievementId())
                         .progressCount(event.getProgressCount())
@@ -156,8 +160,9 @@ public class AchievementEventHandler {
             log.info("call socket for event {} completion", event.getAchievementId());
 
             // 업적 달성 후, 클라이언트에게 socket 통신
-            achievementSocketService.sendMessageAboutAchievmentCompletion(
-                event.getUserId(), AchievementMessage.builder()
+            achievementSocketService.sendMessageForAchievementCompletion(
+                achievementSessionRepository.getSession(event.getUserId()),
+                AchievementMessage.builder()
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())
                     .completed(Boolean.TRUE)
@@ -190,8 +195,9 @@ public class AchievementEventHandler {
             log.info("call socket for event {} completion", event.getAchievementId());
 
             // 업적 달성 후, 클라이언트에게 socket 통신
-            achievementSocketService.sendMessageAboutAchievmentCompletion(
-                event.getUserId(), AchievementMessage.builder()
+            achievementSocketService.sendMessageForAchievementCompletion(
+                achievementSessionRepository.getSession(event.getUserId()),
+                AchievementMessage.builder()
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())
                     .completed(Boolean.TRUE)
