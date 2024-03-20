@@ -43,6 +43,7 @@ public class FinishedProjectScheduler {
             jdbcTemplate.execute(sql);
         }
         sendReviewNotification();
+        sendMatchFailNotification();
 
     }
 
@@ -58,7 +59,7 @@ public class FinishedProjectScheduler {
 
     private void sendReviewNotification() {
         jdbcTemplate.query(
-            "SELECT mt.sender_id, pt.id, pt.creator_id FROM matching_tb mt left JOIN project_tb pt on mt.project_id = pt.id WHERE mt.matching_status = 'FINISHED' and DATE(pt.meet_start_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+            "SELECT mt.sender_id, pt.id, pt.creator_id FROM matching_tb mt LEFT JOIN project_tb pt on mt.project_id = pt.id WHERE mt.matching_status = 'FINISHED' and DATE(pt.meet_start_time) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
             rch -> {
                 Long senderId = rch.getLong("sender_id");
                 Long projectId = rch.getLong("id");
@@ -67,6 +68,17 @@ public class FinishedProjectScheduler {
                 fcmNotificationService.sendNotification(senderId, creatorId, projectId);
                 notificationService.createReviewRequestNotification(creatorId, senderId, projectId);
                 fcmNotificationService.sendNotification(creatorId, senderId, projectId);
+            }
+        );
+    }
+
+    private void sendMatchFailNotification() {
+        jdbcTemplate.query(
+            "SELECT pjrt.sender_id, pjrt.project_id FROM mogakgo.project_join_request_tb pjrt WHERE pjrt.join_request_status = 'REJECTED' and DATE(pjrt.created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+            rch -> {
+                Long projectId = rch.getLong("project_id");
+                Long senderId = rch.getLong("sender_id");
+                notificationService.createMatchingFailedNotification(senderId, projectId);
             }
         );
     }

@@ -59,10 +59,12 @@ public class NotificationService {
         notificationRepository.save(Notification.newMatchingSuccessNotification(user, project));
     }
 
-    public void createMatchingFailedNotification(Long userId, Project project) {
+    public void createMatchingFailedNotification(Long userId, Long projectId) {
         log.info("createMatchingFailedNotification userId: {}, project: {}", userId,
-            project.getId());
+            projectId);
         User user = userCommonService.getUserById(userId);
+        Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new NotificationException(ErrorCode404.PROJECT_NOT_FOUND));
         notificationRepository.save(Notification.newMatchingFailedNotification(user, project));
     }
 
