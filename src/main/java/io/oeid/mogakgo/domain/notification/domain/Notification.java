@@ -103,9 +103,7 @@ public class Notification {
 
     public static Notification newReviewRequestNotification(User user, User receiver,
         Project project) {
-        return new Notification(
-            receiver.getUsername() + NotificationMessage.REVIEW_REQUEST_MESSAGE.getMessage(), user,
-            receiver, project);
+        return new Notification(NotificationMessage.REVIEW_REQUEST_MESSAGE.getMessage(), user, receiver, project);
     }
 
     public static Notification newAchievementNotification(User user, Achievement achievement) {
