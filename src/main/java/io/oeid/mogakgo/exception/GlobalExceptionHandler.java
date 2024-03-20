@@ -6,6 +6,7 @@ import static io.oeid.mogakgo.exception.code.ErrorCode401.AUTH_MISSING_CREDENTIA
 import static io.oeid.mogakgo.exception.code.ErrorCode401.AUTH_TOKEN_EXPIRED;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.AUTH_ACCESS_DENIED;
 import static io.oeid.mogakgo.exception.code.ErrorCode500.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
@@ -33,6 +34,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleCustomException(
         CustomException e, HttpServletRequest request
     ) {
+        log.debug("Custom Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(e.getErrorCode());
     }
 
@@ -44,6 +46,7 @@ public class GlobalExceptionHandler {
         BindException e,
         HttpServletRequest request
     ) {
+        log.debug("Validation Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         BindingResult bindingResult = e.getBindingResult();
 
         StringBuilder builder = new StringBuilder();
@@ -69,6 +72,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> missingPathVariableException(
         Exception e, HttpServletRequest request
     ) {
+        log.debug("Missing Path Variable Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(PATH_PARAMETER_BAD_REQUEST);
     }
 
@@ -76,7 +80,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleTokenExpiredException(
         TokenExpiredException e, HttpServletRequest request
     ) {
-        log.warn("Token Expired: {}", e.getMessage());
+        log.debug("Token Expiry Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(AUTH_TOKEN_EXPIRED);
     }
 
@@ -84,7 +88,8 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleAuthenticationException(
         AuthenticationException e, HttpServletRequest request
     ) {
-        log.warn("Authentication Exception: {}", e.getMessage());
+        log.debug("AuthenticationException Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
+        log.debug("Token: {}", request.getHeader(AUTHORIZATION));
         return ErrorResponse.from(AUTH_MISSING_CREDENTIALS);
     }
 
@@ -92,7 +97,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleAccessDeniedException(
         AccessDeniedException e, HttpServletRequest request
     ) {
-        log.warn("Access Denied: {}", e.getMessage());
+        log.debug("Access Denied: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(AUTH_ACCESS_DENIED);
     }
 
@@ -100,7 +105,7 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleException(
         Exception e, HttpServletRequest request
     ) {
-        log.error("error", e);
+        log.debug("Exception: {}, Path: {}", e.getMessage(), request.getPathInfo());
         return ErrorResponse.from(INTERNAL_SERVER_ERROR);
     }
 }
