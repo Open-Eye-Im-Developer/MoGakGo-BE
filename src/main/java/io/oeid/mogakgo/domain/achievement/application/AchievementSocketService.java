@@ -40,9 +40,11 @@ public class AchievementSocketService {
 
         if (session != null) {
             try {
+                log.info("call sendMessage");
                 String jsonMessage = objectMapper.writeValueAsString(message);
                 TextMessage textMessage = new TextMessage(jsonMessage);
                 session.sendMessage(textMessage);
+                log.info("call completed");
             } catch (JsonProcessingException e) {
                 log.error("failed to convert Json message from object: {}", e.getMessage());
             } catch (Exception e) {
