@@ -11,6 +11,7 @@ import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCard;
 import io.oeid.mogakgo.domain.profile.infrastructure.ProfileCardJpaRepository;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileInfoAPIRes;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,9 +36,7 @@ public class ProfileCardService {
     public CursorPaginationResult<UserProfileInfoAPIRes> getRandomOrderedProfileCardsByRegion(
         Long userId, Region region, CursorPaginationInfoReq pageable
     ) {
-        if (userId != null) {
-            validateToken(userId);
-        }
+        validateToken(userId);
         validateRegionCoverage(region);
 
         CursorPaginationResult<UserProfileInfoAPIRes> profiles = profileCardRepository
@@ -47,6 +46,24 @@ public class ProfileCardService {
             Collections.shuffle(profiles.getData().subList(0, profiles.getData().size() - 1));
         }
         return profiles;
+    }
+
+    public CursorPaginationResult<UserProfileInfoAPIRes> getRandomOrderedProfileCardsByRegionPublic(
+        Region region, CursorPaginationInfoReq pageable) {
+        validateRegionCoverage(region);
+        var result = profileCardRepository.findByConditionWithPaginationPublic(region,
+            pageable.getCursorId(), pageable.getPageSize());
+        if (result.size() >= 2) {
+            Collections.shuffle(result.subList(0, result.size() - 1));
+        }
+        var profiles = result.stream().map(
+            profileCard -> new UserProfileInfoAPIRes(
+                UserPublicApiResponse.from(profileCard.getUser()),
+                Boolean.FALSE
+            )
+        ).toList();
+        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(profiles,
+            pageable.getPageSize());
     }
 
     private void validateToken(Long userId) {

@@ -15,6 +15,7 @@ import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -45,14 +46,21 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
         List<UserProfileInfoAPIRes> result = entities.stream().map(
             profileCard -> new UserProfileInfoAPIRes(
                 UserPublicApiResponse.from(profileCard.getUser()),
-                userId == null ? Boolean.FALSE
-                    : validateProfileCardLikeBySenderId(profileCard.getUser().getId(), userId)
+                validateProfileCardLikeBySenderId(profileCard.getUser().getId(), userId)
             )
         ).toList();
 
         return CursorPaginationResult.fromDataWithExtraItemForNextCheck(
             result, pageable.getPageSize()
         );
+    }
+
+    public List<ProfileCard> findByConditionWithPaginationPublic(@NonNull Region region,
+        Long cursorId, @NonNull Integer pageSize) {
+        return jpaQueryFactory.selectFrom(profileCard).innerJoin(profileCard.user, user)
+            .on(profileCard.user.id.eq(user.id))
+            .where(cursorIdCondition(cursorId), regionEq(region), deletedProfileCardEq())
+            .orderBy(profileCard.id.desc()).limit(pageSize + 1L).fetch();
     }
 
     private Boolean validateProfileCardLikeBySenderId(Long receiverId, Long userId) {
