@@ -44,7 +44,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(
                 requests -> {
                     requests.requestMatchers("/api/v1/auth/**").permitAll();
-                    requests.requestMatchers(HttpMethod.GET, "/api/v1/profiles/{}").permitAll();
+                    requests.requestMatchers("/api/v1/public/**").permitAll();
                     requests.requestMatchers(HttpMethod.GET, "/api/v1/projects/density/{}").permitAll();
                     requests.requestMatchers(HttpMethod.GET, "/api/v1/projects/{}").permitAll();
                     requests.anyRequest().authenticated();
