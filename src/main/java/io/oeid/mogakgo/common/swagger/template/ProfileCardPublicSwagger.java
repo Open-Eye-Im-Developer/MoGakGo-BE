@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
-@Tag(name = "ProfileCardPublic", description = "공개 프로필 카드 관련 API")
+@Tag(name = "Profile Card Public", description = "공개 프로필 카드 관련 API")
 @SuppressWarnings("unused")
 public interface ProfileCardPublicSwagger {
 
