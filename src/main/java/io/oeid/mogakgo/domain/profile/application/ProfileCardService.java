@@ -11,7 +11,6 @@ import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCard;
 import io.oeid.mogakgo.domain.profile.infrastructure.ProfileCardJpaRepository;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileInfoAPIRes;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
-import io.oeid.mogakgo.domain.user.domain.User;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,13 +35,13 @@ public class ProfileCardService {
     public CursorPaginationResult<UserProfileInfoAPIRes> getRandomOrderedProfileCardsByRegion(
         Long userId, Region region, CursorPaginationInfoReq pageable
     ) {
-        validateToken(userId);
+        if (userId != null) {
+            validateToken(userId);
+        }
         validateRegionCoverage(region);
 
         CursorPaginationResult<UserProfileInfoAPIRes> profiles = profileCardRepository
-            .findByConditionWithPagination(
-            userId, region, pageable
-        );
+            .findByConditionWithPagination(userId, region, pageable);
 
         if (profiles.getData().size() >= 2) {
             Collections.shuffle(profiles.getData().subList(0, profiles.getData().size() - 1));
@@ -50,8 +49,8 @@ public class ProfileCardService {
         return profiles;
     }
 
-    private User validateToken(Long userId) {
-        return userCommonService.getUserById(userId);
+    private void validateToken(Long userId) {
+        userCommonService.getUserById(userId);
     }
 
     private void validateRegionCoverage(Region region) {
