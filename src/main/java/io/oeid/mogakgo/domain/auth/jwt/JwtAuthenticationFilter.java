@@ -42,7 +42,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken =
             request.getHeader(header) != null ? URLDecoder.decode(request.getHeader(header),
                 StandardCharsets.UTF_8) : null;
-        log.info("accessToken: {}", accessToken);
         if (accessToken == null || !accessToken.contains(IDENTIFICATION_TYPE)) {
             request.setAttribute("exception", new JWTVerificationException("Invalid token type"));
         } else {
