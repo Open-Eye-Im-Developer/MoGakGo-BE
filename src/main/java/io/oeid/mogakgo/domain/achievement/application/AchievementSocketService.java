@@ -27,6 +27,7 @@ public class AchievementSocketService {
 
     public void addSession(Long userId, WebSocketSession session) {
         achievementSessionRepository.addSession(userId, session);
+        log.info("saved session {} completely for userId {}", session.getId(), userId);
     }
 
     public void removeSession(Long userId, WebSocketSession session) {
