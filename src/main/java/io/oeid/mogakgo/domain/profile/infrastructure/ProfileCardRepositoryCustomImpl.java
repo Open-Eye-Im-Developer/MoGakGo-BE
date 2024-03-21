@@ -10,12 +10,12 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.geo.domain.enums.Region;
 import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCard;
-import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCardLike;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileInfoAPIRes;
 import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -40,14 +40,13 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
             )
             // 최근순
             .orderBy(profileCard.id.desc())
-            .limit(pageable.getPageSize() + 1)
+            .limit(pageable.getPageSize() + 1L)
             .fetch();
 
         List<UserProfileInfoAPIRes> result = entities.stream().map(
             profileCard -> new UserProfileInfoAPIRes(
                 UserPublicApiResponse.from(profileCard.getUser()),
-                findProfileCardLikeBySenderId(profileCard.getUser().getId(), userId)
-                    .isPresent() ? Boolean.TRUE : Boolean.FALSE
+                validateProfileCardLikeBySenderId(profileCard.getUser().getId(), userId)
             )
         ).toList();
 
@@ -56,14 +55,22 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
         );
     }
 
-    private Optional<ProfileCardLike> findProfileCardLikeBySenderId(Long receiverId, Long userId) {
+    public List<ProfileCard> findByConditionWithPaginationPublic(@NonNull Region region,
+        Long cursorId, @NonNull Integer pageSize) {
+        return jpaQueryFactory.selectFrom(profileCard).innerJoin(profileCard.user, user)
+            .on(profileCard.user.id.eq(user.id))
+            .where(cursorIdCondition(cursorId), regionEq(region), deletedProfileCardEq())
+            .orderBy(profileCard.id.desc()).limit(pageSize + 1L).fetch();
+    }
+
+    private Boolean validateProfileCardLikeBySenderId(Long receiverId, Long userId) {
         return Optional.ofNullable(jpaQueryFactory.selectFrom(profileCardLike)
             .join(profileCardLike.receiver)
             .where(
                 profileCardLike.receiver.id.eq(receiverId),
                 profileCardLike.sender.id.eq(userId)
             )
-            .fetchOne());
+            .fetchOne()).isPresent();
     }
 
     private BooleanExpression regionEq(Region region) {
