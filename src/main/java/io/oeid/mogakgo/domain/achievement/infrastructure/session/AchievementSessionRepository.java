@@ -11,7 +11,7 @@ public class AchievementSessionRepository {
     private final Map<Long, WebSocketSession> sessionStorage = new ConcurrentHashMap<>();
 
     public void addSession(Long userId, WebSocketSession session) {
-        sessionStorage.putIfAbsent(userId, session);
+        sessionStorage.put(userId, session);
     }
 
     public WebSocketSession getSession(Long userId) {
