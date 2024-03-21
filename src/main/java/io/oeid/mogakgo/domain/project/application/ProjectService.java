@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class ProjectService {
+
     private static final int DENSITY_RANK_LIMIT = 3;
 
     private final UserJpaRepository userJpaRepository;
@@ -134,10 +135,7 @@ public class ProjectService {
 
     // 선택한 구역에 대한 프로젝트 카드 리스트 랜덤 조회
     public CursorPaginationResult<ProjectDetailAPIRes> getRandomOrderedProjectsByRegion(
-        Long userId, Region region, CursorPaginationInfoReq pageable
-    ) {
-        getUser(userId);
-
+        Region region, CursorPaginationInfoReq pageable) {
         // 선택한 구역의 서비스 지역 여부 체크
         validateRegionCoverage(region);
 
@@ -145,7 +143,7 @@ public class ProjectService {
         CursorPaginationResult<ProjectDetailAPIRes> projects = projectJpaRepository
             .findByConditionWithPagination(
                 null, region, ProjectStatus.PENDING, pageable
-        );
+            );
 
         // 요청할 때마다 랜덤 정렬
         if (projects.getData().size() >= 2) {
@@ -172,7 +170,8 @@ public class ProjectService {
     }
 
     public ProjectDensityRankRes getDensityRankProjects() {
-        List<Region> regionRankList = projectJpaRepository.getDensityRankProjectsByRegion(DENSITY_RANK_LIMIT);
+        List<Region> regionRankList = projectJpaRepository.getDensityRankProjectsByRegion(
+            DENSITY_RANK_LIMIT);
 
         // 필요한 경우 기본 지역 순위 목록으로 채움
         fillWithDefaultRegionsIfNecessary(regionRankList);
@@ -198,7 +197,7 @@ public class ProjectService {
             // 기본 지역 순위에서 이미 리스트에 있는 지역을 제외하고 남은 지역을 추가
             List<Region> defaultRegionsToAdd = Region.getDefaultDensityRank().stream()
                 .filter(region -> !regionRankList.contains(region))
-                .limit(DENSITY_RANK_LIMIT - regionRankList.size())
+                .limit(DENSITY_RANK_LIMIT - (long) regionRankList.size())
                 .toList();
 
             regionRankList.addAll(defaultRegionsToAdd);

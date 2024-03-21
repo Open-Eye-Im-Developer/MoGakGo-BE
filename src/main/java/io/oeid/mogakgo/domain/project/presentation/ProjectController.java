@@ -65,17 +65,15 @@ public class ProjectController implements ProjectSwagger {
         return ResponseEntity.ok().body(projectService.getJoinRequest(userId, id, pageable));
     }
 
+    // TODO: Make Public
     @GetMapping("/{region}")
     public ResponseEntity<CursorPaginationResult<ProjectDetailAPIRes>> getRandomOrderedProjectsByRegion(
-        @UserId Long userId, @PathVariable Region region,
-        @Valid @ModelAttribute CursorPaginationInfoReq pageable
+        @PathVariable Region region, @Valid @ModelAttribute CursorPaginationInfoReq pageable
     ) {
-        return ResponseEntity.ok().body(
-            projectService.getRandomOrderedProjectsByRegion(userId, region, pageable)
-        );
+        return ResponseEntity.ok(projectService.getRandomOrderedProjectsByRegion(region, pageable));
     }
 
-    @GetMapping("density/rank")
+    @GetMapping("/density/rank")
     public ResponseEntity<ProjectDensityRankRes> getDensityRankProjects() {
         return ResponseEntity.ok().body(projectService.getDensityRankProjects());
     }
@@ -93,7 +91,7 @@ public class ProjectController implements ProjectSwagger {
     @GetMapping("/{projectId}/{id}")
     public ResponseEntity<ProjectDetailAPIRes> getById(
         @UserId Long userId, @PathVariable Long projectId, @PathVariable Long id
-        ) {
+    ) {
         return ResponseEntity.ok().body(projectService.getByProjectId(userId, id, projectId));
     }
 
