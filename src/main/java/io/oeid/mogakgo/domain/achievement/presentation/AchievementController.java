@@ -4,6 +4,7 @@ import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.swagger.template.AchievementSwagger;
 import io.oeid.mogakgo.domain.achievement.application.AchievementService;
 import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
+import io.oeid.mogakgo.domain.achievement.presentation.dto.res.AchievementInfoAPIRes;
 import io.oeid.mogakgo.domain.achievement.presentation.dto.res.UserAchievementDetailAPIRes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,13 @@ public class AchievementController implements AchievementSwagger {
 
         return ResponseEntity.ok().body(
             userAchievementLists.stream().map(UserAchievementDetailAPIRes::from).toList()
+        );
+    }
+
+    @GetMapping("/{id}/info")
+    public ResponseEntity<AchievementInfoAPIRes> getAchievementById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(
+            AchievementInfoAPIRes.from(achievementService.getById(id))
         );
     }
 

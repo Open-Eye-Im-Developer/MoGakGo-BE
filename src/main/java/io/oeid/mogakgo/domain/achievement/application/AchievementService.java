@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.achievement.application;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode403.ACHIEVEMENT_FORBIDDEN_OPERATION;
+import static io.oeid.mogakgo.exception.code.ErrorCode404.ACHIEVEMENT_NOT_FOUND;
 
 import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
@@ -35,6 +36,11 @@ public class AchievementService {
     private final UserCommonService userCommonService;
     private final UserActivityJpaRepository userActivityRepository;
     private final AchievementFacadeService achievementFacadeService;
+
+    public Achievement getById(Long achievementId) {
+        return achievementRepository.findById(achievementId)
+            .orElseThrow(() -> new AchievementException(ACHIEVEMENT_NOT_FOUND));
+    }
 
     public List<UserAchievementInfoRes> getUserAchievementInfo(Long userId, Long id) {
         User user = validateToken(userId);
