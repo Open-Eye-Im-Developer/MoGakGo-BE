@@ -22,6 +22,7 @@ import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepositor
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserActivityJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.session.AchievementSessionRepository;
+import io.oeid.mogakgo.domain.notification.application.NotificationService;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import java.util.List;
@@ -47,13 +48,15 @@ public class AchievementEventHandler {
     private final UserCommonService userCommonService;
     private final AchievementSocketService achievementSocketService;
     private final AchievementSessionRepository achievementSessionRepository;
+    private final NotificationService notificationService;
 
-    @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
+    @Retryable(retryFor = EventListenerProcessingException.class, backoff = @Backoff(1000))
     @Transactional
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeActivity(final UserActivityEvent event) {
 
-        log.info("call activity event of {} on Thread:{}", event.getAchievementId(), Thread.currentThread().getName());
+        log.info("call activity event of {} on Thread:{}", event.getAchievementId(),
+            Thread.currentThread().getName());
 
         try {
 
@@ -85,7 +88,7 @@ public class AchievementEventHandler {
         }
     }
 
-    @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
+    @Retryable(retryFor = EventListenerProcessingException.class, backoff = @Backoff(1000))
     @Transactional
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeEvent(final SequenceAchievementEvent event) {
@@ -111,7 +114,8 @@ public class AchievementEventHandler {
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeEvent(final AccumulateAchievementEvent event) {
 
-        log.info("call activity event of {} on Thread:{}", event.getAchievementId(), Thread.currentThread().getName());
+        log.info("call activity event of {} on Thread:{}", event.getAchievementId(),
+            Thread.currentThread().getName());
 
         try {
             User user = userCommonService.getUserById(event.getUserId());
@@ -129,7 +133,7 @@ public class AchievementEventHandler {
             if (event.getCompleted().equals(Boolean.TRUE)) {
 
                 log.info("call socket for event {} completion", event.getAchievementId());
-
+                notificationService.createAchievementNotification(user.getId(), achievement);
                 achievementSocketService.sendMessageForAchievementCompletion(
                     achievementSessionRepository.getSession(event.getUserId()),
                     AchievementMessage.builder()
@@ -145,12 +149,13 @@ public class AchievementEventHandler {
         }
     }
 
-    @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
+    @Retryable(retryFor = EventListenerProcessingException.class, backoff = @Backoff(1000))
     @Transactional
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeEvent(final AccumulateAchievementUpdateEvent event) {
 
-        log.info("call activity event of {} on Thread:{}", event.getAchievementId(), Thread.currentThread().getName());
+        log.info("call activity event of {} on Thread:{}", event.getAchievementId(),
+            Thread.currentThread().getName());
 
         try {
             // 진행중인 업적에 대해 '달성' 업데이트
@@ -158,7 +163,7 @@ public class AchievementEventHandler {
             userAchievement.updateCompleted();
 
             log.info("call socket for event {} completion", event.getAchievementId());
-
+            notificationService.createAchievementNotification(userAchievement.getUser().getId(), userAchievement.getAchievement());
             // 업적 달성 후, 클라이언트에게 socket 통신
             Achievement achievement = getById(event.getAchievementId());
             achievementSocketService.sendMessageForAchievementCompletion(
@@ -175,12 +180,13 @@ public class AchievementEventHandler {
         }
     }
 
-    @Retryable(retryFor = EventListenerProcessingException.class, maxAttempts = 3, backoff = @Backoff(1000))
+    @Retryable(retryFor = EventListenerProcessingException.class, backoff = @Backoff(1000))
     @Transactional
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeEvent(final SequenceAchievementUpdateEvent event) {
 
-        log.info("call activity event of {} on Thread:{}", event.getAchievementId(), Thread.currentThread().getName());
+        log.info("call activity event of {} on Thread:{}", event.getAchievementId(),
+            Thread.currentThread().getName());
 
         try {
             // 진행중인 업적에 대해 '달성' 업데이트
@@ -195,7 +201,7 @@ public class AchievementEventHandler {
             history.forEach(UserActivity::delete);
 
             log.info("call socket for event {} completion", event.getAchievementId());
-
+            notificationService.createAchievementNotification(userAchievement.getUser().getId(), achievement);
             // 업적 달성 후, 클라이언트에게 socket 통신
             achievementSocketService.sendMessageForAchievementCompletion(
                 achievementSessionRepository.getSession(event.getUserId()),
