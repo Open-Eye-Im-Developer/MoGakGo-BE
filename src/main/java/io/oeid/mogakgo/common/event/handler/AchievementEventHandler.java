@@ -167,6 +167,7 @@ public class AchievementEventHandler {
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())
                     .progressCount(achievement.getRequirementValue())
+                    .requirementValue(achievement.getRequirementValue())
                     .completed(Boolean.TRUE)
                     .build()
             );
@@ -203,6 +204,7 @@ public class AchievementEventHandler {
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())
                     .progressCount(achievement.getRequirementValue())
+                    .requirementValue(achievement.getRequirementValue())
                     .completed(Boolean.TRUE)
                     .build()
             );
