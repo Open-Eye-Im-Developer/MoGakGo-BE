@@ -11,7 +11,7 @@ import io.oeid.mogakgo.domain.profile.domain.entity.ProfileCard;
 import io.oeid.mogakgo.domain.profile.infrastructure.ProfileCardJpaRepository;
 import io.oeid.mogakgo.domain.profile.presentation.dto.res.UserProfileInfoAPIRes;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
-import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.domain.user.presentation.dto.res.UserPublicApiResponse;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,9 +40,7 @@ public class ProfileCardService {
         validateRegionCoverage(region);
 
         CursorPaginationResult<UserProfileInfoAPIRes> profiles = profileCardRepository
-            .findByConditionWithPagination(
-            userId, region, pageable
-        );
+            .findByConditionWithPagination(userId, region, pageable);
 
         if (profiles.getData().size() >= 2) {
             Collections.shuffle(profiles.getData().subList(0, profiles.getData().size() - 1));
@@ -50,8 +48,26 @@ public class ProfileCardService {
         return profiles;
     }
 
-    private User validateToken(Long userId) {
-        return userCommonService.getUserById(userId);
+    public CursorPaginationResult<UserProfileInfoAPIRes> getRandomOrderedProfileCardsByRegionPublic(
+        Region region, CursorPaginationInfoReq pageable) {
+        validateRegionCoverage(region);
+        var result = profileCardRepository.findByConditionWithPaginationPublic(region,
+            pageable.getCursorId(), pageable.getPageSize());
+        if (result.size() >= 2) {
+            Collections.shuffle(result.subList(0, result.size() - 1));
+        }
+        var profiles = result.stream().map(
+            profileCard -> new UserProfileInfoAPIRes(
+                UserPublicApiResponse.from(profileCard.getUser()),
+                Boolean.FALSE
+            )
+        ).toList();
+        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(profiles,
+            pageable.getPageSize());
+    }
+
+    private void validateToken(Long userId) {
+        userCommonService.getUserById(userId);
     }
 
     private void validateRegionCoverage(Region region) {
