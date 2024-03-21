@@ -65,7 +65,6 @@ public class ProjectController implements ProjectSwagger {
         return ResponseEntity.ok().body(projectService.getJoinRequest(userId, id, pageable));
     }
 
-    // TODO: Make Public
     @GetMapping("/{region}")
     public ResponseEntity<CursorPaginationResult<ProjectDetailAPIRes>> getRandomOrderedProjectsByRegion(
         @PathVariable Region region, @Valid @ModelAttribute CursorPaginationInfoReq pageable
