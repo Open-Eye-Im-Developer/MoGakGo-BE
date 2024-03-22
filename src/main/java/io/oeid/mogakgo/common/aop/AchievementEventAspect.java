@@ -32,6 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AchievementEventAspect {
 
+    private static final int MAX_SERVICE_AREA = 26;
+    private static final int SAME_MATCHING_COUNT = 2;
+
     private final AchievementEventService achievementEventService;
     private final UserCommonService userCommonService;
     private final ProjectJpaRepository projectRepository;
@@ -75,7 +78,7 @@ public class AchievementEventAspect {
             ActivityType.PLEASE_GIVE_ME_MOGAK);
 
         achievementEventService.publishCompletedEventWithVerify(userId,
-            ActivityType.BRAVE_EXPLORER, projectRepository.getRegionCountByUserId(userId));
+            ActivityType.BRAVE_EXPLORER, checkCreatedProjectCountByRegion(userId));
 
         log.info("AOP 호출 완료 on Thread={}", Thread.currentThread().getName());
     }
@@ -104,12 +107,12 @@ public class AchievementEventAspect {
         achievementEventService.publishSequenceEventWithVerify(userId, ActivityType.LIKE_E);
 
         achievementEventService.publishCompletedEventWithVerify(userId,
-            ActivityType.NOMAD_CODER, matchingService.getRegionCountByMatching(userId));
+            ActivityType.NOMAD_CODER, checkMatchedProjectCountByRegion(userId));
 
         Long participantId = getParticipantIdFromJoinRequest(projectRequestId);
         achievementEventService.publishCompletedEventWithVerify(userId,
             ActivityType.MY_DESTINY,
-            matchingService.getDuplicateMatching(userId, participantId));
+            checkMatchingCountWithSameUser(userId, participantId));
 
         // -- '참여자' 매칭 요청을 생성한 사용자에 대한 업적 이벤트 발행
         achievementEventService.publishAccumulateEventWithVerify(participantId,
@@ -121,11 +124,11 @@ public class AchievementEventAspect {
             ActivityType.LIKE_E);
 
         achievementEventService.publishCompletedEventWithVerify(participantId,
-            ActivityType.NOMAD_CODER, matchingService.getRegionCountByMatching(participantId));
+            ActivityType.NOMAD_CODER, checkMatchedProjectCountByRegion(participantId));
 
         achievementEventService.publishCompletedEventWithVerify(participantId,
             ActivityType.MY_DESTINY,
-            matchingService.getDuplicateMatching(participantId, userId));
+            checkMatchingCountWithSameUser(userId, participantId));
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -141,6 +144,21 @@ public class AchievementEventAspect {
             receiverId, ActivityType.WHAT_A_POPULAR_PERSON,
             achievementFacadeService.getAccumulatedProgressCount(receiverId, ActivityType.WHAT_A_POPULAR_PERSON)
         );
+    }
+
+    private Integer checkCreatedProjectCountByRegion(Long userId) {
+        Integer progressCount = projectRepository.getRegionCountByUserId(userId);
+        return progressCount.equals(MAX_SERVICE_AREA) ? 1 : 0;
+    }
+
+    private Integer checkMatchedProjectCountByRegion(Long userId) {
+        Integer progressCount = matchingService.getRegionCountByMatching(userId);
+        return progressCount.equals(MAX_SERVICE_AREA) ? 1 : 0;
+    }
+
+    private Integer checkMatchingCountWithSameUser(Long userId, Long participantId) {
+        Integer progressCount = matchingService.getDuplicateMatching(userId, participantId);
+        return progressCount.equals(SAME_MATCHING_COUNT) ? 1 : 0;
     }
 
     private Integer getAccumulatedProgressCount(Long userId, ActivityType activityType) {

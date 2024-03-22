@@ -71,7 +71,7 @@ public class MatchingRepositoryCustomImpl implements MatchingRepositoryCustom {
             )
             .fetchOne();
 
-        return result != null ? Math.toIntExact(result) - 1 : 0;
+        return result != null ? Math.toIntExact(result) : 0;
     }
 
     @Override
