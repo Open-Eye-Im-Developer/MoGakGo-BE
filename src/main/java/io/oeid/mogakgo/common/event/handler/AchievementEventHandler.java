@@ -65,7 +65,8 @@ public class AchievementEventHandler {
                 .build());
 
             Achievement achievement = getById(event.getAchievementId());
-            if (!isPossibleToAchieve(achievement, event.getProgressCount())) {
+            if (achievement.getRequirementValue().equals(event.getProgressCount())
+                || achievement.getProgressLevel().equals(1)) {
 
                 log.info("call socket for event {} in progress", event.getAchievementId());
 
@@ -252,11 +253,6 @@ public class AchievementEventHandler {
     public void recoverForSequencedUpdateEvent(EventListenerProcessingException e,
         final AccumulateAchievementUpdateEvent event) {
         throw new AchievementException(EVENT_LISTENER_REQUEST_FAILED);
-    }
-
-    private boolean isPossibleToAchieve(Achievement achievement, Integer progressCount) {
-        return achievement.getRequirementValue().equals(progressCount)
-            || achievement.getProgressLevel().equals(1);
     }
 
     public Achievement getById(Long achievementId) {
