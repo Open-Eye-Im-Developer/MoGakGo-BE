@@ -73,7 +73,10 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
             )
             .from(userAchievement)
             .innerJoin(userAchievement.achievement).on(userAchievement.achievement.id.eq(achievement.id))
-            .innerJoin(userActivity).on(userActivity.activityType.eq(userAchievement.achievement.activityType))
+            .innerJoin(userActivity).on(
+                userActivity.activityType.eq(userAchievement.achievement.activityType), 
+                userActivity.user.id.eq(userId)
+            )
             .where(
                 userAchievement.user.id.eq(userId),
                 userAchievement.achievement.id.in(
