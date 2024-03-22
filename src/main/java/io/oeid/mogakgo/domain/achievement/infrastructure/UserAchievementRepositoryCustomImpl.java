@@ -16,8 +16,6 @@ import io.oeid.mogakgo.domain.achievement.domain.entity.QUserAchievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.QUserActivity;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +73,10 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
             )
             .from(userAchievement)
             .innerJoin(userAchievement.achievement).on(userAchievement.achievement.id.eq(achievement.id))
-            .innerJoin(userActivity).on(userActivity.activityType.eq(userAchievement.achievement.activityType))
+            .innerJoin(userActivity).on(
+                userActivity.activityType.eq(userAchievement.achievement.activityType), 
+                userActivity.user.id.eq(userId)
+            )
             .where(
                 userAchievement.user.id.eq(userId),
                 userAchievement.achievement.id.in(
@@ -179,13 +180,17 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
     @Override
     public Integer getAccumulatedProgressCountByActivity(Long userId, ActivityType activityType) {
         Long result = jpaQueryFactory.select(userActivity.createdAt.count())
-            .from(userActivity)
-            .innerJoin(achievement).on(achievement.activityType.eq(userActivity.activityType))
+            .from(achievement)
+            .innerJoin(userActivity).on(achievement.activityType.eq(userActivity.activityType), userActivity.user.id.eq(userId))
             .where(
-                userIdEq(userId),
-                requirementTypeEq(RequirementType.ACCUMULATE),
-                activityTypeEq(activityType),
-                createdAtCondition()
+                achievement.id.in(
+                JPAExpressions.select(achievement1.id.min())
+                    .from(achievement1)
+                    .where(
+                        achievement1.requirementType.eq(RequirementType.ACCUMULATE),
+                        achievement1.activityType.eq(activityType)
+                    )
+                )
             )
             .fetchOne();
 
@@ -210,23 +215,5 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                 achievement.id.gt(achievementId)
             )
             .exists();
-    }
-
-    private BooleanExpression userIdEq(Long userId) {
-        return userId != null ? userActivity.user.id.eq(userId) : null;
-    }
-
-    private BooleanExpression requirementTypeEq(RequirementType requirementType) {
-        return requirementType != null ? achievement.requirementType.eq(requirementType) : null;
-    }
-
-    private BooleanExpression activityTypeEq(ActivityType activityType) {
-        return activityType != null ? userActivity.activityType.eq(activityType) : null;
-    }
-
-    private BooleanExpression createdAtCondition() {
-        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
-        LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1);
-        return userActivity.createdAt.before(startOfDay).or(userActivity.createdAt.after(endOfDay));
     }
 }
