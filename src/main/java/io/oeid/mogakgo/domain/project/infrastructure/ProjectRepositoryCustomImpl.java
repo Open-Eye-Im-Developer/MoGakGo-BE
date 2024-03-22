@@ -103,6 +103,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     public List<Region> getDensityRankProjectsByRegion(int limit) {
         return jpaQueryFactory.select(project.creatorInfo.region)
             .from(project)
+            .where(projectStatusEq(ProjectStatus.PENDING))
             .groupBy(project.creatorInfo.region)
             .having(project.creatorInfo.region.count().gt(0L))
             .orderBy(project.creatorInfo.region.count().desc())
