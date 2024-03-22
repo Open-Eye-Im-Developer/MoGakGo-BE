@@ -15,6 +15,7 @@ import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.AchievementMessage;
 import io.oeid.mogakgo.domain.achievement.domain.entity.UserAchievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.UserActivity;
+import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.exception.AchievementException;
 import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
@@ -65,7 +66,8 @@ public class AchievementEventHandler {
                 .build());
 
             Achievement achievement = getById(event.getAchievementId());
-            if (!isPossibleToAchieve(achievement, event.getProgressCount())) {
+            if (!achievement.getRequirementValue().equals(event.getProgressCount())
+                || !getProgressLevelSize(event.getActivityType()).equals(1)) {
 
                 log.info("call socket for event {} in progress", event.getAchievementId());
 
@@ -254,14 +256,13 @@ public class AchievementEventHandler {
         throw new AchievementException(EVENT_LISTENER_REQUEST_FAILED);
     }
 
-    private boolean isPossibleToAchieve(Achievement achievement, Integer progressCount) {
-        return achievement.getRequirementValue().equals(progressCount)
-            || achievement.getProgressLevel().equals(1);
-    }
-
     public Achievement getById(Long achievementId) {
         return achievementRepository.findById(achievementId)
             .orElseThrow(() -> new AchievementException(ACHIEVEMENT_NOT_FOUND));
+    }
+
+    public Integer getProgressLevelSize(ActivityType activityType) {
+        return achievementRepository.findByActivityType(activityType).size();
     }
 
     public UserAchievement getByUserAndAchievementId(final AchievementEvent event) {
