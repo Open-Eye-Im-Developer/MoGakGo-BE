@@ -41,7 +41,6 @@ public class ProfileCardLikeService {
         }
 
         profileCard.increaseLikeAmount();
-        user.decreaseAvailableLikeCount();
 
         // 프로필 카드에 '찔러보기' 요청 생성
         ProfileCardLike profileCardLike = request.toEntity(user, profileCard.getUser());
@@ -62,7 +61,6 @@ public class ProfileCardLikeService {
         }
 
         profileCard.decreaseLikeAmount();
-        user.increaseAvailableLikeCount();
 
         // 프로필 카드에 '찔러보기' 요청 취소
         ProfileCardLike profileCardLike = getBySenderAndReceiver(userId, request.getReceiverId());
