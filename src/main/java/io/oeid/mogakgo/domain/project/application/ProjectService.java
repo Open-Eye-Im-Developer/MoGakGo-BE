@@ -174,7 +174,7 @@ public class ProjectService {
             DENSITY_RANK_LIMIT);
 
         // 필요한 경우 기본 지역 순위 목록으로 채움
-        fillWithDefaultRegionsIfNecessary(regionRankList);
+//        fillWithDefaultRegionsIfNecessary(regionRankList);
 
         return new ProjectDensityRankRes(regionRankList);
     }
