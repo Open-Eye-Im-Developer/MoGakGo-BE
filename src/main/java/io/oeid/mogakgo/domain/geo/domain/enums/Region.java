@@ -26,7 +26,7 @@ public enum Region {
     GANGSEO("서울특별시", "강서구", 11500),
     GURO("서울특별시", "구로구", 11530),
     GEUMCHEON("서울특별시", "금천구", 11545),
-    YOUNGDEUNGPO("서울특별시", "영등포구", 11560),
+    YEONGDEUNGPO("서울특별시", "영등포구", 11560),
     DONGJAK("서울특별시", "동작구", 11590),
     GWANAK("서울특별시", "관악구", 11620),
     SEOCHO("서울특별시", "서초구", 11650),
@@ -52,7 +52,7 @@ public enum Region {
         return List.of(
             JONGNO, JUNG, YONGSAN, SEONGDONG, GWANGJIN, DONGDAEMUN, JUNGNANG, SEONGBUK, GANGBUK,
             DOBONG, NOWON, EUNPYEONG, SEODAEMUN, MAPO, YANGCHEON, GANGSEO, GURO, GEUMCHEON,
-            YOUNGDEUNGPO, DONGJAK, GWANAK, SEOCHO, GANGNAM, SONGPA, GANGDONG
+            YEONGDEUNGPO, DONGJAK, GWANAK, SEOCHO, GANGNAM, SONGPA, GANGDONG
         );
     }
 
