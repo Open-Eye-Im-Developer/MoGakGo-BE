@@ -15,6 +15,10 @@ public interface AchievementJpaRepository extends JpaRepository<Achievement, Lon
     @Query("select ac from Achievement ac where ac.id = :id")
     Optional<Achievement> findById(Long id);
 
+    @Query("select ac from Achievement ac where ac.activityType = :activityType")
+    List<Achievement> findByActivityType(ActivityType activityType);
+
+
     @Query("""
         select ac.activityType from Achievement ac join UserAchievement ua
         on ac.id = ua.achievement.id and ua.user.id = :userId
