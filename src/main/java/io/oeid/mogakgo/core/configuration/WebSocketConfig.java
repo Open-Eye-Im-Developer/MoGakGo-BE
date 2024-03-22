@@ -1,7 +1,6 @@
 package io.oeid.mogakgo.core.configuration;
 
-import io.oeid.mogakgo.domain.achievement.handler.AchievementSocketHandler;
-import io.oeid.mogakgo.domain.chat.interceptor.ChatInterceptor;
+import io.oeid.mogakgo.domain.chat.interceptor.StompInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -9,18 +8,15 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSocket
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSocketConfigurer {
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final ChatInterceptor chatInterceptor;
-    private final AchievementSocketHandler achievementSocketHandler;
+    private final StompInterceptor stompInterceptor;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -31,15 +27,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat").setAllowedOriginPatterns("*");
+        registry.addEndpoint("/achievement").setAllowedOrigins("*");
     }
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(chatInterceptor);
-    }
-
-    @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(achievementSocketHandler, "/ws/achievement").setAllowedOrigins("*");
+        registration.interceptors(stompInterceptor);
     }
 }
