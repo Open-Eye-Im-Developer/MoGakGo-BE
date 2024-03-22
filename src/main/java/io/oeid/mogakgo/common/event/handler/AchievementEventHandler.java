@@ -11,7 +11,6 @@ import io.oeid.mogakgo.common.event.SequenceAchievementEvent;
 import io.oeid.mogakgo.common.event.SequenceAchievementUpdateEvent;
 import io.oeid.mogakgo.common.event.UserActivityEvent;
 import io.oeid.mogakgo.common.event.exception.EventListenerProcessingException;
-import io.oeid.mogakgo.domain.achievement.application.AchievementSocketService;
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.AchievementMessage;
 import io.oeid.mogakgo.domain.achievement.domain.entity.UserAchievement;
@@ -21,13 +20,13 @@ import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserActivityJpaRepository;
-import io.oeid.mogakgo.domain.achievement.infrastructure.session.AchievementSessionRepository;
 import io.oeid.mogakgo.domain.notification.application.NotificationService;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -46,9 +45,8 @@ public class AchievementEventHandler {
     private final AchievementJpaRepository achievementRepository;
     private final UserActivityJpaRepository userActivityRepository;
     private final UserCommonService userCommonService;
-    private final AchievementSocketService achievementSocketService;
-    private final AchievementSessionRepository achievementSessionRepository;
     private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Retryable(retryFor = EventListenerProcessingException.class, backoff = @Backoff(1000))
     @Transactional
@@ -71,12 +69,12 @@ public class AchievementEventHandler {
 
                 log.info("call socket for event {} in progress", event.getAchievementId());
 
-                achievementSocketService.sendMessageForAchievementCompletion(
-                    achievementSessionRepository.getSession(event.getUserId()),
+                messagingTemplate.convertAndSend("/topic/achievement/" + event.getUserId(),
                     AchievementMessage.builder()
                         .userId(event.getUserId())
                         .achievementId(event.getAchievementId())
                         .progressCount(event.getProgressCount())
+                        .requirementValue(achievement.getRequirementValue())
                         .build()
                 );
 
@@ -134,15 +132,17 @@ public class AchievementEventHandler {
 
                 log.info("call socket for event {} completion", event.getAchievementId());
                 notificationService.createAchievementNotification(user.getId(), achievement);
-                achievementSocketService.sendMessageForAchievementCompletion(
-                    achievementSessionRepository.getSession(event.getUserId()),
+
+                messagingTemplate.convertAndSend("/topic/achievement/" + event.getUserId(),
                     AchievementMessage.builder()
                         .userId(event.getUserId())
                         .achievementId(event.getAchievementId())
                         .progressCount(event.getProgressCount())
+                        .requirementValue(achievement.getRequirementValue())
                         .completed(event.getCompleted())
                         .build()
                 );
+
             }
         } catch (RuntimeException e) {
             throw new EventListenerProcessingException(e.getMessage());
@@ -164,10 +164,11 @@ public class AchievementEventHandler {
 
             log.info("call socket for event {} completion", event.getAchievementId());
             notificationService.createAchievementNotification(userAchievement.getUser().getId(), userAchievement.getAchievement());
+
             // 업적 달성 후, 클라이언트에게 socket 통신
             Achievement achievement = getById(event.getAchievementId());
-            achievementSocketService.sendMessageForAchievementCompletion(
-                achievementSessionRepository.getSession(event.getUserId()),
+
+            messagingTemplate.convertAndSend("/topic/achievement/" + event.getUserId(),
                 AchievementMessage.builder()
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())
@@ -176,6 +177,7 @@ public class AchievementEventHandler {
                     .completed(Boolean.TRUE)
                     .build()
             );
+
         } catch (RuntimeException e) {
             throw new EventListenerProcessingException(e.getMessage());
         }
@@ -203,9 +205,9 @@ public class AchievementEventHandler {
 
             log.info("call socket for event {} completion", event.getAchievementId());
             notificationService.createAchievementNotification(userAchievement.getUser().getId(), achievement);
+
             // 업적 달성 후, 클라이언트에게 socket 통신
-            achievementSocketService.sendMessageForAchievementCompletion(
-                achievementSessionRepository.getSession(event.getUserId()),
+            messagingTemplate.convertAndSend("/topic/achievement/" + event.getUserId(),
                 AchievementMessage.builder()
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())
@@ -214,6 +216,7 @@ public class AchievementEventHandler {
                     .completed(Boolean.TRUE)
                     .build()
             );
+
         } catch (RuntimeException e) {
             throw new EventListenerProcessingException(e.getMessage());
         }
