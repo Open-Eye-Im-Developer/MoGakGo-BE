@@ -48,8 +48,4 @@ public class AchievementFacadeService {
     public Long getAvailableAchievementIdWithoutNull(Long userId, ActivityType activityType) {
         return userAchievementRepository.getAvailableAchievementWithoutNull(userId, activityType);
     }
-
-    public Integer getAccumulatedProgressCount(Long userId, ActivityType activityType) {
-        return userAchievementRepository.getAccumulatedProgressCountByActivity(userId, activityType);
-    }
 }

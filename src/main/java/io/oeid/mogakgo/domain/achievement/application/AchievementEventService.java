@@ -28,12 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AchievementEventService {
 
-    private final AchievementService achievementService;
+    // 작업과 동시에 업적 달성이 가능한, progressCount 최솟값
+    private static final Integer MIN_PROGRESS_COUNT = 1;
+
+    private final AchievementProgressService achievementProgressService;
     private final AchievementFacadeService achievementFacadeService;
     private final ApplicationEventPublisher eventPublisher;
-
-    // 작업과 동시에 업적 달성이 가능한, progressCount 최솟값
-    private final Integer MIN_PROGRESS_COUNT = 1;
 
     // 달성 자격요건의 검증 없이 한 번에 달성 가능한 업적에 대한 이벤트 발행
     @Async("threadPoolTaskExecutor")
@@ -186,7 +186,7 @@ public class AchievementEventService {
             .getAvailableAchievementId(userId, activityType);
 
         // 오늘을 제외한, 업적의 진행도 조회
-        Map<ActivityType, Integer> map = achievementService
+        Map<ActivityType, Integer> map = achievementProgressService
             .getProgressCountMap(userId, List.of(activityType));
 
         if (achievementId != null) {

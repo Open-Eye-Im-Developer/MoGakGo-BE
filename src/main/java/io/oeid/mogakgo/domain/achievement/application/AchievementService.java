@@ -5,22 +5,17 @@ import static io.oeid.mogakgo.exception.code.ErrorCode404.ACHIEVEMENT_NOT_FOUND;
 
 import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
-import io.oeid.mogakgo.domain.achievement.domain.entity.UserActivity;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
 import io.oeid.mogakgo.domain.achievement.exception.AchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
-import io.oeid.mogakgo.domain.achievement.infrastructure.UserActivityJpaRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +29,7 @@ public class AchievementService {
     private final UserAchievementJpaRepository userAchievementRepository;
     private final AchievementJpaRepository achievementRepository;
     private final UserCommonService userCommonService;
-    private final UserActivityJpaRepository userActivityRepository;
+    private final AchievementProgressService achievementProgressService;
     private final AchievementFacadeService achievementFacadeService;
 
     public Achievement getById(Long achievementId) {
@@ -75,52 +70,22 @@ public class AchievementService {
             activityType -> achievementFacadeService.getAvailableAchievementIdWithoutNull(userId, activityType)
         ).toList();
 
-        Map<ActivityType, Integer> map = getProgressCountMap(userId, sequenceList);
+        Map<ActivityType, Integer> map = achievementProgressService.getProgressCountMap(userId, sequenceList);
 
         return achievementIds.stream().map(achievementId -> {
             Achievement achievement = achievementFacadeService.getById(achievementId);
-            return new UserAchievementInfoRes(
-                userId,
-                achievementId,
-                achievement.getTitle(),
-                achievement.getImgUrl(),
-                achievement.getDescription(),
-                achievement.getRequirementType(),
-                achievement.getRequirementValue(),
-                map.get(achievement.getActivityType()),
-                verifyCompleted(achievement, map)
-            );
+            return UserAchievementInfoRes.builder()
+                .userId(userId)
+                .achievementId(achievementId)
+                .title(achievement.getTitle())
+                .imgUrl(achievement.getImgUrl())
+                .description(achievement.getDescription())
+                .requirementType(achievement.getRequirementType())
+                .requirementValue(achievement.getRequirementValue())
+                .progressCount(map.get(achievement.getActivityType()))
+                .completed(verifyCompleted(achievement, map))
+                .build();
         }).toList();
-    }
-
-    public Map<ActivityType, Integer> getProgressCountMap(Long userId, List<ActivityType> activityList) {
-        return activityList.stream().collect(Collectors.toMap(
-            activityType -> activityType,
-            activityType -> {
-                List<UserActivity> history = userActivityRepository
-                    .findByUserIdAndActivityType(userId, activityType);
-                return !history.isEmpty() ? getSeqProgressCountFromToday(history) : 0;
-            }
-        ));
-    }
-
-    private Integer getSeqProgressCountFromToday(List<UserActivity> activityList) {
-        LocalDate today = LocalDate.now();
-        if (!equalToLocalDate(today, activityList.get(0).getCreatedAt())) {
-            today = today.minusDays(1);
-        }
-        return validateContinuous(today, 0, activityList, 0);
-    }
-
-    private int validateContinuous(LocalDate date, int idx, List<UserActivity> activityList, int count) {
-        if (idx == activityList.size() || !equalToLocalDate(date, activityList.get(idx).getCreatedAt())) {
-            return count;
-        }
-        return validateContinuous(date.minusDays(1), idx + 1, activityList, count + 1);
-    }
-
-    private boolean equalToLocalDate(LocalDate target, LocalDateTime comparison) {
-        return target.equals(comparison.toLocalDate());
     }
 
     private boolean verifyCompleted(Achievement achievement, Map<ActivityType, Integer> map) {
