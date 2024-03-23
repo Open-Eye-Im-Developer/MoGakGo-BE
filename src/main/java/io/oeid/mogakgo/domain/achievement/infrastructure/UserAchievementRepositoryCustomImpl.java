@@ -110,17 +110,17 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
 
         return sql1.stream()
             .sorted(Comparator.comparing(tuple -> tuple.get(1, Long.class))).map(
-                tuple -> new UserAchievementInfoRes(
-                    userId,
-                    tuple.get(1, Long.class),
-                    tuple.get(2, String.class),
-                    tuple.get(3, String.class),
-                    tuple.get(4, String.class),
-                    tuple.get(5, RequirementType.class),
-                    tuple.get(6, Integer.class),
-                    Integer.valueOf(String.valueOf(tuple.get(7, Long.class))),
-                    tuple.get(8, Boolean.class)
-                )
+                tuple -> UserAchievementInfoRes.builder()
+                    .userId(userId)
+                    .achievementId(tuple.get(1, Long.class))
+                    .title(tuple.get(2, String.class))
+                    .imgUrl(tuple.get(3, String.class))
+                    .description(tuple.get(4, String.class))
+                    .requirementType(tuple.get(5, RequirementType.class))
+                    .requirementValue(tuple.get(6, Integer.class))
+                    .progressCount(Integer.valueOf(String.valueOf(tuple.get(7, Long.class))))
+                    .completed(tuple.get(8, Boolean.class))
+                    .build()
             ).toList();
     }
 
