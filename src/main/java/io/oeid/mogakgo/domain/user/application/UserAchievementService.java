@@ -54,7 +54,7 @@ public class UserAchievementService {
 
     private void validateAvailableUpdateAchievement(UserAchievement userAchievement) {
         if (userAchievement.getCompleted().equals(Boolean.FALSE) &&
-            isAlreadyAchievedAchievement(
+            !isAlreadyAchievedAchievement(
                 userAchievement.getAchievement().getId(),
                 userAchievement.getAchievement().getActivityType())) {
             throw new UserAchievementException(NON_ACHIEVED_USER_ACHIEVEMENT);
