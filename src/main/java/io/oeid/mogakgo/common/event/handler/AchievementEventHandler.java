@@ -42,6 +42,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class AchievementEventHandler {
 
+    private static final String SUBSCRIBE_DESTINATIONN = "/topic/achievement/";
+
     private final UserAchievementJpaRepository userAchievementRepository;
     private final AchievementJpaRepository achievementRepository;
     private final UserActivityJpaRepository userActivityRepository;
@@ -71,7 +73,7 @@ public class AchievementEventHandler {
 
                 log.info("call socket for event {} in progress", event.getAchievementId());
 
-                messagingTemplate.convertAndSend("/topic/achievement/" + event.getUserId(),
+                messagingTemplate.convertAndSend(SUBSCRIBE_DESTINATIONN + event.getUserId(),
                     AchievementMessage.builder()
                         .userId(event.getUserId())
                         .achievementId(event.getAchievementId())
@@ -135,7 +137,7 @@ public class AchievementEventHandler {
                 log.info("call socket for event {} completion", event.getAchievementId());
                 notificationService.createAchievementNotification(user.getId(), achievement);
 
-                messagingTemplate.convertAndSend("/topic/achievement/" + event.getUserId(),
+                messagingTemplate.convertAndSend(SUBSCRIBE_DESTINATIONN + event.getUserId(),
                     AchievementMessage.builder()
                         .userId(event.getUserId())
                         .achievementId(event.getAchievementId())
@@ -170,7 +172,7 @@ public class AchievementEventHandler {
             // 업적 달성 후, 클라이언트에게 socket 통신
             Achievement achievement = getById(event.getAchievementId());
 
-            messagingTemplate.convertAndSend("/topic/achievement/" + event.getUserId(),
+            messagingTemplate.convertAndSend(SUBSCRIBE_DESTINATIONN + event.getUserId(),
                 AchievementMessage.builder()
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())
@@ -209,7 +211,7 @@ public class AchievementEventHandler {
             notificationService.createAchievementNotification(userAchievement.getUser().getId(), achievement);
 
             // 업적 달성 후, 클라이언트에게 socket 통신
-            messagingTemplate.convertAndSend("/topic/achievement/" + event.getUserId(),
+            messagingTemplate.convertAndSend(SUBSCRIBE_DESTINATIONN + event.getUserId(),
                 AchievementMessage.builder()
                     .userId(event.getUserId())
                     .achievementId(event.getAchievementId())

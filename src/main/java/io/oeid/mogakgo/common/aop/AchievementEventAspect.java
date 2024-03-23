@@ -3,7 +3,7 @@ package io.oeid.mogakgo.common.aop;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_JOIN_REQUEST_NOT_FOUND;
 
 import io.oeid.mogakgo.domain.achievement.application.AchievementEventService;
-import io.oeid.mogakgo.domain.achievement.application.AchievementFacadeService;
+import io.oeid.mogakgo.domain.achievement.application.AchievementProgressService;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.profile.presentation.dto.req.UserProfileLikeCreateAPIReq;
@@ -40,7 +40,7 @@ public class AchievementEventAspect {
     private final ProjectJpaRepository projectRepository;
     private final ProjectJoinRequestJpaRepository projectJoinRequestRepository;
     private final MatchingService matchingService;
-    private final AchievementFacadeService achievementFacadeService;
+    private final AchievementProgressService achievementProgressService;
 
     @Pointcut("execution(public * io.oeid.mogakgo.domain.review.application.ReviewService.createNewReview(Long, ..))")
     public void updateJandiRateExecution() {}
@@ -142,7 +142,7 @@ public class AchievementEventAspect {
         Long receiverId = request.getReceiverId();
         achievementEventService.publishAccumulateEventWithVerify(
             receiverId, ActivityType.WHAT_A_POPULAR_PERSON,
-            achievementFacadeService.getAccumulatedProgressCount(receiverId, ActivityType.WHAT_A_POPULAR_PERSON)
+            getAccumulatedProgressCount(receiverId, ActivityType.WHAT_A_POPULAR_PERSON)
         );
     }
 
@@ -162,7 +162,7 @@ public class AchievementEventAspect {
     }
 
     private Integer getAccumulatedProgressCount(Long userId, ActivityType activityType) {
-        return achievementFacadeService.getAccumulatedProgressCount(userId, activityType);
+        return achievementProgressService.getAccumulatedProgressCount(userId, activityType);
     }
 
     private Long getParticipantIdFromJoinRequest(Long projectRequestId) {
