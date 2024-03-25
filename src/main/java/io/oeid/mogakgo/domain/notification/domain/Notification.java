@@ -117,7 +117,7 @@ public class Notification {
     }
 
     public static Notification newMatchingSuccessNotification(User user, Project project) {
-        return new Notification(NotificationTag.MATCHING_SUCCEEDED,
+        return new Notification(NotificationTag.MATCHING_SUCCESS,
             NotificationMessage.MATCHING_SUCCESS_MESSAGE.getMessage(), user, project);
     }
 
@@ -127,7 +127,7 @@ public class Notification {
     }
 
     private NotificationTag validateNotificationTag(NotificationTag notificationTag) {
-        if (!notificationTag.equals(NotificationTag.MATCHING_SUCCEEDED) && !notificationTag.equals(
+        if (!notificationTag.equals(NotificationTag.MATCHING_SUCCESS) && !notificationTag.equals(
             NotificationTag.MATCHING_FAILED)) {
             throw new NotificationException(ErrorCode400.NOTIFICATION_TAG_SHOULD_LIKE_MATCHING);
         }
