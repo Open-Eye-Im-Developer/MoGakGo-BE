@@ -30,7 +30,7 @@ public class ChatWebSocketController {
         var response = chatWebSocketService.handleChatMessage(request.getUserId(), chatRoomId,
             ChatReq.from(request));
         fcmNotificationService.sendNotification(response.getReceiverId(),
-            response.getReceiverUsername(), response.getMessage());
+            response.getSenderUserName(), response.getMessage());
         return response.toApiResponse();
     }
 }
