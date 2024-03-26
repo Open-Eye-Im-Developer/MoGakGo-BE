@@ -53,7 +53,9 @@ public enum DevelopLanguage {
     OBJECT_C("Objective-C",
         "https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/c99bf59a-716f-4dfd-9414-005133ce9c97"),
     ETC("ETC",
-        "https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/b489846c-bcbf-4575-8bfc-7788da4b9ba0");
+        "https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/b489846c-bcbf-4575-8bfc-7788da4b9ba0"),
+    NULL("NULL",
+        "https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/8f0c33f3-62ef-4379-ba6f-eb1eb0ef2471");
 
     private final String language;
     private final String imageUrl;
