@@ -32,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("서비스 테스트: UserService")
 class UserServiceTest {
+
     @InjectMocks
     private UserService userService;
     @Mock
@@ -132,6 +133,19 @@ class UserServiceTest {
     }
 
     @Test
+    void 유저_개발언어_업데이트_레포지토리가_존재하지_않는_경우() {
+        // Arrange
+        var expectedUserId = 1L;
+        when(userCommonService.getUserById(expectedUserId)).thenReturn(user);
+        when(userGithubUtil.updateUserDevelopLanguage(any(String.class))).thenReturn(Map.of());
+        // Act
+        var actualResult = userService.updateUserDevelopLanguages(expectedUserId);
+        // Assert
+        assertThat(actualResult).isNotNull().hasSize(1).extracting("language")
+            .contains(DevelopLanguage.NULL);
+    }
+
+    @Test
     void 유저_프로필_조회() {
         // Arrange
         var expectedUserId = 1L;
@@ -181,7 +195,7 @@ class UserServiceTest {
     }
 
     @Test
-    void 유저_잔디력_조회(){
+    void 유저_잔디력_조회() {
         // Arrange
         var expectedUserId = 1L;
         when(userCommonService.getUserById(expectedUserId)).thenReturn(user);
