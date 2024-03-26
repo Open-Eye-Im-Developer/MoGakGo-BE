@@ -23,7 +23,7 @@ public class UserGithubUtil {
 
     public Map<String, Integer> updateUserDevelopLanguage(String repositoryUrl) {
         var repositoriesData = getRepositoriesData(repositoryUrl);
-        if (repositoriesData == null) {
+        if (repositoriesData == null || repositoriesData.isEmpty()) {
             return Map.of();
         }
         var monoList = repositoriesData.stream().map(
