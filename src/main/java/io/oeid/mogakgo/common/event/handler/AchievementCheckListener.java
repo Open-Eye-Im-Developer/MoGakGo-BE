@@ -2,15 +2,17 @@ package io.oeid.mogakgo.common.event.handler;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.NON_ACHIEVED_USER_ACHIEVEMENT;
 
-import io.oeid.mogakgo.common.event.AchievementCompletionEvent;
+import io.oeid.mogakgo.common.event.domain.vo.AchievementCompletionEvent;
 import io.oeid.mogakgo.domain.achievement.application.AchievementFacadeService;
 import io.oeid.mogakgo.domain.achievement.application.AchievementProgressService;
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.AchievementMessage;
 import io.oeid.mogakgo.domain.achievement.domain.entity.UserAchievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.UserActivity;
+import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
 import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
+import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserActivityJpaRepository;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
@@ -22,24 +24,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class AchievementCheckListener {
 
+    private static final Integer MIN_PROGRESS_SIZE = 1;
     private static final String SUBSCRIBE_DESTINATIONN = "/topic/achievement/";
 
     private final UserCommonService userCommonService;
+    private final AchievementJpaRepository achievementRepository;
     private final AchievementFacadeService achievementFacadeService;
     private final UserAchievementJpaRepository userAchievementRepository;
     private final UserActivityJpaRepository userActivityRepository;
     private final AchievementProgressService achievementProgressService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void executeEvent(final AchievementCompletionEvent event) {
 
         Long achievementId = achievementFacadeService
@@ -48,7 +53,7 @@ public class AchievementCheckListener {
         if (achievementId != null) {
 
             User user = userCommonService.getUserById(event.getUserId());
-            UserAchievement userAchievement = getByUserAndAchievement(event.getUserId(), achievementId);
+            Achievement achievement = achievementFacadeService.getById(achievementId);
 
             Boolean isExist = achievementFacadeService
                 .validateAchivementAlreadyInProgress(event.getUserId(), achievementId);
@@ -58,26 +63,29 @@ public class AchievementCheckListener {
                 userAchievementRepository.save(
                     UserAchievement.builder()
                         .user(user)
-                        .achievement(userAchievement.getAchievement())
+                        .achievement(achievement)
                         .completed(Boolean.FALSE)
                         .build()
                 );
             }
 
             Object progressCount = event.getTarget() == null
-                ? getProgressCountForAchievement(event.getUserId(), userAchievement.getAchievement()) + 1
+                ? getProgressCountForAchievement(event.getUserId(), achievement) + 1
                 : event.getTarget();
 
             // -- 업적이 달성 가능한 조건을 만족했을 경우
-            if (validateAvailabilityToAchieve(progressCount, userAchievement.getAchievement())) {
+            if (validateAvailabilityToAchieve(progressCount, achievement)) {
+
+                UserAchievement userAchievement = getByUserAndAchievement(event.getUserId(), achievementId);
                 userAchievement.updateCompleted();
 
                 // -- 해당 업적이 연속적으로 달성 가능한 업적인 경우
-                if (userAchievement.getAchievement().getRequirementType()
-                    .equals(RequirementType.SEQUENCE)) {
+                if (achievement.getRequirementType().equals(RequirementType.SEQUENCE)) {
                     List<UserActivity> history = userActivityRepository.getActivityHistoryByActivityType(
-                        event.getUserId(), userAchievement.getAchievement().getActivityType(),
-                        userAchievement.getAchievement().getRequirementValue());
+                        event.getUserId(),
+                        event.getActivityType(),
+                        achievement.getRequirementValue()
+                    );
                     history.forEach(UserActivity::delete);
                 }
 
@@ -86,11 +94,26 @@ public class AchievementCheckListener {
                     AchievementMessage.builder()
                         .userId(event.getUserId())
                         .achievementId(achievementId)
-                        .progressCount(userAchievement.getAchievement().getRequirementValue())
-                        .requirementValue(userAchievement.getAchievement().getRequirementValue())
+                        .progressCount(achievement.getRequirementValue())
+                        .requirementValue(achievement.getRequirementValue())
                         .completed(Boolean.TRUE)
                         .build()
                 );
+
+            } else {
+
+                if (!isAvailableToAchieveOnce(event.getActivityType())) {
+
+                    // 업적 진행에 대한 STOMP 통신
+                    messagingTemplate.convertAndSend(SUBSCRIBE_DESTINATIONN + event.getUserId(),
+                        AchievementMessage.builder()
+                            .userId(event.getUserId())
+                            .achievementId(achievementId)
+                            .progressCount((Integer) progressCount)
+                            .requirementValue(achievement.getRequirementValue())
+                            .build()
+                    );
+                }
             }
         }
     }
@@ -104,7 +127,7 @@ public class AchievementCheckListener {
         if (achievement.getRequirementType().equals(RequirementType.ACCUMULATE)) {
             return achievementProgressService.getAccumulatedProgressCount(userId, achievement.getActivityType());
         }
-        return achievementProgressService.getProgressCountMap(userId,
+        return achievementProgressService.getProgressCountMapWithoutToday(userId,
             List.of(achievement.getActivityType())).get(achievement.getActivityType());
     }
 
@@ -116,6 +139,14 @@ public class AchievementCheckListener {
         } else {
             throw new IllegalArgumentException("Unsupported target type");
         }
+    }
+
+    private boolean isAvailableToAchieveOnce(ActivityType activityType) {
+        return getProgressLevelSize(activityType).equals(MIN_PROGRESS_SIZE);
+    }
+
+    private Integer getProgressLevelSize(ActivityType activityType) {
+        return achievementRepository.findByActivityType(activityType).size();
     }
 
 }
