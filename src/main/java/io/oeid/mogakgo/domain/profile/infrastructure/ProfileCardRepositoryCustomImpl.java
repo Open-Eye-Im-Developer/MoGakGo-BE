@@ -58,10 +58,16 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
 
     public List<ProfileCard> findByConditionWithPaginationPublic(@NonNull Region region,
         Long cursorId, @NonNull Integer pageSize) {
-        return jpaQueryFactory.selectFrom(profileCard).innerJoin(profileCard.user, user)
+        return jpaQueryFactory.selectFrom(profileCard)
+            .innerJoin(profileCard.user, user)
             .on(profileCard.user.id.eq(user.id))
-            .where(cursorIdCondition(cursorId), regionEq(region), deletedProfileCardEq())
-            .orderBy(profileCard.id.desc()).limit(pageSize + 1L).fetch();
+            .where(
+                cursorIdCondition(cursorId),
+                regionEq(region),
+                deletedProfileCardEq()
+            )
+            .orderBy(user.id.desc())
+            .limit(pageSize + 1L).fetch();
     }
 
     private Boolean validateProfileCardLikeBySenderId(Long receiverId, Long userId) {

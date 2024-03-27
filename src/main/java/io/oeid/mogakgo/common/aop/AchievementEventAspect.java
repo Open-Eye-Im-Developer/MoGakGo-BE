@@ -1,12 +1,15 @@
 package io.oeid.mogakgo.common.aop;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_JOIN_REQUEST_NOT_FOUND;
+import static io.oeid.mogakgo.exception.code.ErrorCode404.PROJECT_NOT_FOUND;
 
 import io.oeid.mogakgo.domain.achievement.application.AchievementEventService;
 import io.oeid.mogakgo.domain.achievement.application.AchievementProgressService;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.profile.presentation.dto.req.UserProfileLikeCreateAPIReq;
+import io.oeid.mogakgo.domain.project.domain.entity.Project;
+import io.oeid.mogakgo.domain.project.exception.ProjectException;
 import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import io.oeid.mogakgo.domain.project.presentation.dto.req.ProjectCreateReq;
 import io.oeid.mogakgo.domain.project_join_req.application.dto.req.ProjectJoinCreateReq;
@@ -62,9 +65,9 @@ public class AchievementEventAspect {
     public void publishCompletedEvent(JoinPoint joinPoint, Long userId, ReviewCreateReq request) {
 
         // -- '리뷰' 잔디력이 업데이트되는 사용자에 대한 업적 이벤트 발행
-        User user = userCommonService.getUserById(userId);
-        achievementEventService.publishCompletedEventWithVerify(userId,
-            ActivityType.FRESH_DEVELOPER, user.getJandiRate());
+        User receiver = userCommonService.getUserById(request.getReceiverId());
+        achievementEventService.publishCompletedEventWithVerify(receiver.getId(),
+            ActivityType.FRESH_DEVELOPER, receiver.getJandiRate());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -88,9 +91,10 @@ public class AchievementEventAspect {
     public void publishAccumulateEvent(JoinPoint joinPoint, Long userId, ProjectJoinCreateReq request) {
 
         // -- '생성자' 매칭 요청을 수신한 사용자에 대한 업적 이벤트 발행
+        Project project = getProject(request.getProjectId());
         achievementEventService.publishAccumulateEventWithVerify(
             userId, ActivityType.CATCH_ME_IF_YOU_CAN,
-            getAccumulatedProgressCount(userId, ActivityType.CATCH_ME_IF_YOU_CAN)
+            getAccumulatedProgressCount(project.getCreator().getId(), ActivityType.CATCH_ME_IF_YOU_CAN)
         );
     }
 
@@ -144,6 +148,11 @@ public class AchievementEventAspect {
             receiverId, ActivityType.WHAT_A_POPULAR_PERSON,
             getAccumulatedProgressCount(receiverId, ActivityType.WHAT_A_POPULAR_PERSON)
         );
+    }
+
+    private Project getProject(Long projectId) {
+        return projectRepository.findById(projectId)
+            .orElseThrow(() -> new ProjectException(PROJECT_NOT_FOUND));
     }
 
     private Integer checkCreatedProjectCountByRegion(Long userId) {
