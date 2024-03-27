@@ -51,7 +51,7 @@ public class ProjectService {
     private final GeoService geoService;
     private final ProjectJoinRequestJpaRepository projectJoinRequestJpaRepository;
     private final UserMatchingService userMatchingService;
-    private final ProjectEventHelper projectEventHelper;
+    private final ProjectEventHelper eventHelper;
 
     @Transactional
     public Long create(Long userId, ProjectCreateReq request) {
@@ -79,7 +79,7 @@ public class ProjectService {
         Project project = request.toEntity(tokenUser);
         projectJpaRepository.save(project);
 
-        projectEventHelper.publishEvent(userId);
+        eventHelper.publishEvent(userId);
 
         return project.getId();
     }
