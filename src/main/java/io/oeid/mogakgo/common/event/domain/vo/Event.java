@@ -1,4 +1,4 @@
-package io.oeid.mogakgo.common.event;
+package io.oeid.mogakgo.common.event.domain.vo;
 
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import lombok.AccessLevel;
