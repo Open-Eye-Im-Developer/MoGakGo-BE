@@ -23,7 +23,7 @@ public interface ProjectJpaRepository extends JpaRepository<Project, Long>, Proj
     List<Project> findNotEndProjectOneByCreatorId(Long creatorId, Pageable pageable);
 
     @Query(value = """
-        select sum(if(p.region, 1, 0)) from project_tb as p where p.creator_id = :userId
+        select COALESCE(SUM(IF(p.region, 1, 0)), 0) from project_tb as p where p.creator_id = :userId
     """, nativeQuery = true)
     Integer getRegionCountByUserId(Long userId);
 }

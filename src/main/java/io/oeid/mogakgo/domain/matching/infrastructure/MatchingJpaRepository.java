@@ -16,10 +16,10 @@ public interface MatchingJpaRepository extends JpaRepository<Matching, Long>,
     List<Matching> findProgressOneByUserId(Long userId, Pageable pageable);
 
     @Query(value = """
-        select sum(if(p.region, 1, 0))
+        select COALESCE(SUM(IF(p.region, 1, 0)), 0)
         from matching_tb as m
         inner join project_tb as p on m.project_id = p.id
-        where m.sender_id = 11 or p.creator_id = 11
+        where m.sender_id = :userId or p.creator_id = :userId
         and m.matching_status = 'FINISHED' or m.matching_status = 'PROGRESS';
     """, nativeQuery = true)
     Integer findRegionCountByMatching(Long userId);

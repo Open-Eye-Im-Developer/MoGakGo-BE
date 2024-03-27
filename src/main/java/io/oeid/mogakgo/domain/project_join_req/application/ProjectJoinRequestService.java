@@ -12,6 +12,7 @@ import static io.oeid.mogakgo.exception.code.ErrorCode404.USER_NOT_FOUND;
 
 import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
+import io.oeid.mogakgo.domain.matching.application.MatchingEventHelper;
 import io.oeid.mogakgo.domain.matching.application.MatchingService;
 import io.oeid.mogakgo.domain.matching.application.UserMatchingService;
 import io.oeid.mogakgo.domain.notification.application.FCMNotificationService;
@@ -45,6 +46,8 @@ public class ProjectJoinRequestService {
     private final FCMNotificationService fcmNotificationService;
     private final UserCommonService userCommonService;
     private final NotificationService notificationService;
+    private final ProjectJoinRequestEventHelper eventHelper;
+    private final MatchingEventHelper matchingEventHelper;
 
     @Transactional
     public Long create(Long userId, ProjectJoinCreateReq request) {
@@ -58,6 +61,9 @@ public class ProjectJoinRequestService {
         // 프로젝트 매칭 요청 생성
         ProjectJoinRequest joinRequest = request.toEntity(tokenUser, project);
         projectJoinRequestRepository.save(joinRequest);
+
+        eventHelper.publishEvent(project.getCreator().getId());
+
         // 매칭 요청 생성시 프로젝트 생성자에게 알림 전달
         notificationService.createRequestArrivalNotification(project.getCreator().getId());
         return joinRequest.getId();
@@ -101,6 +107,8 @@ public class ProjectJoinRequestService {
         } catch (ProjectJoinRequestException e) {
             // TODO: 로그 처리
         }
+
+        matchingEventHelper.publishEvent(userId, projectJoinRequest.getSender().getId());
 
         fcmNotificationService.sendNotification(projectJoinRequest.getSender().getId(),
             MATCHING_SUCCESS_MESSAGE.getTitle(), MATCHING_SUCCESS_MESSAGE.getMessage(),

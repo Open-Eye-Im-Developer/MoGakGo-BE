@@ -29,6 +29,7 @@ public class ProfileCardLikeService {
     private final ProfileCardLikeJpaRepository profileCardLikeRepository;
     private final ProfileCardJpaRepository profileCardRepository;
     private final UserCommonService userCommonService;
+    private final ProfileCardLikeEventHelper eventHelper;
 
     @Transactional
     public Long create(Long userId, UserProfileLikeCreateAPIReq request) {
@@ -45,6 +46,8 @@ public class ProfileCardLikeService {
         // 프로필 카드에 '찔러보기' 요청 생성
         ProfileCardLike profileCardLike = request.toEntity(user, profileCard.getUser());
         profileCardLikeRepository.save(profileCardLike);
+
+        eventHelper.publishEvent(userId, request.getReceiverId());
 
         return profileCardLike.getId();
     }
