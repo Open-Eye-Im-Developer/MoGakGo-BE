@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -61,14 +62,21 @@ public class UserService {
         User user = userCommonService.getUserById(userId);
         user.deleteAllDevelopLanguageTags();
         var languageMap = userGithubUtil.updateUserDevelopLanguage(user.getRepositoryUrl());
-        var languages = sortDevelopLanguageMap(languageMap);
-        languages.forEach((key, value) -> {
+        var result = sortDevelopLanguageMap(languageMap);
+        result.ifPresentOrElse(language -> language.forEach((key, value) -> {
             UserDevelopLanguageTag developLanguageTag = UserDevelopLanguageTag.builder()
                 .user(user)
                 .developLanguage(DevelopLanguage.of(key))
                 .byteSize(value)
                 .build();
             userDevelopLanguageTagRepository.save(developLanguageTag);
+        }), () -> {
+            var userDevelopLanguageTag = UserDevelopLanguageTag.builder()
+                .user(user)
+                .developLanguage(DevelopLanguage.NULL)
+                .byteSize(0)
+                .build();
+            userDevelopLanguageTagRepository.save(userDevelopLanguageTag);
         });
         List<UserDevelopLanguageRes> response = new ArrayList<>();
         for (var developLanguage : user.getUserDevelopLanguageTags()) {
@@ -114,12 +122,17 @@ public class UserService {
         }
     }
 
-    private Map<String, Integer> sortDevelopLanguageMap(Map<String, Integer> languageMap){
+    private Optional<Map<String, Integer>> sortDevelopLanguageMap(
+        Map<String, Integer> languageMap) {
+        if (languageMap.isEmpty()) {
+            return Optional.empty();
+        }
         List<String> languageKeys = new ArrayList<>(languageMap.keySet());
         languageKeys.sort((o1, o2) -> languageMap.get(o2).compareTo(languageMap.get(o1)));
         Map<String, Integer> result = new LinkedHashMap<>();
-        languageKeys.subList(0, 3).forEach(key -> result.put(key, languageMap.get(key)));
-        return result;
+        int length = Math.min(languageMap.size(), 3);
+        languageKeys.subList(0, length).forEach(key -> result.put(key, languageMap.get(key)));
+        return Optional.of(result);
     }
 
 }

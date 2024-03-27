@@ -73,18 +73,18 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
             )
             .from(userAchievement)
             .innerJoin(userAchievement.achievement).on(userAchievement.achievement.id.eq(achievement.id))
-            .innerJoin(userActivity).on(
-                userActivity.activityType.eq(userAchievement.achievement.activityType), 
-                userActivity.user.id.eq(userId)
-            )
+            .innerJoin(userActivity).on(userActivity.activityType.eq(userAchievement.achievement.activityType))
             .where(
                 userAchievement.user.id.eq(userId),
+                userAchievement.user.id.eq(userActivity.user.id),
                 userAchievement.achievement.id.in(
                     JPAExpressions.select(achievement1.id.max())
                         .from(userAchievement1)
-                        .innerJoin(achievement1).on(achievement1.id.eq(userAchievement1.achievement.id))
+                        .innerJoin(achievement1).on(achievement1.id.eq(userAchievement1.achievement.id), userAchievement1.user.id.eq(userId))
                         .innerJoin(userActivity1).on(achievement1.activityType.eq(userActivity1.activityType))
-                        .where(userAchievement1.achievement.requirementType.eq(RequirementType.ACCUMULATE))
+                        .where(
+                            userAchievement1.achievement.requirementType.eq(RequirementType.ACCUMULATE),
+                            userAchievement1.user.id.eq(userActivity1.user.id))
                         .groupBy(userActivity1.activityType)
                 )
             )

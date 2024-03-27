@@ -30,6 +30,7 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
     ) {
 
         List<ProfileCard> entities = jpaQueryFactory.selectFrom(profileCard)
+            .distinct()
             .innerJoin(profileCard.user, user)
             .on(profileCard.user.id.eq(user.id))
             .where(
@@ -39,7 +40,7 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
                 deletedProfileCardEq()
             )
             // 최근순
-            .orderBy(profileCard.id.desc())
+            .orderBy(user.id.desc())
             .limit(pageable.getPageSize() + 1L)
             .fetch();
 
@@ -57,10 +58,16 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
 
     public List<ProfileCard> findByConditionWithPaginationPublic(@NonNull Region region,
         Long cursorId, @NonNull Integer pageSize) {
-        return jpaQueryFactory.selectFrom(profileCard).innerJoin(profileCard.user, user)
+        return jpaQueryFactory.selectFrom(profileCard)
+            .innerJoin(profileCard.user, user)
             .on(profileCard.user.id.eq(user.id))
-            .where(cursorIdCondition(cursorId), regionEq(region), deletedProfileCardEq())
-            .orderBy(profileCard.id.desc()).limit(pageSize + 1L).fetch();
+            .where(
+                cursorIdCondition(cursorId),
+                regionEq(region),
+                deletedProfileCardEq()
+            )
+            .orderBy(user.id.desc())
+            .limit(pageSize + 1L).fetch();
     }
 
     private Boolean validateProfileCardLikeBySenderId(Long receiverId, Long userId) {
@@ -78,7 +85,7 @@ public class ProfileCardRepositoryCustomImpl implements ProfileCardRepositoryCus
     }
 
     private BooleanExpression cursorIdCondition(Long cursorId) {
-        return cursorId != null ? profileCard.id.lt(cursorId) : null;
+        return cursorId != null ? user.id.lt(cursorId) : null;
     }
 
     private BooleanExpression excludeUserId(Long userId) {
