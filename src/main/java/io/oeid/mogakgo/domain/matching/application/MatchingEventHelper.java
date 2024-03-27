@@ -1,10 +1,9 @@
-package io.oeid.mogakgo.domain.project.application;
+package io.oeid.mogakgo.domain.matching.application;
 
 import io.oeid.mogakgo.common.event.domain.vo.AchievementCompletionEvent;
 import io.oeid.mogakgo.common.event.domain.vo.AchievementNotificationEvent;
 import io.oeid.mogakgo.common.event.domain.vo.UserActivityEvent;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
-import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,18 +16,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 @RequiredArgsConstructor
-public class ProjectEventHelper {
+public class MatchingEventHelper {
 
     private static final int MAX_SERVICE_AREA = 26;
+    private static final int SAME_MATCHING_COUNT = 2;
 
-    private final ProjectJpaRepository projectRepository;
+    private final MatchingService matchingService;
     private final ApplicationEventPublisher eventPublisher;
 
-    public void publishEvent(Long userId) {
+    public void publishEvent(Long userId, Long participantId) {
 
-        // -- '생성자' 프로젝트를 생성한 사용자에 대한 업적 이벤트 발행
-        publishEvent(userId, ActivityType.PLEASE_GIVE_ME_MOGAK, null);
-        publishEvent(userId, ActivityType.BRAVE_EXPLORER, checkCreatedProjectCountByRegion(userId));
+        // -- '생성자' 매칭 요청을 수락한 사용자에 대한 업적 이벤트 발행
+        publishEvent(userId, ActivityType.GOOD_PERSON_GOOD_MEETUP, null);
+        publishEvent(userId, ActivityType.LIKE_E, null);
+        publishEvent(userId, ActivityType.NOMAD_CODER, checkMatchedProjectCountByRegion(userId));
+        publishEvent(userId, ActivityType.MY_DESTINY, checkMatchingCountWithSameUser(userId, participantId));
+
+        // -- '참여자' 매칭 요청을 생성한 사용자에 대한 업적 이벤트 발행
+        publishEvent(participantId, ActivityType.GOOD_PERSON_GOOD_MEETUP, null);
+        publishEvent(participantId, ActivityType.LIKE_E, null);
+        publishEvent(participantId, ActivityType.NOMAD_CODER, checkMatchedProjectCountByRegion(userId));
+        publishEvent(participantId, ActivityType.MY_DESTINY, checkMatchingCountWithSameUser(userId, participantId));
     }
 
     @Async("threadPoolTaskExecutor")
@@ -59,9 +67,14 @@ public class ProjectEventHelper {
         );
     }
 
-    private Integer checkCreatedProjectCountByRegion(Long userId) {
-        Integer progressCount = projectRepository.getRegionCountByUserId(userId);
+    private Integer checkMatchedProjectCountByRegion(Long userId) {
+        Integer progressCount = matchingService.getRegionCountByMatching(userId);
         return progressCount.equals(MAX_SERVICE_AREA) ? 1 : 0;
+    }
+
+    private Integer checkMatchingCountWithSameUser(Long userId, Long participantId) {
+        Integer progressCount = matchingService.getDuplicateMatching(userId, participantId);
+        return progressCount.equals(SAME_MATCHING_COUNT) ? 1 : 0;
     }
 
 }

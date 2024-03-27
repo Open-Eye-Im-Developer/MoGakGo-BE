@@ -1,10 +1,10 @@
-package io.oeid.mogakgo.domain.project.application;
+package io.oeid.mogakgo.domain.review.application;
 
 import io.oeid.mogakgo.common.event.domain.vo.AchievementCompletionEvent;
 import io.oeid.mogakgo.common.event.domain.vo.AchievementNotificationEvent;
 import io.oeid.mogakgo.common.event.domain.vo.UserActivityEvent;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
-import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
+import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,18 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(propagation = Propagation.REQUIRES_NEW)
 @RequiredArgsConstructor
-public class ProjectEventHelper {
+public class ReviewEventHelper {
 
-    private static final int MAX_SERVICE_AREA = 26;
-
-    private final ProjectJpaRepository projectRepository;
+    private final UserCommonService userCommonService;
     private final ApplicationEventPublisher eventPublisher;
 
-    public void publishEvent(Long userId) {
+    public void publishEvent(Long userId, Double jandiRate) {
 
-        // -- '생성자' 프로젝트를 생성한 사용자에 대한 업적 이벤트 발행
-        publishEvent(userId, ActivityType.PLEASE_GIVE_ME_MOGAK, null);
-        publishEvent(userId, ActivityType.BRAVE_EXPLORER, checkCreatedProjectCountByRegion(userId));
+        // -- '리뷰' 잔디력이 업데이트되는 사용자에 대한 업적 이벤트 발행
+        publishEvent(userId, ActivityType.FRESH_DEVELOPER, checkUserJandiRate(userId) + jandiRate);
     }
 
     @Async("threadPoolTaskExecutor")
@@ -59,9 +56,8 @@ public class ProjectEventHelper {
         );
     }
 
-    private Integer checkCreatedProjectCountByRegion(Long userId) {
-        Integer progressCount = projectRepository.getRegionCountByUserId(userId);
-        return progressCount.equals(MAX_SERVICE_AREA) ? 1 : 0;
+    private Double checkUserJandiRate(Long userId) {
+        return userCommonService.getUserById(userId).getJandiRate();
     }
 
 }

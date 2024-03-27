@@ -1,10 +1,9 @@
-package io.oeid.mogakgo.domain.project.application;
+package io.oeid.mogakgo.domain.profile.application;
 
 import io.oeid.mogakgo.common.event.domain.vo.AchievementCompletionEvent;
 import io.oeid.mogakgo.common.event.domain.vo.AchievementNotificationEvent;
 import io.oeid.mogakgo.common.event.domain.vo.UserActivityEvent;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
-import io.oeid.mogakgo.domain.project.infrastructure.ProjectJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -15,20 +14,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
 @RequiredArgsConstructor
-public class ProjectEventHelper {
+public class ProfileCardLikeEventHelper {
 
-    private static final int MAX_SERVICE_AREA = 26;
-
-    private final ProjectJpaRepository projectRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    public void publishEvent(Long userId) {
+    public void publishEvent(Long userId, Long receiverId) {
 
-        // -- '생성자' 프로젝트를 생성한 사용자에 대한 업적 이벤트 발행
-        publishEvent(userId, ActivityType.PLEASE_GIVE_ME_MOGAK, null);
-        publishEvent(userId, ActivityType.BRAVE_EXPLORER, checkCreatedProjectCountByRegion(userId));
+        // -- '찔러보기' 요청을 생성한 사용자에 대한 업적 이벤트 발행
+        publishEvent(userId, ActivityType.LEAVE_YOUR_MARK, null);
+
+        // -- '찔러보기' 요청을 수신한 사용자에 대한 업적 이벤트 발행
+        publishEvent(receiverId, ActivityType.WHAT_A_POPULAR_PERSON, null);
     }
 
     @Async("threadPoolTaskExecutor")
@@ -57,11 +55,6 @@ public class ProjectEventHelper {
             .target(target)
             .build()
         );
-    }
-
-    private Integer checkCreatedProjectCountByRegion(Long userId) {
-        Integer progressCount = projectRepository.getRegionCountByUserId(userId);
-        return progressCount.equals(MAX_SERVICE_AREA) ? 1 : 0;
     }
 
 }
