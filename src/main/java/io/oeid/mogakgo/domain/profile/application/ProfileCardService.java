@@ -43,7 +43,7 @@ public class ProfileCardService {
             .findByConditionWithPagination(userId, region, pageable);
 
         if (profiles.getData().size() >= 2) {
-            Collections.shuffle(profiles.getData().subList(0, profiles.getData().size() - 1));
+            Collections.shuffle(profiles.getData().subList(1, profiles.getData().size()));
         }
         return profiles;
     }
@@ -54,7 +54,7 @@ public class ProfileCardService {
         var result = profileCardRepository.findByConditionWithPaginationPublic(region,
             pageable.getCursorId(), pageable.getPageSize());
         if (result.size() >= 2) {
-            Collections.shuffle(result.subList(0, result.size() - 1));
+            Collections.shuffle(result.subList(1, result.size()));
         }
         var profiles = result.stream().map(
             profileCard -> new UserProfileInfoAPIRes(
