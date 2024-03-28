@@ -42,6 +42,7 @@ public class FinishedProjectScheduler {
             String sql = loadSqlFromFile(statement);
             jdbcTemplate.execute(sql);
         }
+        closeChatRoom();
         sendReviewNotification();
         sendMatchFailNotification();
     }
@@ -79,6 +80,12 @@ public class FinishedProjectScheduler {
                 Long senderId = rch.getLong("sender_id");
                 notificationService.createMatchingFailedNotification(senderId, projectId);
             }
+        );
+    }
+
+    private void closeChatRoom() {
+        jdbcTemplate.execute(
+            "UPDATE chat_room_tb SET status = 'CLOSE' WHERE project_id IN (SELECT pt.id FROM project_tb pt WHERE pt.project_status = 'FINISHED')"
         );
     }
 
