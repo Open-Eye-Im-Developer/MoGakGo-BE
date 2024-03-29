@@ -4,17 +4,22 @@
   </a>
 </h3>
 
+## 📢 프로젝트 소개
+<div align="center">
+  <img width="1600" alt="image" src="https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/87f2a91b-7ec7-44fe-ae03-69b74bee9dac">
+</div>
+
 
 ## ⚙️ 아키텍처
 
 <h3 align="center">
-  <img width="1592" alt="image" src="https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/cfdbc5f7-f0a8-453f-bcc2-f6ca94379c85">
+  <img width="1600" alt="image" src="https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/cfdbc5f7-f0a8-453f-bcc2-f6ca94379c85">
 </h3>
 
 ## 📁 DB ERD
 
 <h3 align="center">
-  <img alt="image" src="https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/f7815c1e-7cf9-46ac-a10f-35f9b6a06a48">
+  <img width="1600" alt="image" src="https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/f7815c1e-7cf9-46ac-a10f-35f9b6a06a48">
 </h3>
 
 ## 📚 기술 스택
