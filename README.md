@@ -14,7 +14,7 @@
 ## 📁 DB ERD
 
 <h3 align="center">
-
+  <img alt="image" src="https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/f7815c1e-7cf9-46ac-a10f-35f9b6a06a48">
 </h3>
 
 ## 📚 기술 스택
