@@ -149,6 +149,18 @@ class UserDomainTest {
     }
 
     @Test
+    void 유저_회원_가입_실패_이미_유저가_회원가입을_완료한_경우() {
+        // Arrange
+        user.signUpComplete();
+        // Act
+        assertThatThrownBy(() -> user.signUpComplete())
+            .isInstanceOf(UserException.class)
+            .hasFieldOrPropertyWithValue(
+                "errorCode", ErrorCode400.USER_ALREADY_SIGNUP
+            );
+    }
+
+    @Test
     void 유저_정보_업데이트_성공() {
         // Arrange
         var newUsername = "newUsername";
