@@ -13,6 +13,7 @@ public class UserAchievementInfoRes {
     private final String title;
     private final String imgUrl;
     private final String description;
+    private final Integer progressLevel;
     private final RequirementType requirementType;
     private final Integer requirementValue;
     private final Integer progressCount;
@@ -20,13 +21,14 @@ public class UserAchievementInfoRes {
 
     @Builder
     private UserAchievementInfoRes(Long userId, Long achievementId, String title, String imgUrl,
-        String description, RequirementType requirementType, Integer requirementValue,
-        Integer progressCount, Boolean completed) {
+        String description, Integer progressLevel, RequirementType requirementType,
+        Integer requirementValue, Integer progressCount, Boolean completed) {
         this.userId = userId;
         this.achievementId = achievementId;
         this.title = title;
         this.imgUrl = imgUrl;
         this.description = description;
+        this.progressLevel = progressLevel;
         this.requirementType = requirementType;
         this.requirementValue = requirementValue;
         this.progressCount = progressCount;
@@ -40,6 +42,7 @@ public class UserAchievementInfoRes {
             userAchievement.getAchievement().getTitle(),
             userAchievement.getAchievement().getImgUrl(),
             userAchievement.getAchievement().getDescription(),
+            userAchievement.getAchievement().getProgressLevel(),
             userAchievement.getAchievement().getRequirementType(),
             userAchievement.getAchievement().getRequirementValue(),
             progressCount,

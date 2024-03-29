@@ -80,6 +80,7 @@ public class AchievementService {
                 .title(achievement.getTitle())
                 .imgUrl(achievement.getImgUrl())
                 .description(achievement.getDescription())
+                .progressLevel(achievement.getProgressLevel())
                 .requirementType(achievement.getRequirementType())
                 .requirementValue(achievement.getRequirementValue())
                 .progressCount(map.get(achievement.getActivityType()))
