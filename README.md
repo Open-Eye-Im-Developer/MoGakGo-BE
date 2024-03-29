@@ -55,8 +55,9 @@
 
 ## 🔍︎ 기술적 고민
 
-- 
-- 
+- [GitHub OAuth2 + JWT 활용 인증 구현](https://velog.io/@tidavid1/MoGakGo-GitHub-OAuth2-JWT-%ED%99%9C%EC%9A%A9-%EC%9D%B8%EC%A6%9D-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0) 및 [개선](https://velog.io/@tidavid1/MoGakGo-%EC%9D%B8%EC%A6%9D-%ED%94%84%EB%A1%9C%EC%84%B8%EC%8A%A4-%EA%B0%9C%EC%84%A0%ED%95%98%EA%B8%B0)
+- [GitHub API 활용 사용자 개발 언어 정보 제공 기능 구현 및 비동기 활용 개선](https://velog.io/@tidavid1/MoGakGo-GitHub-API-%ED%99%9C%EC%9A%A9-%EC%82%AC%EC%9A%A9%EC%9E%90-%EA%B0%9C%EB%B0%9C-%EC%96%B8%EC%96%B4-%EC%A0%95%EB%B3%B4-%EC%A0%9C%EA%B3%B5-%EA%B8%B0%EB%8A%A5-%EA%B5%AC%ED%98%84-%EB%B0%8F-%EA%B0%9C%EC%84%A0)
+- [채팅 데이터 MongoDB 컬랙션 분리를 통한 페이지네이션 성능 개선](https://velog.io/@tidavid1/MoGakGo-%EC%B1%84%ED%8C%85-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EC%BB%AC%EB%9E%99%EC%85%98-%EB%B6%84%EB%A6%AC%EB%A5%BC-%ED%86%B5%ED%95%9C-%ED%8E%98%EC%9D%B4%EC%A7%80%EB%84%A4%EC%9D%B4%EC%85%98-%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0%ED%95%98%EA%B8%B0)
 
 
 ## 👤 멤버 소개
