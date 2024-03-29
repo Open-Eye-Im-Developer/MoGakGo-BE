@@ -188,6 +188,9 @@ public class User {
     }
 
     public void signUpComplete() {
+        if (Boolean.TRUE.equals(signupYn)) {
+            throw new UserException(ErrorCode400.USER_ALREADY_SIGNUP);
+        }
         this.signupYn = true;
     }
 

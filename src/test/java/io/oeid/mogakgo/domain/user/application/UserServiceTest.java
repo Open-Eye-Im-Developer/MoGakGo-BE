@@ -100,6 +100,22 @@ class UserServiceTest {
     }
 
     @Test
+    void 유저_회원가입_실패_이미_회원가입이_완료된_계정() {
+        // Arrange
+        user.signUpComplete();
+        var expectedUserId = 1L;
+        var expectedUsername = "tidavid1";
+        var expectedWantedJobs = List.of(WantedJob.BACKEND, WantedJob.DEVOPS);
+        var userSignUpRequest = new UserSignUpRequest(expectedUserId, expectedUsername,
+            expectedWantedJobs);
+        when(userCommonService.getUserById(expectedUserId)).thenReturn(user);
+        // Act & Assert
+        assertThatThrownBy(() -> userService.userSignUp(userSignUpRequest))
+            .isInstanceOf(UserException.class)
+            .hasFieldOrPropertyWithValue("errorCode", ErrorCode400.USER_ALREADY_SIGNUP);
+    }
+
+    @Test
     void 유저_삭제_성공() {
         // Arrange
         var expectedUserId = 1L;

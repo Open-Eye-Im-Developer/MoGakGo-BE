@@ -41,6 +41,7 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                 achievement.title,
                 achievement.imgUrl,
                 achievement.description,
+                achievement.progressLevel,
                 achievement.requirementType,
                 achievement.requirementValue,
                 Expressions.numberPath(Long.class, String.valueOf(0)),
@@ -66,6 +67,7 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                 userAchievement.achievement.title,
                 userAchievement.achievement.imgUrl,
                 userAchievement.achievement.description,
+                userAchievement.achievement.progressLevel,
                 userAchievement.achievement.requirementType,
                 userAchievement.achievement.requirementValue,
                 Expressions.numberPath(Long.class, String.valueOf(userActivity.createdAt.count())),
@@ -94,6 +96,7 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                 userAchievement.achievement.title,
                 userAchievement.achievement.imgUrl,
                 userAchievement.achievement.description,
+                userAchievement.achievement.progressLevel,
                 userAchievement.achievement.requirementType,
                 userAchievement.achievement.requirementValue,
                 userAchievement.completed
@@ -116,10 +119,11 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                     .title(tuple.get(2, String.class))
                     .imgUrl(tuple.get(3, String.class))
                     .description(tuple.get(4, String.class))
-                    .requirementType(tuple.get(5, RequirementType.class))
-                    .requirementValue(tuple.get(6, Integer.class))
-                    .progressCount(Integer.valueOf(String.valueOf(tuple.get(7, Long.class))))
-                    .completed(tuple.get(8, Boolean.class))
+                    .progressLevel(tuple.get(5, Integer.class))
+                    .requirementType(tuple.get(6, RequirementType.class))
+                    .requirementValue(tuple.get(7, Integer.class))
+                    .progressCount(Integer.valueOf(String.valueOf(tuple.get(8, Long.class))))
+                    .completed(tuple.get(9, Boolean.class))
                     .build()
             ).toList();
     }
