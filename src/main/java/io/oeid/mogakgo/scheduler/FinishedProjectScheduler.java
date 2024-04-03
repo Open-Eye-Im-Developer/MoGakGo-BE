@@ -85,7 +85,7 @@ public class FinishedProjectScheduler {
 
     private void closeChatRoom() {
         jdbcTemplate.execute(
-            "UPDATE chat_room_tb SET status = 'CLOSE' WHERE project_id IN (SELECT pt.id FROM project_tb pt WHERE pt.project_status = 'FINISHED')"
+            "UPDATE chat_room_tb SET status = 'CLOSED' WHERE project_id IN (SELECT pt.id FROM project_tb pt WHERE pt.project_status = 'FINISHED')"
         );
     }
 
