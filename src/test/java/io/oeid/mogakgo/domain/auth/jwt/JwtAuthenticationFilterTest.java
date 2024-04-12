@@ -64,8 +64,8 @@ class JwtAuthenticationFilterTest {
         // Assert
         verify(filterChain).doFilter(request, response);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
-        assertThat(SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-            .hasFieldOrPropertyWithValue("userId", expectedUserId);
+        assertThat(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).isEqualTo(
+            expectedUserId);
     }
 
     @Test
