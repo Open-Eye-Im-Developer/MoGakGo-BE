@@ -4,7 +4,6 @@ import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
 import io.oeid.mogakgo.domain.chat.entity.vo.ChatRoomDetail;
 import io.oeid.mogakgo.domain.chat.entity.vo.ChatUserInfo;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
-import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -40,12 +38,15 @@ public class ChatRoom {
 
     private final Map<Long, Boolean> participantsStatus = new HashMap<>();
 
-    @Builder
-    private ChatRoom(Long cursorId, UUID roomId, Project project) {
+    private ChatRoom(Long cursorId, UUID roomId, ChatRoomDetail chatRoomDetail) {
         this.cursorId = cursorId;
         this.roomId = roomId;
-        this.chatRoomDetail = new ChatRoomDetail(project.getId(), project.getMeetingInfo());
+        this.chatRoomDetail = chatRoomDetail;
         this.chatStatus = ChatStatus.OPEN;
+    }
+
+    public static ChatRoom of(Long cursorId, UUID roomId, ChatRoomDetail chatRoomDetail) {
+        return new ChatRoom(cursorId, roomId, chatRoomDetail);
     }
 
     public void addParticipant(User user) {
@@ -69,6 +70,7 @@ public class ChatRoom {
             throw new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND);
         }
         participantsStatus.put(userId, Boolean.FALSE);
+        closeChatRoom();
     }
 
 
