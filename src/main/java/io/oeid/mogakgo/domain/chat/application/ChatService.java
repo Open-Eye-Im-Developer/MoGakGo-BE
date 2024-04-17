@@ -32,6 +32,7 @@ public class ChatService {
         var chatRoom = ChatRoom.of(cursorId, UUID.randomUUID(), ChatRoomDetail.from(project));
         chatRoom.addParticipant(creator);
         chatRoom.addParticipant(sender);
+        chatRepository.createCollection(chatRoom.getRoomId().toString());
         chatRoomRepository.save(chatRoom);
     }
 
