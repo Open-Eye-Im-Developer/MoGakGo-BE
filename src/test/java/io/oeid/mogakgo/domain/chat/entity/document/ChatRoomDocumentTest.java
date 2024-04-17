@@ -2,12 +2,14 @@ package io.oeid.mogakgo.domain.chat.entity.document;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
 import io.oeid.mogakgo.domain.chat.entity.vo.ChatRoomDetail;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
+import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.domain.entity.vo.MeetingInfo;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.exception.code.ErrorCode400;
@@ -45,10 +47,13 @@ class ChatRoomDocumentTest {
 
     @BeforeAll
     static void setUp() {
-        chatRoomDetail = new ChatRoomDetail(PROJECT_ID,
+        var project = mock(Project.class);
+        when(project.getId()).thenReturn(PROJECT_ID);
+        when(project.getMeetingInfo()).thenReturn(
             MeetingInfo.of(CURRENT_TIME, CURRENT_TIME.plusHours(1),
                 new GeometryFactory().createPoint(
                     new Coordinate(MEET_LOCATION_LATITUDE, MEET_LOCATION_LONGITUDE)), MEET_DETAIL));
+        chatRoomDetail = ChatRoomDetail.from(project);
         user1 = spy(User.of(GITHUB_PK, USERNAME, AVATAR_URL, GITHUB_URL, REPOS_URL));
         user2 = spy(User.of(GITHUB_PK, USERNAME, AVATAR_URL, GITHUB_URL, REPOS_URL));
         when(user1.getId()).thenReturn(USER1_ID);
@@ -121,7 +126,7 @@ class ChatRoomDocumentTest {
     }
 
     @Test
-    void 채팅방_종료(){
+    void 채팅방_종료() {
         // Act
         chatRoom.closeChatRoom();
         // Assert
@@ -148,7 +153,7 @@ class ChatRoomDocumentTest {
     }
 
     @Test
-    void 채팅방_유저_나가기_실패_이미_나간_채팅방(){
+    void 채팅방_유저_나가기_실패_이미_나간_채팅방() {
         // Arrange
         chatRoom.addParticipant(user1);
         chatRoom.leaveChatRoom(USER1_ID);
@@ -156,5 +161,19 @@ class ChatRoomDocumentTest {
         assertThatThrownBy(() -> chatRoom.leaveChatRoom(USER1_ID))
             .isInstanceOf(ChatException.class)
             .hasMessageContaining(ErrorCode404.CHAT_USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 채팅방_마지막_채팅_추가() {
+        // Arrange
+        var chatData = ChatMessage.builder()
+            .id(1L)
+            .message("test")
+            .senderId(USER1_ID)
+            .build();
+        // Act
+        chatRoom.updateLastMessage(chatData);
+        // Assert
+        assertThat(chatRoom.getLastMessage()).isEqualTo(chatData);
     }
 }

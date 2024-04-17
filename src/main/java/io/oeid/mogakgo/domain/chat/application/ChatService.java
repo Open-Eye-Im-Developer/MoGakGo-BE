@@ -75,7 +75,10 @@ public class ChatService {
         String chatRoomId,
         CursorPaginationInfoReq pageable) {
         verifyChatUser(chatRoomId, userId);
-        return chatRepository.findAllByCollection(chatRoomId, pageable);
+        var chatData = chatRepository.findAllByCollection(chatRoomId, pageable.getCursorId(),
+            pageable.getPageSize()).stream().map(ChatDataApiRes::from).toList();
+        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(chatData,
+            pageable.getPageSize());
     }
 
     public ChatRoomDataRes findChatRoomDetailData(Long userId, String chatRoomId) {

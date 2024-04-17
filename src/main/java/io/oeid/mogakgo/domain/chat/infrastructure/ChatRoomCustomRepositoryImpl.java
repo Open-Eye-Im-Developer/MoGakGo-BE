@@ -10,7 +10,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
-import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfo;
+import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfoRes;
 import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +30,7 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
                     ChatRoomDataRes.class,
                     chatRoom.project.meetingInfo,
                     Projections.constructor(
-                        ChatUserInfo.class,
+                        ChatUserInfoRes.class,
                         chatUser.user.id,
                         chatUser.user.username,
                         chatUser.user.avatarUrl

@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.domain.chat.entity.vo;
 
+import io.oeid.mogakgo.domain.project.domain.entity.Project;
 import io.oeid.mogakgo.domain.project.domain.entity.vo.MeetingInfo;
 import java.time.LocalDateTime;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class ChatRoomDetail {
     private final LocalDateTime meetStartTime;
     private final LocalDateTime meetEndTime;
 
-    public ChatRoomDetail(Long projectId, MeetingInfo meetingInfo) {
+    private ChatRoomDetail(Long projectId, MeetingInfo meetingInfo) {
         var meetLocation = meetingInfo.getMeetLocation();
         this.projectId = projectId;
         this.meetDetail = meetingInfo.getMeetDetail();
@@ -22,5 +23,10 @@ public class ChatRoomDetail {
         this.meetLocationLongitude = meetLocation.getY();
         this.meetStartTime = meetingInfo.getMeetStartTime();
         this.meetEndTime = meetingInfo.getMeetEndTime();
+    }
+
+    public static ChatRoomDetail from(Project project) {
+        var meetingInfo = project.getMeetingInfo();
+        return new ChatRoomDetail(project.getId(), meetingInfo);
     }
 }

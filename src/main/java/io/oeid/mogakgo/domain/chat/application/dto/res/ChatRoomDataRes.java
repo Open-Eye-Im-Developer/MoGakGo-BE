@@ -1,6 +1,8 @@
 package io.oeid.mogakgo.domain.chat.application.dto.res;
 
-import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfo;
+import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfoRes;
+import io.oeid.mogakgo.domain.chat.entity.vo.ChatRoomDetail;
+import io.oeid.mogakgo.domain.chat.entity.vo.ChatUserInfo;
 import io.oeid.mogakgo.domain.project.domain.entity.vo.MeetingInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
@@ -23,16 +25,26 @@ public class ChatRoomDataRes {
     @Schema(description = "프로젝트 종료 시간")
     private LocalDateTime meetEndTime;
 
-    private ChatUserInfo chatUserInfo;
+    private ChatUserInfoRes chatUserInfoRes;
 
-    public ChatRoomDataRes(MeetingInfo meetingInfo, ChatUserInfo chatUserInfo) {
+    @Deprecated(forRemoval = true)
+    public ChatRoomDataRes(MeetingInfo meetingInfo, ChatUserInfoRes chatUserInfoRes) {
         var meetLocation = meetingInfo.getMeetLocation();
         this.meetDetail = meetingInfo.getMeetDetail();
         this.meetStartTime = meetingInfo.getMeetStartTime();
         this.meetLocationLatitude = meetLocation.getX();
         this.meetLocationLongitude = meetLocation.getY();
         this.meetEndTime = meetingInfo.getMeetEndTime();
-        this.chatUserInfo = chatUserInfo;
+        this.chatUserInfoRes = chatUserInfoRes;
+    }
+
+    public ChatRoomDataRes(ChatRoomDetail chatRoomDetail, ChatUserInfo chatUserInfo) {
+        this.meetDetail = chatRoomDetail.getMeetDetail();
+        this.meetStartTime = chatRoomDetail.getMeetStartTime();
+        this.meetLocationLatitude = chatRoomDetail.getMeetLocationLatitude();
+        this.meetLocationLongitude = chatRoomDetail.getMeetLocationLongitude();
+        this.meetEndTime = chatRoomDetail.getMeetEndTime();
+        this.chatUserInfoRes = ChatUserInfoRes.from(chatUserInfo);
     }
 
 }

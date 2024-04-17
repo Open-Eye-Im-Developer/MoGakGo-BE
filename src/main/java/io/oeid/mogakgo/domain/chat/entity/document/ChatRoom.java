@@ -20,8 +20,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "chatroom_metadata")
 public class ChatRoom {
 
-    private static final int CHAT_USER_MAX_SIZE = 2;
-
     @Id
     private Long cursorId;
 
@@ -30,6 +28,8 @@ public class ChatRoom {
     private final ChatRoomDetail chatRoomDetail;
 
     private ChatStatus chatStatus;
+
+    private ChatMessage lastMessage;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -49,8 +49,12 @@ public class ChatRoom {
         return new ChatRoom(cursorId, roomId, chatRoomDetail);
     }
 
+    public void updateLastMessage(ChatMessage message) {
+        this.lastMessage = message;
+    }
+
     public void addParticipant(User user) {
-        if (participants.size() >= CHAT_USER_MAX_SIZE) {
+        if (participants.size() >= 2) {
             throw new ChatException(ErrorCode400.CHAT_ROOM_MAX_USER_SIZE);
         }
         if (participants.containsKey(user.getId())) {
