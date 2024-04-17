@@ -14,7 +14,6 @@ import io.oeid.mogakgo.exception.code.ErrorCode404;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +43,7 @@ public class ChatRoomService {
         chatRoomRepository.save(chatRoom);
     }
 
-    public List<ChatRoomRes> findChatRoomsByUserId(@NonNull Long userId,
-        @NonNull Long cursorId, int pageSize) {
+    public List<ChatRoomRes> findChatRoomsByUserId(Long userId, Long cursorId, int pageSize) {
         return chatRoomRepository.findChatRoomsByUserId(userId, cursorId, pageSize).stream()
             .map(ChatRoomRes::from).toList();
     }

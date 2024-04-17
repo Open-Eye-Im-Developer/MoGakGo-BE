@@ -29,7 +29,7 @@ public class ChatRoomDocumentRepository {
         return Optional.ofNullable(mongoTemplate.findOne(query, ChatRoom.class));
     }
 
-    public List<ChatRoom> findChatRoomsByUserId(@NonNull Long userId, Long cursorId, int pageSize) {
+    public List<ChatRoom> findChatRoomsByUserId(Long userId, Long cursorId, int pageSize) {
         Query query = new Query();
         query.limit(pageSize + 1).addCriteria(verifyUserId(userId));
         if (cursorId != null) {
