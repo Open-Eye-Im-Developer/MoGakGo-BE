@@ -1,6 +1,6 @@
 package io.oeid.mogakgo.domain.chat.application;
 
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomRes;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.vo.ChatRoomDetail;
@@ -48,13 +48,13 @@ public class ChatService {
             .map(ChatRoomRes::from).toList();
     }
 
-    public ChatRoomDataRes findChatRoomDetailData(UUID roomId, Long userId) {
+    public ChatRoomPublicRes findChatRoomDetailData(UUID roomId, Long userId) {
         var chatRoom = chatRoomRepository.findByRoomIdAndUserId(roomId, userId)
             .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
         var userInfo = chatRoom.getParticipants().values().stream()
             .filter(info -> !info.userId().equals(userId))
             .findFirst().orElseThrow(() -> new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND));
-        return new ChatRoomDataRes(chatRoom.getChatRoomDetail(), userInfo);
+        return new ChatRoomPublicRes(chatRoom.getChatRoomDetail(), userInfo);
     }
 
     public UUID findChatRoomIdByProjectId(Long projectId) {

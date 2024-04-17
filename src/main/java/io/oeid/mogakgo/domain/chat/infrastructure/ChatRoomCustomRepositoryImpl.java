@@ -9,7 +9,7 @@ import static io.oeid.mogakgo.domain.user.domain.QUser.user;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfoRes;
 import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
 import java.util.List;
@@ -24,10 +24,10 @@ public class ChatRoomCustomRepositoryImpl implements ChatRoomCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public ChatRoomDataRes getChatDetailData(Long userId, UUID chatRoomId) {
+    public ChatRoomPublicRes getChatDetailData(Long userId, UUID chatRoomId) {
         return jpaQueryFactory.select(
                 Projections.constructor(
-                    ChatRoomDataRes.class,
+                    ChatRoomPublicRes.class,
                     chatRoom.project.meetingInfo,
                     Projections.constructor(
                         ChatUserInfoRes.class,

@@ -7,7 +7,7 @@ import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerChatErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerProjectErrorExamples;
 import io.oeid.mogakgo.core.properties.swagger.error.SwaggerUserErrorExamples;
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomRes;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatRoomIdApiRes;
@@ -62,7 +62,7 @@ public interface ChatSwagger {
                 }
             ))
     })
-    ResponseEntity<ChatRoomDataRes> getChatRoomDetailData(
+    ResponseEntity<ChatRoomPublicRes> getChatRoomDetailData(
         @Parameter(hidden = true) Long userId,
         @Parameter(in = ParameterIn.PATH) String chatRoomId);
 

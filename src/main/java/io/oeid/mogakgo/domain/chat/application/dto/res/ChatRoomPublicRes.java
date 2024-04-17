@@ -1,55 +1,38 @@
 package io.oeid.mogakgo.domain.chat.application.dto.res;
 
 import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfoRes;
-import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
-import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
-import io.oeid.mogakgo.domain.user.domain.User;
+import io.oeid.mogakgo.domain.chat.entity.vo.ChatRoomDetail;
+import io.oeid.mogakgo.domain.chat.entity.vo.ChatUserInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Deprecated(forRemoval = true)
-@Schema(description = "채팅방 리스트 조회 응답")
+@Schema(description = "채팅방 프로젝트 정보")
 @Getter
+@NoArgsConstructor
 public class ChatRoomPublicRes {
 
-    @Schema(description = "커서 ID")
-    private Long cursorId;
-    @Schema(description = "프로젝트 ID")
-    private Long projectId;
-    @Schema(description = "채팅방 ID")
-    private String chatRoomId;
-    @Schema(description = "마지막 메시지")
-    private String lastMessage;
-    @Schema(description = "마지막 메시지 생성 시간")
-    private LocalDateTime lastMessageCreatedAt;
-    @Schema(description = "채팅방 상태")
-    private ChatStatus status;
+    @Schema(description = "프로젝트 설명")
+    private String meetDetail;
+    @Schema(description = "프로젝트 시작 시간")
+    private LocalDateTime meetStartTime;
+    @Schema(description = "프로젝트 위치 위도")
+    private Double meetLocationLatitude;
+    @Schema(description = "프로젝트 위치 경도")
+    private Double meetLocationLongitude;
+    @Schema(description = "프로젝트 종료 시간")
+    private LocalDateTime meetEndTime;
 
     private ChatUserInfoRes chatUserInfoRes;
 
-    private ChatRoomPublicRes(Long cursorId, Long projectId, UUID chatRoomId, ChatStatus status,
-        ChatUserInfoRes chatUserInfoRes) {
-        this.cursorId = cursorId;
-        this.projectId = projectId;
-        this.chatRoomId = chatRoomId.toString();
-        this.status = status;
-        this.chatUserInfoRes = chatUserInfoRes;
+    public ChatRoomPublicRes(ChatRoomDetail chatRoomDetail, ChatUserInfo chatUserInfo) {
+        this.meetDetail = chatRoomDetail.getMeetDetail();
+        this.meetStartTime = chatRoomDetail.getMeetStartTime();
+        this.meetLocationLatitude = chatRoomDetail.getMeetLocationLatitude();
+        this.meetLocationLongitude = chatRoomDetail.getMeetLocationLongitude();
+        this.meetEndTime = chatRoomDetail.getMeetEndTime();
+        this.chatUserInfoRes = ChatUserInfoRes.from(chatUserInfo);
     }
 
-    public static ChatRoomPublicRes of(ChatRoom chatRoom, User user) {
-        return new ChatRoomPublicRes(
-            chatRoom.getCursorId(),
-            chatRoom.getProject().getId(),
-            chatRoom.getId(),
-            chatRoom.getStatus(),
-            ChatUserInfoRes.from(user)
-        );
-    }
-
-    public void addLastMessage(String lastMessage, LocalDateTime lastMessageCreatedAt) {
-        this.lastMessage = lastMessage;
-        this.lastMessageCreatedAt = lastMessageCreatedAt;
-    }
 }
