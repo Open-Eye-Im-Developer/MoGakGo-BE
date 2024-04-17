@@ -38,7 +38,6 @@ public class ChatWebSocketService {
         ChatMessage chatMessage = chatRepository.save(
             ChatMessage.builder().id(sequenceGeneratorService.generateSequence(roomId))
                 .senderId(userId)
-                .messageType(request.getMessageType())
                 .message(request.getMessage())
                 .build(), roomId);
         return ChatDataRes.of(receiver.getUser().getId(), sender.getUsername(), chatMessage);
