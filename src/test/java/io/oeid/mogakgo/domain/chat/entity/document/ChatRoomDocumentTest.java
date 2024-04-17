@@ -176,4 +176,54 @@ class ChatRoomDocumentTest {
         // Assert
         assertThat(chatRoom.getLastMessage()).isEqualTo(chatData);
     }
+
+    @Test
+    void 채팅방_상대방_유저_조회_성공() {
+        // Arrange
+        chatRoom.addParticipant(user1);
+        chatRoom.addParticipant(user2);
+        // Act
+        var actualResult = chatRoom.getOpponentUserInfo(USER1_ID);
+        // Assert
+        assertThat(actualResult)
+            .hasFieldOrPropertyWithValue("userId", USER2_ID)
+            .hasFieldOrPropertyWithValue("username", USERNAME)
+            .hasFieldOrPropertyWithValue("avatarUrl", AVATAR_URL);
+    }
+
+    @Test
+    void 채팅방_상대_유저_조회_실패_상대_유저가_존재하지_않을_때() {
+        // Arrange
+        chatRoom.addParticipant(user1);
+        chatRoom.addParticipant(user2);
+        // Act & Assert
+        assertThatThrownBy(() -> chatRoom.getOpponentUserInfo(3L))
+            .isInstanceOf(ChatException.class)
+            .hasMessageContaining(ErrorCode404.CHAT_USER_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void 채팅방_유저_정보_조회_성공() {
+        // Arrange
+        chatRoom.addParticipant(user1);
+        chatRoom.addParticipant(user2);
+        // Act
+        var actualResult = chatRoom.getParticipantUserInfo(USER1_ID);
+        // Assert
+        assertThat(actualResult)
+            .hasFieldOrPropertyWithValue("userId", USER1_ID)
+            .hasFieldOrPropertyWithValue("username", USERNAME)
+            .hasFieldOrPropertyWithValue("avatarUrl", AVATAR_URL);
+    }
+
+    @Test
+    void 채팅방_유저_정보_조회_실패_채팅방에_존재하지_않는_유저() {
+        // Arrange
+        chatRoom.addParticipant(user1);
+        chatRoom.addParticipant(user2);
+        // Act & Assert
+        assertThatThrownBy(() -> chatRoom.getParticipantUserInfo(3L))
+            .isInstanceOf(ChatException.class)
+            .hasMessageContaining(ErrorCode404.CHAT_USER_NOT_FOUND.getMessage());
+    }
 }

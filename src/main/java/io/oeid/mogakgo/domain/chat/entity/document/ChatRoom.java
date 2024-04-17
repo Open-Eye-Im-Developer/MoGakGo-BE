@@ -56,6 +56,9 @@ public class ChatRoom {
     }
 
     public ChatUserInfo getOpponentUserInfo(Long userId) {
+        if(!participants.containsKey(userId)){
+            throw new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND);
+        }
         return participants.values().stream()
             .filter(userInfo -> !userInfo.userId().equals(userId))
             .findFirst()
