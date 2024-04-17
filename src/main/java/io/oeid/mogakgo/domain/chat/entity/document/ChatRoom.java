@@ -10,6 +10,7 @@ import io.oeid.mogakgo.exception.code.ErrorCode404;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
@@ -49,6 +50,18 @@ public class ChatRoom {
         return new ChatRoom(cursorId, roomId, chatRoomDetail);
     }
 
+    public ChatUserInfo getParticipantUserInfo(Long userId) {
+        return Optional.ofNullable(participants.get(userId))
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND));
+    }
+
+    public ChatUserInfo getOpponentUserInfo(Long userId) {
+        return participants.values().stream()
+            .filter(userInfo -> !userInfo.userId().equals(userId))
+            .findFirst()
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND));
+    }
+
     public void updateLastMessage(ChatMessage message) {
         this.lastMessage = message;
     }
@@ -76,6 +89,5 @@ public class ChatRoom {
         participantsStatus.put(userId, Boolean.FALSE);
         closeChatRoom();
     }
-
 
 }

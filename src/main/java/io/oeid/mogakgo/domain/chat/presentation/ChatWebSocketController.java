@@ -1,10 +1,10 @@
 package io.oeid.mogakgo.domain.chat.presentation;
 
 import io.oeid.mogakgo.domain.chat.application.ChatWebSocketService;
-import io.oeid.mogakgo.domain.chat.application.dto.req.ChatReq;
 import io.oeid.mogakgo.domain.chat.presentation.dto.req.ChatApiReq;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
 import io.oeid.mogakgo.domain.notification.application.FCMNotificationService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -27,8 +27,8 @@ public class ChatWebSocketController {
     public ChatDataApiRes sendChatData(@DestinationVariable("chatRoomId") String chatRoomId,
         ChatApiReq request) {
         log.info("ChatWebSocketController - sendChatData start -> chatRoomId: {}", chatRoomId);
-        var response = chatWebSocketService.handleChatMessage(request.getUserId(), chatRoomId,
-            ChatReq.from(request));
+        var response = chatWebSocketService.handleChatMessage(UUID.fromString(chatRoomId),
+            request.getUserId(), request.getMessage());
         fcmNotificationService.sendNotification(response.getReceiverId(),
             response.getSenderUserName(), response.getMessage());
         return response.toApiResponse();

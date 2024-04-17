@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.domain.chat.application.dto.res;
 
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
+import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -18,12 +19,14 @@ public class ChatDataRes {
     private String message;
     private LocalDateTime createdAt;
 
-    public static ChatDataRes of(Long receiverId, String senderUserName, ChatMessage chatMessage) {
+    public static ChatDataRes of(ChatRoom chatRoom, ChatMessage chatMessage) {
+        var sender = chatRoom.getParticipantUserInfo(chatMessage.getSenderId());
+        var receiver = chatRoom.getOpponentUserInfo(chatMessage.getSenderId());
         return new ChatDataRes(
-            receiverId,
+            receiver.userId(),
             chatMessage.getId(),
             chatMessage.getSenderId(),
-            senderUserName,
+            sender.username(),
             chatMessage.getMessage(),
             chatMessage.getCreatedAt());
     }
