@@ -1,119 +1,74 @@
 package io.oeid.mogakgo.domain.chat.application;
 
-import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
-import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
-import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomRes;
+import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
+import io.oeid.mogakgo.domain.chat.entity.vo.ChatRoomDetail;
 import io.oeid.mogakgo.domain.chat.exception.ChatException;
 import io.oeid.mogakgo.domain.chat.infrastructure.ChatRepository;
-import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomRoomJpaRepository;
-import io.oeid.mogakgo.domain.chat.infrastructure.ChatUserJpaRepository;
+import io.oeid.mogakgo.domain.chat.infrastructure.ChatRoomDocumentRepository;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
 import io.oeid.mogakgo.domain.project.domain.entity.Project;
-import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import io.oeid.mogakgo.exception.code.ErrorCode404;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Deprecated(forRemoval = true)
-@Slf4j
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ChatService {
 
-    private final UserCommonService userCommonService;
-    private final ChatRoomRoomJpaRepository chatRoomRepository;
-    private final ChatUserJpaRepository chatUserRepository;
+    private final ChatRoomDocumentRepository chatRoomRepository;
     private final ChatRepository chatRepository;
+    private final ChatIdSequenceGeneratorService sequenceGeneratorService;
 
-    // 채팅방 리스트 조회
-    public CursorPaginationResult<ChatRoomPublicRes> findAllChatRoomByUserId(Long userId,
-        CursorPaginationInfoReq pageable) {
-        log.info("findAllChatRoomByUserId - userId: {}", userId);
-        var chatRoomList = chatRoomRepository.getChatRoomList(userId, pageable.getCursorId(),
-            pageable.getPageSize());
-        var result = chatRoomList.stream().map(
-            chatRoom -> {
-                var user = chatRoom.getOppositeUser(userId);
-                ChatRoomPublicRes res = ChatRoomPublicRes.of(chatRoom, user);
-                var chatMessage = chatRepository.findLastChatByCollection(
-                    chatRoom.getId().toString());
-                chatMessage.ifPresent(
-                    message -> res.addLastMessage(message.getMessage(), message.getCreatedAt()));
-                return res;
-            }
-        ).toList();
-        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(result,
-            pageable.getPageSize());
-    }
-
-    // 채팅방 생성
     @Transactional
     public void createChatRoom(Project project, User creator, User sender) {
-        ChatRoom chatRoom = chatRoomRepository.save(new ChatRoom(project));
-        chatUserRepository.save(chatRoom.join(creator));
-        chatUserRepository.save(chatRoom.join(sender));
-        chatRepository.createCollection(chatRoom.getId().toString());
+        var cursorId = sequenceGeneratorService.generateSequence("chatroom_metadata");
+        var chatRoom = ChatRoom.of(cursorId, UUID.randomUUID(), ChatRoomDetail.from(project));
+        chatRoom.addParticipant(creator);
+        chatRoom.addParticipant(sender);
+        chatRoomRepository.save(chatRoom);
     }
 
     @Transactional
-    public void leaveChatroom(Long userId, String chatRoomId) {
-        var user = findUserById(userId);
-        var chatRoom = findChatRoomById(chatRoomId);
-        chatRoom.leaveUser(user);
-        // 채팅방 비활성화
-        chatRoom.closeChat();
-    }
-
-    // 채팅방 조회
-    public CursorPaginationResult<ChatDataApiRes> findAllChatInChatRoom(Long userId,
-        String chatRoomId,
-        CursorPaginationInfoReq pageable) {
-        verifyChatUser(chatRoomId, userId);
-        var chatData = chatRepository.findAllByCollection(chatRoomId, pageable.getCursorId(),
-            pageable.getPageSize()).stream().map(ChatDataApiRes::from).toList();
-        return CursorPaginationResult.fromDataWithExtraItemForNextCheck(chatData,
-            pageable.getPageSize());
-    }
-
-    public ChatRoomDataRes findChatRoomDetailData(Long userId, String chatRoomId) {
-        log.info("findChatRoomDetailData - userId: {}, chatRoomId: {}", userId, chatRoomId);
-        verifyChatUser(chatRoomId, userId);
-        return chatRoomRepository.getChatDetailData(userId, UUID.fromString(chatRoomId));
-    }
-
-    public String findChatRoomIdByProjectId(Long userId, Long projectId) {
-        var user = findUserById(userId);
-        var chatRoom = chatRoomRepository.findByProject_Id(projectId)
+    public void leaveChatRoom(UUID roomId, Long userId) {
+        var chatRoom = chatRoomRepository.findByRoomIdAndUserId(roomId, userId)
             .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
-        verifyChatUser(chatRoom.getId().toString(), user.getId());
-        return chatRoom.getId().toString();
+        chatRoom.leaveChatRoom(userId);
+        chatRoomRepository.save(chatRoom);
     }
 
-    private ChatRoom findChatRoomById(String chatRoomId) {
-        return chatRoomRepository.findById(chatRoomId)
+    public List<ChatRoomRes> findChatRoomsByUserId(Long userId, Long cursorId, int pageSize) {
+        return chatRoomRepository.findChatRoomsByUserId(userId, cursorId, pageSize).stream()
+            .map(ChatRoomRes::from).toList();
+    }
+
+    public ChatRoomDataRes findChatRoomDetailData(UUID roomId, Long userId) {
+        var chatRoom = chatRoomRepository.findByRoomIdAndUserId(roomId, userId)
             .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
+        var userInfo = chatRoom.getParticipants().values().stream()
+            .filter(info -> !info.userId().equals(userId))
+            .findFirst().orElseThrow(() -> new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND));
+        return new ChatRoomDataRes(chatRoom.getChatRoomDetail(), userInfo);
     }
 
-    private User findUserById(Long userId) {
-        return userCommonService.getUserById(userId);
+    public UUID findChatRoomIdByProjectId(Long projectId) {
+        return chatRoomRepository.findByProjectId(projectId)
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND)).getRoomId();
     }
 
-    private void verifyChatUser(String chatRoomIdStr, Long userId) {
-        log.info("verifyChatUser - chatRoomId: {}, userId: {}", chatRoomIdStr, userId);
-        UUID chatRoomId = UUID.fromString(chatRoomIdStr);
-        chatUserRepository.findByChatRoomIdAndUserId(chatRoomId, userId)
-            .ifPresentOrElse(chatuser -> {
-                },
-                () -> {
-                    throw new ChatException(ErrorCode404.CHAT_USER_NOT_FOUND);
-                });
+    public List<ChatDataApiRes> findChatMessagesByRoomId(UUID roomId, Long userId,
+        Long cursorId, int pageSize) {
+        var chatRoom = chatRoomRepository.findByRoomIdAndUserId(roomId, userId)
+            .orElseThrow(() -> new ChatException(ErrorCode404.CHAT_ROOM_NOT_FOUND));
+        return chatRepository.findAllByCollection(chatRoom.getRoomId().toString(), cursorId,
+            pageSize).stream().map(ChatDataApiRes::from).toList();
     }
+
 
 }
