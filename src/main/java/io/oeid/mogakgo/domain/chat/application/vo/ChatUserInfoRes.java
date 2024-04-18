@@ -1,7 +1,6 @@
 package io.oeid.mogakgo.domain.chat.application.vo;
 
 import io.oeid.mogakgo.domain.chat.entity.vo.ChatUserInfo;
-import io.oeid.mogakgo.domain.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,14 +16,6 @@ public class ChatUserInfoRes {
     private String username;
     @Schema(description = "유저 프로필 이미지 URL")
     private String avatarUrl;
-
-    public static ChatUserInfoRes from(User user) {
-        return new ChatUserInfoRes(
-            user.getId(),
-            user.getUsername(),
-            user.getAvatarUrl()
-        );
-    }
 
     public static ChatUserInfoRes from(ChatUserInfo chatUserInfo) {
         return new ChatUserInfoRes(
