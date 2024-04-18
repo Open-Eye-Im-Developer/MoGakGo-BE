@@ -2,6 +2,7 @@ package io.oeid.mogakgo.domain.chat.entity.document;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -56,8 +57,8 @@ class ChatRoomDocumentTest {
         chatRoomDetail = ChatRoomDetail.from(project);
         user1 = spy(User.of(GITHUB_PK, USERNAME, AVATAR_URL, GITHUB_URL, REPOS_URL));
         user2 = spy(User.of(GITHUB_PK, USERNAME, AVATAR_URL, GITHUB_URL, REPOS_URL));
-        when(user1.getId()).thenReturn(USER1_ID);
-        when(user2.getId()).thenReturn(USER2_ID);
+        doReturn(USER1_ID).when(user1).getId();
+        doReturn(USER2_ID).when(user2).getId();
     }
 
     @BeforeEach
