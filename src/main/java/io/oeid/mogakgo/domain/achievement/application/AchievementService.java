@@ -3,13 +3,13 @@ package io.oeid.mogakgo.domain.achievement.application;
 import static io.oeid.mogakgo.exception.code.ErrorCode403.ACHIEVEMENT_FORBIDDEN_OPERATION;
 import static io.oeid.mogakgo.exception.code.ErrorCode404.ACHIEVEMENT_NOT_FOUND;
 
-import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
 import io.oeid.mogakgo.domain.achievement.exception.AchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
+import io.oeid.mogakgo.domain.achievement.presentation.dto.res.UserAchievementDetailInfoRes;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
 import java.util.Collections;
@@ -37,26 +37,26 @@ public class AchievementService {
             .orElseThrow(() -> new AchievementException(ACHIEVEMENT_NOT_FOUND));
     }
 
-    public List<UserAchievementInfoRes> getUserAchievementInfo(Long userId, Long id) {
+    public List<UserAchievementDetailInfoRes> getUserAchievementInfo(Long userId, Long id) {
         User user = validateToken(userId);
         validateUser(user, id);
 
         // 사용자의 미달성, Accumulate 타입 업적에 대한 상세 조회
-        List<UserAchievementInfoRes> result = getNonAchievedAndAccumulateAchiementInfo(userId);
+        List<UserAchievementDetailInfoRes> result = getNonAchievedAndAccumulateAchiementInfo(userId);
 
         // 사용자의 Sequence 타입 업적에 대한 상세 조회
-        List<UserAchievementInfoRes> seqResult = getSequenceAchievementInfoAboutUser(userId);
+        List<UserAchievementDetailInfoRes> seqResult = getSequenceAchievementInfoAboutUser(userId);
 
         return Stream
             .concat(result.stream(), seqResult.stream())
-            .sorted(Comparator.comparing(UserAchievementInfoRes::getAchievementId)).toList();
+            .sorted(Comparator.comparing(UserAchievementDetailInfoRes::getAchievementId)).toList();
     }
 
-    private List<UserAchievementInfoRes> getNonAchievedAndAccumulateAchiementInfo(Long userId) {
+    private List<UserAchievementDetailInfoRes> getNonAchievedAndAccumulateAchiementInfo(Long userId) {
         return userAchievementRepository.getAchievementInfoAboutUser(userId);
     }
 
-    private List<UserAchievementInfoRes> getSequenceAchievementInfoAboutUser(Long userId) {
+    private List<UserAchievementDetailInfoRes> getSequenceAchievementInfoAboutUser(Long userId) {
 
         // 사용자가 진행중이거나 달성중인, Sequence 타입 업적
         List<ActivityType> sequenceList = achievementRepository
@@ -74,9 +74,9 @@ public class AchievementService {
 
         return achievementIds.stream().map(achievementId -> {
             Achievement achievement = achievementFacadeService.getById(achievementId);
-            return UserAchievementInfoRes.builder()
-                .userId(userId)
+            return UserAchievementDetailInfoRes.builder()
                 .achievementId(achievementId)
+                .userId(userId)
                 .title(achievement.getTitle())
                 .imgUrl(achievement.getImgUrl())
                 .description(achievement.getDescription())
