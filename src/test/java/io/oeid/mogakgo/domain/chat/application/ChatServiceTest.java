@@ -140,12 +140,16 @@ class ChatServiceTest {
         assertThat(actualResult).hasSize(1);
         assertThat(actualResult.get(0))
             .hasFieldOrPropertyWithValue("cursorId", cursorId)
-            .hasFieldOrPropertyWithValue("roomId", roomId.toString())
-            .hasFieldOrPropertyWithValue("meetDetail", MEET_DETAIL)
-            .hasFieldOrPropertyWithValue("meetStartTime", CURRENT_TIME)
-            .hasFieldOrPropertyWithValue("chatStatus", ChatStatus.OPEN.name())
+            .hasFieldOrPropertyWithValue("projectId", PROJECT_ID)
+            .hasFieldOrPropertyWithValue("chatRoomId", roomId.toString())
+            .hasFieldOrPropertyWithValue("status", ChatStatus.OPEN)
+            .hasFieldOrProperty("ChatUserInfoRes")
             .hasFieldOrProperty("lastMessage")
             .hasFieldOrProperty("lastMessageCreatedAt");
+        assertThat(actualResult.get(0).getChatUserInfoRes())
+            .hasFieldOrPropertyWithValue("userId", USER2_ID)
+            .hasFieldOrPropertyWithValue("username", "tidavid1")
+            .hasFieldOrPropertyWithValue("avatarUrl", "https://avatars.githubusercontent.com/u/85854384?v=4");
     }
 
     @Test

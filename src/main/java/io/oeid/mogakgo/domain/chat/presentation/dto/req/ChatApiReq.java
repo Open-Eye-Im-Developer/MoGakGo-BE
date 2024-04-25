@@ -13,6 +13,13 @@ public class ChatApiReq {
 
     @Schema(description = "유저 ID", example = "2")
     private Long userId;
+
+    /**
+     * @deprecated
+     */
+    @Deprecated(forRemoval = true)
+    private String messageType;
+
     @Schema(description = "메시지", example = "안녕하세요", nullable = true)
     private String message;
 }

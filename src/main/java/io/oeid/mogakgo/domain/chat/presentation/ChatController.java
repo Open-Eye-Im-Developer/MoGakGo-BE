@@ -4,8 +4,8 @@ import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
 import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.common.swagger.template.ChatSwagger;
 import io.oeid.mogakgo.domain.chat.application.ChatService;
+import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomDataRes;
 import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomPublicRes;
-import io.oeid.mogakgo.domain.chat.application.dto.res.ChatRoomRes;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
 import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatRoomIdApiRes;
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ public class ChatController implements ChatSwagger {
     private final ChatService chatService;
 
     @GetMapping
-    public ResponseEntity<CursorPaginationResult<ChatRoomRes>> getChatRoomList(
+    public ResponseEntity<CursorPaginationResult<ChatRoomPublicRes>> getChatRoomList(
         @AuthenticationPrincipal Long userId,
         @Valid @ModelAttribute CursorPaginationInfoReq pageable) {
         var result = chatService.findChatRoomsByUserId(userId, pageable.getCursorId(), pageable.getPageSize());
@@ -38,7 +38,7 @@ public class ChatController implements ChatSwagger {
     }
 
     @GetMapping("/detail/{chatRoomId}")
-    public ResponseEntity<ChatRoomPublicRes> getChatRoomDetailData(
+    public ResponseEntity<ChatRoomDataRes> getChatRoomDetailData(
         @AuthenticationPrincipal Long userId,
         @PathVariable String chatRoomId) {
         return ResponseEntity.ok(
