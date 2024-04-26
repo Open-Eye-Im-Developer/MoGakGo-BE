@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,8 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-        FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String accessToken =
             request.getHeader(header) != null ? URLDecoder.decode(request.getHeader(header),
@@ -53,9 +54,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 List<GrantedAuthority> authorities = getAuthorities(
                     claims.get(JwtHelper.ROLES_STR).asArray(String.class));
                 var authentication = new JwtAuthenticationToken(
-                    JwtToken.of(userId, accessToken), "", authorities);
+                    userId, "", authorities);
                 authentication.setDetails(
                     new WebAuthenticationDetailsSource().buildDetails(request));
+                // TODO: SHOULD REMOVE
                 request.setAttribute(JwtHelper.USER_ID_STR, userId);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
