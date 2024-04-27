@@ -10,13 +10,10 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.domain.entity.QAchievement;
-import io.oeid.mogakgo.domain.achievement.domain.entity.QUserAchievement;
-import io.oeid.mogakgo.domain.achievement.domain.entity.QUserActivity;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
-import java.util.Comparator;
+import io.oeid.mogakgo.domain.achievement.presentation.dto.res.UserAchievementDetailInfoRes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -29,15 +26,13 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
     private static final int ACHIEVEMENT_SIZE = 14;
 
     QAchievement achievement1 = new QAchievement("achievement1");
-    QUserAchievement userAchievement1 = new QUserAchievement("userAchievement1");
-    QUserActivity userActivity1 = new QUserActivity("userActivity1");
 
     @Override
-    public List<UserAchievementInfoRes> getAchievementInfoAboutUser(Long userId) {
+    public List<UserAchievementDetailInfoRes> getAchievementInfoAboutUser(Long userId) {
 
         List<Tuple> sql1 = jpaQueryFactory.select(
-                Expressions.numberPath(Long.class, String.valueOf(userId)),
                 achievement.id,
+                Expressions.numberPath(Long.class, String.valueOf(userId)),
                 achievement.title,
                 achievement.imgUrl,
                 achievement.description,
@@ -48,11 +43,11 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
                 Expressions.booleanPath(String.valueOf(false))
             )
             .from(achievement)
-            .leftJoin(userAchievement)
-            .on(userAchievement.achievement.id.eq(achievement.id),
-                userAchievement.user.id.eq(userId))
+            .leftJoin(userActivity)
+            .on(achievement.activityType.eq(userActivity.activityType),
+                userActivity.user.id.eq(userId))
             .where(
-                userAchievement.user.id.isNull(),
+                userActivity.id.isNull(),
                 achievement.id.in(
                     JPAExpressions.select(achievement1.id.min())
                         .from(achievement1)
@@ -62,45 +57,25 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
             .fetch();
 
         List<Tuple> sql2 = jpaQueryFactory.select(
-                userAchievement.user.id,
                 userAchievement.achievement.id,
+                userAchievement.user.id,
                 userAchievement.achievement.title,
                 userAchievement.achievement.imgUrl,
                 userAchievement.achievement.description,
                 userAchievement.achievement.progressLevel,
                 userAchievement.achievement.requirementType,
                 userAchievement.achievement.requirementValue,
-                Expressions.numberPath(Long.class, String.valueOf(userActivity.createdAt.count())),
-                userAchievement.completed
-            )
+                Expressions.numberPath(Long.class, String.valueOf(userActivity.createdAt.countDistinct())),
+                userAchievement.completed).distinct()
             .from(userAchievement)
-            .innerJoin(userAchievement.achievement).on(userAchievement.achievement.id.eq(achievement.id))
-            .innerJoin(userActivity).on(userActivity.activityType.eq(userAchievement.achievement.activityType))
+            .innerJoin(userAchievement.achievement)
+            .innerJoin(userActivity).on(userActivity.activityType.eq(userAchievement.achievement.activityType),
+                userAchievement.user.id.eq(userActivity.user.id))
             .where(
                 userAchievement.user.id.eq(userId),
-                userAchievement.user.id.eq(userActivity.user.id),
-                userAchievement.achievement.id.in(
-                    JPAExpressions.select(achievement1.id.max())
-                        .from(userAchievement1)
-                        .innerJoin(achievement1).on(achievement1.id.eq(userAchievement1.achievement.id), userAchievement1.user.id.eq(userId))
-                        .innerJoin(userActivity1).on(achievement1.activityType.eq(userActivity1.activityType))
-                        .where(
-                            userAchievement1.achievement.requirementType.eq(RequirementType.ACCUMULATE),
-                            userAchievement1.user.id.eq(userActivity1.user.id))
-                        .groupBy(userActivity1.activityType)
-                )
+                userAchievement.achievement.requirementType.eq(RequirementType.ACCUMULATE)
             )
-            .groupBy(
-                userAchievement.user.id,
-                userAchievement.achievement.id,
-                userAchievement.achievement.title,
-                userAchievement.achievement.imgUrl,
-                userAchievement.achievement.description,
-                userAchievement.achievement.progressLevel,
-                userAchievement.achievement.requirementType,
-                userAchievement.achievement.requirementValue,
-                userAchievement.completed
-            )
+            .groupBy(userActivity.activityType)
             .fetch();
 
         if (sql1.size() < ACHIEVEMENT_SIZE) {
@@ -111,20 +86,19 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
             sql1 = sql2;
         }
 
-        return sql1.stream()
-            .sorted(Comparator.comparing(tuple -> tuple.get(1, Long.class))).map(
-                tuple -> UserAchievementInfoRes.builder()
-                    .userId(userId)
-                    .achievementId(tuple.get(1, Long.class))
-                    .title(tuple.get(2, String.class))
-                    .imgUrl(tuple.get(3, String.class))
-                    .description(tuple.get(4, String.class))
-                    .progressLevel(tuple.get(5, Integer.class))
-                    .requirementType(tuple.get(6, RequirementType.class))
-                    .requirementValue(tuple.get(7, Integer.class))
-                    .progressCount(Integer.valueOf(String.valueOf(tuple.get(8, Long.class))))
-                    .completed(tuple.get(9, Boolean.class))
-                    .build()
+        return sql1.stream().map(
+            tuple -> UserAchievementDetailInfoRes.builder()
+                .achievementId(tuple.get(0, Long.class))
+                .userId(userId)
+                .title(tuple.get(2, String.class))
+                .imgUrl(tuple.get(3, String.class))
+                .description(tuple.get(4, String.class))
+                .progressLevel(tuple.get(5, Integer.class))
+                .requirementType(tuple.get(6, RequirementType.class))
+                .requirementValue(tuple.get(7, Integer.class))
+                .progressCount(Integer.valueOf(String.valueOf(tuple.get(8, Long.class))))
+                .completed(tuple.get(9, Boolean.class))
+                .build()
             ).toList();
     }
 
