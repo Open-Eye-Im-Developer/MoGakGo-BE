@@ -203,8 +203,7 @@ public class AchievementEventHandler {
             // -- 'SEQUENCE' 타입 업적에 한해, 달성 조건을 위해 사용된 히스토리 soft delete 처리
             Achievement achievement = getById(event.getAchievementId());
             List<UserActivity> history = userActivityRepository.getActivityHistoryByActivityType(
-                event.getUserId(), achievement.getActivityType(),
-                achievement.getRequirementValue());
+                event.getUserId(), achievement.getActivityType(), achievement.getRequirementValue());
             history.forEach(UserActivity::delete);
 
             log.info("call socket for event {} completion", event.getAchievementId());
@@ -264,7 +263,7 @@ public class AchievementEventHandler {
     }
 
     public Integer getProgressLevelSize(ActivityType activityType) {
-        return achievementRepository.findByActivityType(activityType).size();
+        return achievementRepository.findMaxProgressLevelByActivityType(activityType);
     }
 
     public UserAchievement getByUserAndAchievementId(final AchievementEvent event) {

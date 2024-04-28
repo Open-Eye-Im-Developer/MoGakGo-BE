@@ -30,7 +30,8 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
     @Override
     public List<UserAchievementDetailInfoRes> getAchievementInfoAboutUser(Long userId) {
 
-        List<Tuple> sql1 = jpaQueryFactory.select(
+        List<Tuple> sql1 = jpaQueryFactory
+            .select(
                 achievement.id,
                 Expressions.numberPath(Long.class, String.valueOf(userId)),
                 achievement.title,
@@ -56,7 +57,8 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
             )
             .fetch();
 
-        List<Tuple> sql2 = jpaQueryFactory.select(
+        List<Tuple> sql2 = jpaQueryFactory
+            .select(
                 userAchievement.achievement.id,
                 userAchievement.user.id,
                 userAchievement.achievement.title,
@@ -138,17 +140,17 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
 
     private Tuple findAvailableAchievementByActivityType(Long userId, ActivityType activityType) {
 
-        return jpaQueryFactory.select(
-                userAchievement.achievement.id.max(),
+        return jpaQueryFactory
+            .select(
+                userAchievement.achievement.id,
                 userAchievement.completed,
-                findAvailableNextStep(userAchievement.achievement.id.max(), activityType)
+                findAvailableNextStep(userAchievement.achievement.id, activityType)
             )
             .from(userAchievement)
             .innerJoin(userActivity).on(userAchievement.user.id.eq(userActivity.user.id))
-            .innerJoin(userAchievement.achievement).on(userActivity.activityType.eq(userAchievement.achievement.activityType))
             .where(
                 userAchievement.user.id.eq(userId),
-                userAchievement.achievement.activityType.eq(activityType)
+                userActivity.activityType.eq(activityType)
             )
             .groupBy(userActivity.activityType)
             .fetchOne();
@@ -157,18 +159,14 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
     // 오늘 날짜를 제외한, Accumulate 타입 업적의 진행 횟수 조회
     @Override
     public Integer getAccumulatedProgressCountByActivity(Long userId, ActivityType activityType) {
-        Long result = jpaQueryFactory.select(userActivity.createdAt.count())
-            .from(achievement)
-            .innerJoin(userActivity).on(achievement.activityType.eq(userActivity.activityType), userActivity.user.id.eq(userId))
+        Long result = jpaQueryFactory
+            .select(userActivity.createdAt.countDistinct())
+            .from(userActivity)
+            .innerJoin(achievement).on(userActivity.activityType.eq(achievement.activityType),
+                userActivity.user.id.eq(userId))
             .where(
-                achievement.id.in(
-                JPAExpressions.select(achievement1.id.min())
-                    .from(achievement1)
-                    .where(
-                        achievement1.requirementType.eq(RequirementType.ACCUMULATE),
-                        achievement1.activityType.eq(activityType)
-                    )
-                )
+                achievement.requirementType.eq(RequirementType.ACCUMULATE),
+                userActivity.activityType.eq(activityType)
             )
             .fetchOne();
 
@@ -177,7 +175,8 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
 
     @Override
     public Long findMinAchievementIdByActivityType(ActivityType activityType) {
-        return jpaQueryFactory.select(achievement.id.min())
+        return jpaQueryFactory
+            .select(achievement.id.min())
             .from(achievement)
             .where(achievement.activityType.eq(activityType))
             .fetchOne();
@@ -186,7 +185,8 @@ public class UserAchievementRepositoryCustomImpl implements UserAchievementRepos
     private BooleanExpression findAvailableNextStep(NumberExpression<Long> achievementId,
         ActivityType activityType) {
 
-        return jpaQueryFactory.selectOne()
+        return jpaQueryFactory
+            .selectOne()
             .from(achievement)
             .where(
                 achievement.activityType.eq(activityType),

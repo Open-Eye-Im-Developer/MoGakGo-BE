@@ -17,13 +17,13 @@ public class UserActivityRepositoryCustomImpl implements UserActivityRepositoryC
 
     @Override
     public List<UserActivity> getActivityHistoryByActivityType(Long userId, ActivityType activityType, Integer limit) {
-        return jpaQueryFactory.selectFrom(userActivity)
+        return jpaQueryFactory
+            .selectFrom(userActivity)
             .where(
                 userActivity.user.id.eq(userId),
                 userActivity.activityType.eq(activityType),
                 userActivity.deletedAt.isNull()
             )
-            .orderBy(userActivity.createdAt.desc())
             .limit(limit)
             .fetch();
     }
