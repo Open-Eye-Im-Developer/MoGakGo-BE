@@ -32,6 +32,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
+@Deprecated(forRemoval = true)
 @Entity
 @Getter
 @Table(name = "chat_room_tb", uniqueConstraints = {
