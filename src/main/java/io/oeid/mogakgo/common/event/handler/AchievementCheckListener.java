@@ -146,7 +146,7 @@ public class AchievementCheckListener {
     }
 
     private Integer getProgressLevelSize(ActivityType activityType) {
-        return achievementRepository.findByActivityType(activityType).size();
+        return achievementRepository.findMaxProgressLevelByActivityType(activityType);
     }
 
 }
