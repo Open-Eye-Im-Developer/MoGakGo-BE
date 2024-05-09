@@ -2,20 +2,18 @@ package io.oeid.mogakgo.domain.achievement.presentation.dto.res;
 
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Schema(description = "사용자에 대한 업적 상세 정보 조회 응답 DTO")
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserAchievementDetailAPIRes {
-
-    @Schema(description = "업적을 조회할 사용자 ID", example = "11", implementation = Long.class)
-    private final Long userId;
+public class UserAchievementDetailInfoRes {
 
     @Schema(description = "조회할 업적 ID")
     private final Long achievementId;
+
+    @Schema(description = "업적을 조회할 사용자 ID", example = "11", implementation = Long.class)
+    private final Long userId;
 
     @Schema(description = "조회할 업적 타이틀")
     private final String title;
@@ -41,18 +39,19 @@ public class UserAchievementDetailAPIRes {
     @Schema(description = "해당 업적의 달성 여부")
     private final Boolean completed;
 
-    public static UserAchievementDetailAPIRes from(UserAchievementDetailInfoRes response) {
-        return new UserAchievementDetailAPIRes(
-            response.getUserId(),
-            response.getAchievementId(),
-            response.getTitle(),
-            response.getImgUrl(),
-            response.getDescription(),
-            response.getProgressLevel(),
-            response.getRequirementType(),
-            response.getRequirementValue(),
-            response.getProgressCount(),
-            response.getCompleted()
-        );
+    @Builder
+    private UserAchievementDetailInfoRes(Long achievementId, Long userId, String title,
+        String imgUrl, String description, Integer progressLevel, RequirementType requirementType,
+        Integer requirementValue, Integer progressCount, Boolean completed) {
+        this.achievementId = achievementId;
+        this.userId = userId;
+        this.title = title;
+        this.imgUrl = imgUrl;
+        this.description = description;
+        this.progressLevel = progressLevel;
+        this.requirementType = requirementType;
+        this.requirementValue = requirementValue;
+        this.progressCount = progressCount;
+        this.completed = completed;
     }
 }

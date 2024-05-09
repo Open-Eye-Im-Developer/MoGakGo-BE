@@ -1,12 +1,10 @@
 package io.oeid.mogakgo.domain.chat.application.dto.res;
 
-import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfo;
-import io.oeid.mogakgo.domain.chat.entity.ChatRoom;
+import io.oeid.mogakgo.domain.chat.application.vo.ChatUserInfoRes;
+import io.oeid.mogakgo.domain.chat.entity.document.ChatRoom;
 import io.oeid.mogakgo.domain.chat.entity.enums.ChatStatus;
-import io.oeid.mogakgo.domain.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.Getter;
 
 @Schema(description = "채팅방 리스트 조회 응답")
@@ -26,29 +24,35 @@ public class ChatRoomPublicRes {
     @Schema(description = "채팅방 상태")
     private ChatStatus status;
 
-    private ChatUserInfo chatUserInfo;
+    private final ChatUserInfoRes chatUserInfoRes;
 
-    private ChatRoomPublicRes(Long cursorId, Long projectId, UUID chatRoomId, ChatStatus status,
-        ChatUserInfo chatUserInfo) {
+    private ChatRoomPublicRes(Long cursorId, Long projectId, String chatRoomId, ChatStatus status,
+        ChatUserInfoRes chatUserInfoRes) {
+        this.status = status;
+        this.chatRoomId = chatRoomId;
         this.cursorId = cursorId;
         this.projectId = projectId;
-        this.chatRoomId = chatRoomId.toString();
-        this.status = status;
-        this.chatUserInfo = chatUserInfo;
+        this.chatUserInfoRes = chatUserInfoRes;
     }
 
-    public static ChatRoomPublicRes of(ChatRoom chatRoom, User user) {
-        return new ChatRoomPublicRes(
-            chatRoom.getCursorId(),
-            chatRoom.getProject().getId(),
-            chatRoom.getId(),
-            chatRoom.getStatus(),
-            ChatUserInfo.from(user)
-        );
-    }
-
-    public void addLastMessage(String lastMessage, LocalDateTime lastMessageCreatedAt) {
+    private void addLastMessage(String lastMessage, LocalDateTime lastMessageCreatedAt) {
         this.lastMessage = lastMessage;
         this.lastMessageCreatedAt = lastMessageCreatedAt;
+    }
+
+    public static ChatRoomPublicRes of(ChatRoom chatRoom, Long userId) {
+        var chatUserInfo = chatRoom.getOpponentUserInfo(userId);
+        var chatRoomRes = new ChatRoomPublicRes(
+            chatRoom.getCursorId(),
+            chatRoom.getChatRoomDetail().getProjectId(),
+            chatRoom.getRoomId().toString(),
+            chatRoom.getChatStatus(),
+            ChatUserInfoRes.from(chatUserInfo)
+        );
+        var lastMessage = chatRoom.getLastMessage();
+        if (lastMessage != null) {
+            chatRoomRes.addLastMessage(lastMessage.getMessage(), lastMessage.getCreatedAt());
+        }
+        return chatRoomRes;
     }
 }

@@ -13,14 +13,14 @@ public interface UserActivityJpaRepository extends JpaRepository<UserActivity, L
     UserActivityRepositoryCustom {
 
     @Query("""
-        select uact from UserActivity uact where uact.user.id = :userId
-        and uact.activityType = :activityType and uact.deletedAt is null order by uact.createdAt desc
+        select uat from UserActivity uat where uat.user.id = :userId
+        and uat.activityType = :activityType and uat.deletedAt is null
     """)
     List<UserActivity> findByUserIdAndActivityType(Long userId, ActivityType activityType);
 
     @Query("""
-        select uact from UserActivity uact where uact.user.id = :userId and uact.activityType = :activityType
-        and FUNCTION('DATE_FORMAT', uact.createdAt, '%Y-%m-%d') = CURRENT_DATE
+        select uat from UserActivity uat where uat.user.id = :userId and uat.activityType = :activityType
+        and FUNCTION('DATE_FORMAT', uat.createdAt, '%Y-%m-%d') = CURRENT_DATE
     """)
     Optional<UserActivity> findByActivityTypeAndCreatedAt(Long userId, ActivityType activityType);
 

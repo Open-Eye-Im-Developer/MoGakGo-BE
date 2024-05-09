@@ -3,9 +3,9 @@ package io.oeid.mogakgo.domain.achievement.presentation;
 import io.oeid.mogakgo.common.annotation.UserId;
 import io.oeid.mogakgo.common.swagger.template.AchievementSwagger;
 import io.oeid.mogakgo.domain.achievement.application.AchievementService;
-import io.oeid.mogakgo.domain.achievement.application.dto.res.UserAchievementInfoRes;
 import io.oeid.mogakgo.domain.achievement.presentation.dto.res.AchievementInfoAPIRes;
 import io.oeid.mogakgo.domain.achievement.presentation.dto.res.UserAchievementDetailAPIRes;
+import io.oeid.mogakgo.domain.achievement.presentation.dto.res.UserAchievementDetailInfoRes;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ public class AchievementController implements AchievementSwagger {
     public ResponseEntity<List<UserAchievementDetailAPIRes>> getUserAchievementDetail(
         @UserId Long userId, @PathVariable Long id
     ) {
-        List<UserAchievementInfoRes> userAchievementLists = achievementService
+        List<UserAchievementDetailInfoRes> userAchievementLists = achievementService
             .getUserAchievementInfo(userId, id);
 
         return ResponseEntity.ok().body(

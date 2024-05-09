@@ -1,9 +1,7 @@
 package io.oeid.mogakgo.domain.chat.infrastructure;
 
-import io.oeid.mogakgo.common.base.CursorPaginationInfoReq;
-import io.oeid.mogakgo.common.base.CursorPaginationResult;
 import io.oeid.mogakgo.domain.chat.entity.document.ChatMessage;
-import io.oeid.mogakgo.domain.chat.presentation.dto.res.ChatDataApiRes;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -28,15 +26,12 @@ public class ChatRepository {
         return mongoTemplate.save(chatMessage, collectionName);
     }
 
-    public CursorPaginationResult<ChatDataApiRes> findAllByCollection(String collectionName,
-        CursorPaginationInfoReq pageable) {
+    public List<ChatMessage> findAllByCollection(String collectionName,
+        Long cursorId, int pageSize) {
         Query query = new Query();
-        query.limit(pageable.getPageSize()).addCriteria(cursorIdCondition(pageable.getCursorId()))
+        query.limit(pageSize + 1).addCriteria(cursorIdCondition(cursorId))
             .with(Sort.by(Sort.Order.desc("createdAt")));
-        var result = mongoTemplate.find(query, ChatMessage.class, collectionName).stream()
-            .map(ChatDataApiRes::from).toList();
-        return CursorPaginationResult.fromDataWithHasNext(result, pageable.getPageSize(),
-            hasNext(pageable.getCursorId(), pageable.getPageSize(), collectionName));
+        return mongoTemplate.find(query, ChatMessage.class, collectionName);
     }
 
     public Optional<ChatMessage> findLastChatByCollection(String collectionName) {

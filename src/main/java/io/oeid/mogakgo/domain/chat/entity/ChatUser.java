@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Deprecated(forRemoval = true)
 @Entity
 @Getter
 @Table(name = "chat_user_mapping_tb", uniqueConstraints = {

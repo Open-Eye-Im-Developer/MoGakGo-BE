@@ -24,6 +24,9 @@ public class AchievementInfoAPIRes {
     @Schema(description = "조회할 업적 상세 설명")
     private final String description;
 
+    @Schema(description = "조회할 업적 단계")
+    private final Integer progressLevel;
+
     @Schema(description = "조회할 업적 타입")
     private final RequirementType requirementType;
 
@@ -36,6 +39,7 @@ public class AchievementInfoAPIRes {
             achievement.getTitle(),
             achievement.getImgUrl(),
             achievement.getDescription(),
+            achievement.getProgressLevel(),
             achievement.getRequirementType(),
             achievement.getRequirementValue()
         );
