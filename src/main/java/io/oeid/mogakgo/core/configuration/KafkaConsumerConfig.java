@@ -16,11 +16,11 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 @Configuration
 public class KafkaConsumerConfig {
 
-    @Value("${spring.kafka.consumer.group-id}")
-    private String GROUP_ID;
-
     @Value("${spring.kafka.bootstrap-servers}")
     private String BOOTSTRAP_ADDRESS;
+
+    @Value("${spring.kafka.consumer.group-id}")
+    private String GROUP_ID;
 
     @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String AUTO_OFFSET_RESET;
