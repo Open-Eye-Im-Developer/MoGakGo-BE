@@ -37,7 +37,6 @@ public class KafkaProducerConfig {
      * 사용하는 직렬화 메커니즘을 설정.
      */
 
-
     @Bean
     public ProducerFactory<String, String> producerFactory() {
         Map<String, Object> props = new HashMap<>();
