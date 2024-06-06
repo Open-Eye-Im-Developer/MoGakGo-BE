@@ -11,7 +11,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
-/**
+/*
  * Deprecated annotation programming -> change to functional programming
  * @EnableBinding
  * @Input
