@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  kafka-1:
+    image: bashj79/kafka-kraft
+    ports:
+      - '9092:9092'
+
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper
+#    ports:
+#      - '2181:2181'
+#    environment:
+#      ZOOKEEPER_CLIENT_PORT: 2181
+#      ZOOKEEPER_TICK_TIME: 2000
+#  kafka-1:
+#    image: confluentinc/cp-kafka
+#    ports:
+#      - '9092:9092'
+#    depends_on:
+#      - zookeeper
+#    environment:
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT, EXTERNAL:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+#      KAFKA_ADVERTIESED_LISTENERS: INTERNAL://kafka-1:29092,EXTERNAL://localhost:9092
+#  kafka-ui:
+#    image: provectuslabs/kafka-ui
+#    container_name: kafka-ui
+#    ports:
+#      - '9000:8080'
+#    restart: always
+#    environment:
+#      - KAFKA_CLUSTERS_0_NAME=local
+#      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-1:29092
+#      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
