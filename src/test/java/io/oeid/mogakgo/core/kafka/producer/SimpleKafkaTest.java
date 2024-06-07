@@ -12,9 +12,9 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 @SpringBootTest
 @EmbeddedKafka(partitions = 3,
                brokerProperties = {
-                  "listeners=PLAINTEXT://localhost:49092"
+                  "listeners=PLAINTEXT://localhost:59092"
                },
-               ports = { 49092 })
+               ports = { 59092 })
 public class SimpleKafkaTest {
 
     @Autowired
