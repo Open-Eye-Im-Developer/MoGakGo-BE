@@ -40,3 +40,6 @@ out/
 ### application.yml ###
 application*.yml
 firebase*.json
+
+### docker-compose.yml ###
+docker-compose.yml
