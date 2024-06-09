@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.core.configuration;
 
+import io.oeid.mogakgo.core.properties.RabbitMQProperties;
 import io.oeid.mogakgo.domain.chat.interceptor.StompInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +18,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompInterceptor stompInterceptor;
+    private final RabbitMQProperties rabbitMQProperties;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableSimpleBroker("/topic", "/queue");
+        registry.enableStompBrokerRelay("/topic", "/queue")
+            .setRelayHost(rabbitMQProperties.getUrl())
+            .setRelayPort(rabbitMQProperties.getPort())
+            .setClientLogin(rabbitMQProperties.getClientLogin())
+            .setClientPasscode(rabbitMQProperties.getClientPassword());
     }
 
     @Override
