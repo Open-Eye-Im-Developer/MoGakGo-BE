@@ -56,6 +56,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb:3.1.8'
     // Spring Boot WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket:3.1.8'
+    // Spring Kafka
+    implementation 'org.springframework.kafka:spring-kafka:3.0.16'
     // Spring Retry
     implementation 'org.springframework.retry:spring-retry'
     // Flyway
@@ -70,6 +72,8 @@ dependencies {
     testImplementation 'org.testcontainers:mysql:1.19.3'
     // Spring Security Test
     testImplementation 'org.springframework.security:spring-security-test:6.1.3'
+    // Spring Kafka Test
+    testImplementation 'org.springframework.kafka:spring-kafka-test:3.0.16'
 }
 
     test {
