@@ -38,6 +38,16 @@ services:
       - KAFKA_CLUSTERS_0_AUDIT_CONSOLEAUDITENABLED=true
     depends_on:
       - kafka00
+  mogakgo-rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      # TODO: SHOULD BE CHANGED
+      RABBITMQ_DEFAULT_USER: "root"
+      RABBITMQ_DEFAULT_PASS: "root!"
+
 
 #  zookeeper:
 #    image: confluentinc/cp-zookeeper
