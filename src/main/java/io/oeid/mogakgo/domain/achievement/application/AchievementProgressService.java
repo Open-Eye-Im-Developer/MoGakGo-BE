@@ -26,6 +26,7 @@ public class AchievementProgressService {
         return userAchievementRepository.getAccumulatedProgressCountByActivity(userId, activityType);
     }
 
+    // -- 업적 상세 조회를 위한 progressCount 조회
     public Map<ActivityType, Integer> getProgressCountMap(Long userId, List<ActivityType> activityList) {
         return activityList.stream().collect(Collectors.toMap(
             activityType -> activityType,
@@ -43,6 +44,26 @@ public class AchievementProgressService {
             today = today.minusDays(1);
         }
         return validateContinuous(today, 0, activityList, 0);
+    }
+
+    // -- 연속으로 달성 가능한 업적에 대한 달성조건 검증을 위한 progressCount 조회
+    public Map<ActivityType, Integer> getProgressCountMapWithoutToday(Long userId, List<ActivityType> activityList) {
+        return activityList.stream().collect(Collectors.toMap(
+            activityType -> activityType,
+            activityType -> {
+                List<UserActivity> history = userActivityRepository
+                    .findByUserIdAndActivityType(userId, activityType);
+                return !history.isEmpty() ? getSeqProgressCountFromYesterday(history) : 0;
+            }
+        ));
+    }
+
+    private Integer getSeqProgressCountFromYesterday(List<UserActivity> activityList) {
+        LocalDate today = LocalDate.now();
+        if (equalToLocalDate(today, activityList.get(0).getCreatedAt())) {
+            activityList.remove(0);
+        }
+        return validateContinuous(today.minusDays(1), 0, activityList, 0);
     }
 
     private int validateContinuous(LocalDate date, int idx, List<UserActivity> activityList, int count) {

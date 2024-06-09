@@ -33,10 +33,12 @@ import io.oeid.mogakgo.domain.user.infrastructure.UserJpaRepository;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
@@ -49,6 +51,7 @@ public class ProjectService {
     private final GeoService geoService;
     private final ProjectJoinRequestJpaRepository projectJoinRequestJpaRepository;
     private final UserMatchingService userMatchingService;
+    private final ProjectEventHelper eventHelper;
 
     @Transactional
     public Long create(Long userId, ProjectCreateReq request) {
@@ -75,6 +78,8 @@ public class ProjectService {
         // 프로젝트 생성
         Project project = request.toEntity(tokenUser);
         projectJpaRepository.save(project);
+
+        eventHelper.publishEvent(userId);
 
         return project.getId();
     }
