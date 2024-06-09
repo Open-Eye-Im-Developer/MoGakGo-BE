@@ -32,6 +32,10 @@ jobs:
       ## Gradle Wrapper grant permission
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      ## Run docker-compose.yml
+      - name: run docker-compose.yml
+        run: docker-compose up -d
   
       ## create application.yml
       - name: make application.yml
