@@ -1,7 +1,10 @@
 package io.oeid.mogakgo.domain.outbox.domain.entity;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.EVENT_ALREADY_COMPLETED;
+
 import io.oeid.mogakgo.domain.outbox.domain.EventStatus;
 import io.oeid.mogakgo.domain.outbox.domain.EventType;
+import io.oeid.mogakgo.domain.outbox.exception.OutboxException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,6 +46,17 @@ public class OutboxEvent {
         this.type = type;
         this.status = EventStatus.PENDING;
         this.key = key;
+    }
+
+    public void complete() {
+        validateAvailableComplete();
+        this.status = EventStatus.COMPLETED;
+    }
+
+    private void validateAvailableComplete() {
+        if (this.status == EventStatus.COMPLETED) {
+            throw new OutboxException(EVENT_ALREADY_COMPLETED);
+        }
     }
 
 }

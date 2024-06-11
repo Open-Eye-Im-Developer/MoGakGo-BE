@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OutboxJpaRepository extends JpaRepository<OutboxEvent, Long> {
 
+    OutboxEvent findByKey(String key);
 }
