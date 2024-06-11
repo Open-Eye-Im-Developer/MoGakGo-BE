@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface UserActivityRepositoryCustom {
 
-    List<UserActivity> getActivityHistoryByActivityType(Long userId, ActivityType activityType, Integer limit);
+    List<UserActivity> getHistoryByActivityType(Long userId, ActivityType activityType, Integer limit);
 }

@@ -21,9 +21,8 @@ public class AchievementFacadeService {
     private final AchievementJpaRepository achievementRepository;
     private final UserActivityJpaRepository userActivityRepository;
 
-    public boolean validateActivityDuplicate(Long userId, ActivityType activityType) {
-        return userActivityRepository.findByActivityTypeAndCreatedAt(userId, activityType)
-            .isEmpty();
+    public boolean validateDuplicateActivityHistory(Long userId, ActivityType activityType) {
+        return userActivityRepository.findByActivityTypeAndCreatedAt(userId, activityType).isEmpty();
     }
 
     public Achievement getById(Long achievementId) {
@@ -31,7 +30,7 @@ public class AchievementFacadeService {
             .orElseThrow(() -> new AchievementException(ACHIEVEMENT_NOT_FOUND));
     }
 
-    public Boolean validateAchivementAlreadyInProgress(Long userId, Long achievementId) {
+    public Boolean validateAlreadyInProgress(Long userId, Long achievementId) {
         return userAchievementRepository.findByUserAndAchievementId(userId, achievementId)
             .isPresent();
     }
