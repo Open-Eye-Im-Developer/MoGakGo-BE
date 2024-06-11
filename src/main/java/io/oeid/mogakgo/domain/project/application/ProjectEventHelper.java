@@ -25,7 +25,6 @@ public class ProjectEventHelper {
     private final ProjectJpaRepository projectRepository;
     private final ApplicationEventPublisher eventPublisher;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishEvent(Long userId) {
 
         // -- '생성자' 프로젝트를 생성한 사용자에 대한 업적 이벤트 발행
@@ -34,7 +33,6 @@ public class ProjectEventHelper {
         publishEvent(userId, ActivityType.BRAVE_EXPLORER, checkCreatedProjectCountByRegion(userId));
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishEvent(Long userId, ActivityType activityType, Object target) {
 
         // -- 업적 이력 및 달성 처리에 대한 이벤트 발행
