@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.common.handler.event;
 
 import io.oeid.mogakgo.core.properties.event.vo.AchievementEvent;
+import io.oeid.mogakgo.core.properties.event.vo.GeneralEvent;
 import io.oeid.mogakgo.core.properties.kafka.MessageProducer;
 import io.oeid.mogakgo.domain.event.Event;
 import io.oeid.mogakgo.domain.outbox.domain.entity.OutboxEvent;
@@ -39,7 +40,7 @@ public class AchievementEventHandler {
 
     }
 
-    private String generateKey(final AchievementEvent event) {
+    private String generateKey(final GeneralEvent event) {
         return event.getUserId().toString() + event.getActivityType().toString();
     }
 
