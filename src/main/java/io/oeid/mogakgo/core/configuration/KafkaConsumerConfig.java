@@ -1,7 +1,9 @@
 package io.oeid.mogakgo.core.configuration;
 
-import io.oeid.mogakgo.common.handler.DltProcessor;
+import io.oeid.mogakgo.common.handler.kafka.DltProcessor;
 import io.oeid.mogakgo.core.properties.kafka.constant.KafkaConsumerConstants;
+import io.oeid.mogakgo.core.properties.kafka.deserializer.CustomDeserializer;
+import io.oeid.mogakgo.domain.event.Event;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
 import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
 import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
 import org.springframework.kafka.support.EndpointHandlerMethod;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
 @EnableKafka
@@ -42,15 +45,19 @@ public class KafkaConsumerConfig {
     private boolean AUTO_COMMIT;
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
+    public ConsumerFactory<String, Event<?>> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_ADDRESS);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, AUTO_OFFSET_RESET);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, AUTO_COMMIT);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        return new DefaultKafkaConsumerFactory<>(props);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
+        props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, CustomDeserializer.class.getName());
+
+        return new DefaultKafkaConsumerFactory<>(props,
+            new StringDeserializer(),
+            new ErrorHandlingDeserializer<>(new CustomDeserializer()));
     }
 
     /*
@@ -69,10 +76,10 @@ public class KafkaConsumerConfig {
      */
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(
-        KafkaTemplate<String, String> kafkaTemplate
+    public ConcurrentKafkaListenerContainerFactory<String, Event<?>> kafkaListenerContainerFactory(
+        KafkaTemplate<String, Event<?>> kafkaTemplate
     ) {
-        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+        ConcurrentKafkaListenerContainerFactory<String, Event<?>> factory =
             new ConcurrentKafkaListenerContainerFactory<>();
 
         var recover = new DeadLetterPublishingRecoverer(kafkaTemplate);
@@ -96,7 +103,7 @@ public class KafkaConsumerConfig {
      */
 
     @Bean
-    public RetryTopicConfiguration retryTopicConfig(KafkaTemplate<String, String> kafkaTemplate)
+    public RetryTopicConfiguration retryTopicConfig(KafkaTemplate<String, Event<?>> kafkaTemplate)
         throws NoSuchMethodException {
 
         return RetryTopicConfigurationBuilder
