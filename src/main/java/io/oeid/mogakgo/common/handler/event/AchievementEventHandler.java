@@ -27,8 +27,10 @@ public class AchievementEventHandler {
     private final OutboxJpaRepository outboxRepository;
     private final MessageProducer messageProducer;
 
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void executeEvent(final AchievementEvent event) {
+
+        log.info("published event '{}' through thread '{}'", event, Thread.currentThread().getName());
 
         // TODO: 토픽에 어떤 메시지 형태로 컨슈머에게 전달할 것인지 고민
         messageProducer.sendMessage(TOPIC, Event.<AchievementEvent>builder()
@@ -48,7 +50,7 @@ public class AchievementEventHandler {
     }
 
     private String generateKey(final GeneralEvent event) {
-        return event.getUserId().toString() + event.getActivityType().toString();
+        return event.getUserId().toString() + "-" + event.getActivityType().toString();
     }
 
 }

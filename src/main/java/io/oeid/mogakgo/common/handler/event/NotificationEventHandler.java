@@ -27,7 +27,7 @@ public class NotificationEventHandler {
     private final MessageProducer messageProducer;
     private final OutboxJpaRepository outboxRepository;
 
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void executeEvent(final NotificationEvent event) {
         messageProducer.sendMessage(TOPIC, Event.<NotificationEvent>builder()
             .event(event)
@@ -44,7 +44,7 @@ public class NotificationEventHandler {
     }
 
     private String generateKey(final GeneralEvent event) {
-        return event.getUserId().toString() + event.getActivityType().toString();
+        return event.getUserId().toString() + "-" + event.getActivityType().toString();
     }
 
 }
