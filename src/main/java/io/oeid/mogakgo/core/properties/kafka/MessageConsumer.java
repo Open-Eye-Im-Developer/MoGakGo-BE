@@ -39,8 +39,6 @@ public class MessageConsumer {
 
     private static final Integer MIN_PROGRESS_SIZE = 1;
 
-    private final ApplicationEventPublisher publisher;
-    private final ObjectMapper objectMapper;
     private final UserCommonService userCommonService;
     private final AchievementJpaRepository achievementRepository;
     private final AchievementFacadeService achievementFacadeService;
