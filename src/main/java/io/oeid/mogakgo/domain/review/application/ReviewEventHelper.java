@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional(propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 public class ReviewEventHelper {
 
@@ -26,9 +26,22 @@ public class ReviewEventHelper {
     public void publishEvent(Long userId, Double jandiRate) {
 
         // -- '리뷰' 잔디력이 업데이트되는 사용자에 대한 업적 이벤트 발행
-        publishEvent(userId, ActivityType.FRESH_DEVELOPER, checkUserJandiRate(userId) + jandiRate);
+        registerEvent(userId, ActivityType.FRESH_DEVELOPER, checkUserJandiRate(userId) + jandiRate);
     }
 
+    private void registerEvent(Long userId, ActivityType activityType, Object target) {
+
+        outboxRepository.save(OutboxEvent.builder()
+            .type(EventType.ACHIEVEMENT)
+            .key(generateKey(userId, activityType))
+            .target(setTarget(target))
+            .build()
+        );
+
+        publishEvent(userId, activityType, target);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishEvent(Long userId, ActivityType activityType, Object target) {
 
         // -- 업적 이력 및 달성 처리에 대한 이벤트 발행
@@ -38,20 +51,18 @@ public class ReviewEventHelper {
             .target(target)
             .build()
         );
-
-        outboxRepository.save(OutboxEvent.builder()
-            .type(EventType.ACHIEVEMENT)
-            .key(generateKey(userId, activityType))
-            .build()
-        );
     }
 
     private String generateKey(Long userId, ActivityType activityType) {
-        return userId.toString() + activityType.toString();
+        return userId.toString() + "-" + activityType.toString();
     }
 
     private Double checkUserJandiRate(Long userId) {
         return userCommonService.getUserById(userId).getJandiRate();
+    }
+
+    private Integer setTarget(Object target) {
+        return target != null ? (Integer) target : null;
     }
 
 }

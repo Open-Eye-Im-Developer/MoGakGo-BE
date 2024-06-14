@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional(propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 public class ProjectJoinRequestEventHelper {
 
@@ -24,9 +24,22 @@ public class ProjectJoinRequestEventHelper {
     public void publishEvent(Long userId) {
 
         // -- '생성자' 매칭 요청을 수신한 사용자에 대한 업적 이벤트 발행
-        publishEvent(userId, ActivityType.CATCH_ME_IF_YOU_CAN, null);
+        registerEvent(userId, ActivityType.CATCH_ME_IF_YOU_CAN, null);
     }
 
+    private void registerEvent(Long userId, ActivityType activityType, Object target) {
+
+        outboxRepository.save(OutboxEvent.builder()
+            .type(EventType.ACHIEVEMENT)
+            .key(generateKey(userId, activityType))
+            .target(setTarget(target))
+            .build()
+        );
+
+        publishEvent(userId, activityType, target);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishEvent(Long userId, ActivityType activityType, Object target) {
 
         // -- 업적 이력 및 달성 처리에 대한 이벤트 발행
@@ -36,16 +49,14 @@ public class ProjectJoinRequestEventHelper {
             .target(target)
             .build()
         );
-
-        outboxRepository.save(OutboxEvent.builder()
-            .type(EventType.ACHIEVEMENT)
-            .key(generateKey(userId, activityType))
-            .build()
-        );
     }
 
     private String generateKey(Long userId, ActivityType activityType) {
-        return userId.toString() + activityType.toString();
+        return userId.toString() + "-" + activityType.toString();
+    }
+
+    private Integer setTarget(Object target) {
+        return target != null ? (Integer) target : null;
     }
 
 }

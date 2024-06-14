@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Transactional(propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
 public class MatchingEventHelper {
 
@@ -28,18 +28,31 @@ public class MatchingEventHelper {
     public void publishEvent(Long userId, Long participantId) {
 
         // -- '생성자' 매칭 요청을 수락한 사용자에 대한 업적 이벤트 발행
-        publishEvent(userId, ActivityType.GOOD_PERSON_GOOD_MEETUP, null);
-        publishEvent(userId, ActivityType.LIKE_E, null);
-        publishEvent(userId, ActivityType.NOMAD_CODER, checkMatchedProjectCountByRegion(userId));
-        publishEvent(userId, ActivityType.MY_DESTINY, checkMatchingCountWithSameUser(userId, participantId));
+        registerEvent(userId, ActivityType.GOOD_PERSON_GOOD_MEETUP, null);
+        registerEvent(userId, ActivityType.LIKE_E, null);
+        registerEvent(userId, ActivityType.NOMAD_CODER, checkMatchedProjectCountByRegion(userId));
+        registerEvent(userId, ActivityType.MY_DESTINY, checkMatchingCountWithSameUser(userId, participantId));
 
         // -- '참여자' 매칭 요청을 생성한 사용자에 대한 업적 이벤트 발행
-        publishEvent(participantId, ActivityType.GOOD_PERSON_GOOD_MEETUP, null);
-        publishEvent(participantId, ActivityType.LIKE_E, null);
-        publishEvent(participantId, ActivityType.NOMAD_CODER, checkMatchedProjectCountByRegion(userId));
-        publishEvent(participantId, ActivityType.MY_DESTINY, checkMatchingCountWithSameUser(userId, participantId));
+        registerEvent(participantId, ActivityType.GOOD_PERSON_GOOD_MEETUP, null);
+        registerEvent(participantId, ActivityType.LIKE_E, null);
+        registerEvent(participantId, ActivityType.NOMAD_CODER, checkMatchedProjectCountByRegion(userId));
+        registerEvent(participantId, ActivityType.MY_DESTINY, checkMatchingCountWithSameUser(userId, participantId));
     }
 
+    private void registerEvent(Long userId, ActivityType activityType, Object target) {
+
+        outboxRepository.save(OutboxEvent.builder()
+            .type(EventType.ACHIEVEMENT)
+            .key(generateKey(userId, activityType))
+            .target(setTarget(target))
+            .build()
+        );
+
+        publishEvent(userId, activityType, target);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishEvent(Long userId, ActivityType activityType, Object target) {
 
         // -- 업적 이력 및 달성 처리에 대한 이벤트 발행
@@ -49,16 +62,10 @@ public class MatchingEventHelper {
             .target(target)
             .build()
         );
-
-        outboxRepository.save(OutboxEvent.builder()
-            .type(EventType.ACHIEVEMENT)
-            .key(generateKey(userId, activityType))
-            .build()
-        );
     }
 
     private String generateKey(Long userId, ActivityType activityType) {
-        return userId.toString() + activityType.toString();
+        return userId.toString() + "-" + activityType.toString();
     }
 
     private Integer checkMatchedProjectCountByRegion(Long userId) {
@@ -69,6 +76,10 @@ public class MatchingEventHelper {
     private Integer checkMatchingCountWithSameUser(Long userId, Long participantId) {
         Integer progressCount = matchingService.getDuplicateMatching(userId, participantId);
         return progressCount.equals(SAME_MATCHING_COUNT) ? 1 : 0;
+    }
+
+    private Integer setTarget(Object target) {
+        return target != null ? (Integer) target : null;
     }
 
 }
