@@ -41,11 +41,15 @@ public class OutboxEvent {
     @Column(name = "key")
     private String key;
 
+    @Column(name = "target")
+    private Integer target;
+
     @Builder
-    private OutboxEvent(EventType type, String key) {
+    private OutboxEvent(EventType type, String key, Integer target) {
         this.type = type;
         this.status = EventStatus.PENDING;
         this.key = key;
+        this.target = target;
     }
 
     public void complete() {
