@@ -21,6 +21,7 @@ public class AchievementEventHandler {
 
     private final MessageProducer messageProducer;
 
+    // TODO: 'Achievement' 'Notification' 에 대해 각각의 비동기 스레드 처리를 위한 설정 추가
     @Async // 비동기로 호출, 즉 별도의 tx에서 처리
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void executeEvent(final AchievementEvent event) {
