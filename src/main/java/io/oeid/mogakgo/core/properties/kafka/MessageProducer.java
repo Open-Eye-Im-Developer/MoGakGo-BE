@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -24,28 +25,33 @@ public class MessageProducer {
     private final KafkaTemplate<String, Event<?>> kafkaTemplate;
     private final OutboxJpaRepository outboxRepository;
 
+    // TODO: 트랜잭션으로 묶는 이유?
+    @Transactional("kafkaTransactionManager")
     public void sendMessage(String topic, Event<?> event) {
-        kafkaTemplate.send(topic, event)
-            .whenComplete(
-                (res, ex) -> {
-                    if (ex != null) {
-                        // handle the exception scenario
+        kafkaTemplate.executeInTransaction(operations -> {
+            operations.send(topic, event)
+                .whenComplete(
+                    (res, ex) -> {
+                        if (ex != null) {
+                            // handle the exception scenario
 
-                        // TODO: 메시지 발행 실패에 대한 재처리 전략 구성 필요
-                        log.error("Failed to send message due to '{}'", ex.getMessage());
-                    } else if (res != null) {
-                        // send data to db
+                            // TODO: 메시지 발행 실패에 대한 재처리 전략 구성 필요
+                            log.error("Failed to send message due to '{}'", ex.getMessage());
+                        } else if (res != null) {
+                            // send data to db
 
-                        log.info("Sent message '{}' through thread '{}'",
-                            event, Thread.currentThread().getName()); // kafka-producer-network-thread | producer-1
-                        log.info("Sent message '{}' with offset '{}' thorugh topic '{}'",
-                            event, res.getRecordMetadata().offset(), topic);
+                            log.info("Sent message '{}' through thread '{}'",
+                                event, Thread.currentThread().getName()); // kafka-producer-network-thread | producer-1
+                            log.info("Sent message '{}' with offset '{}' thorugh topic '{}'",
+                                event, res.getRecordMetadata().offset(), topic);
 
-                        // TODO: 디비 작업의 병목현상을 해결할 수 있는 방안 필요
-                        executor.execute(process(res));
+                            // TODO: 디비 작업의 병목현상을 해결할 수 있는 방안 필요
+                            executor.execute(process(res));
+                        }
                     }
-                }
-            );
+                );
+            return true;
+        });
     }
 
     private Runnable process(SendResult<String, Event<?>> res) {
