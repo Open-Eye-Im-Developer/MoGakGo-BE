@@ -16,6 +16,7 @@ import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepositor
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserActivityJpaRepository;
 import io.oeid.mogakgo.domain.event.Event;
+import io.oeid.mogakgo.domain.log.application.DuplicateLogService;
 import io.oeid.mogakgo.domain.notification.application.NotificationEventHelper;
 import io.oeid.mogakgo.domain.user.application.UserCommonService;
 import io.oeid.mogakgo.domain.user.domain.User;
@@ -27,6 +28,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -45,13 +47,33 @@ public class AchievementMessageConsumer {
     private final UserActivityJpaRepository userActivityRepository;
     private final AchievementProgressService achievementProgressService;
     private final NotificationEventHelper eventHelper;
+    private final DuplicateLogService duplicateChecker;
 
     @KafkaListener(topics = TOPIC, groupId = "my-group", containerFactory = "kafkaListenerContainerFactory")
-    protected void consumeAchievement(ConsumerRecord<String, Event<AchievementEvent>> record,
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    protected void consumeAchievement(List<ConsumerRecord<String, Event<AchievementEvent>>> records,
         Acknowledgment acknowledgment) {
 
+        for (ConsumerRecord<String, Event<AchievementEvent>> record : records) {
+            // TODO: 소비하기 전에 캐시를 이용해 중복 처리 검사 구현
+            String messageId = record.value().getEvent().getId();
+            if (duplicateChecker.isMessageIdProcessed(messageId)) {
+                continue;
+            }
+            consume(record);
+            // TODO: 메시지가 정상적으로 처리되면 디비에 업데이트
+            duplicateChecker.caching(messageId);
+        }
+
+        // 메시지 소비가 성공적으로 처리되면, 브로커에게 커밋 요청
+        acknowledgment.acknowledge();
+    }
+
+    public void consume(ConsumerRecord<String, Event<AchievementEvent>> record) {
+
         Event<AchievementEvent> event = record.value();
-        log.info("receive event '{}' from producer through topic 'achievement'", event);
+        log.info("receive event '{}' with offset '{}' from producer through topic '{}'",
+            event, record.offset(), record.topic());
 
         // TODO: GeneralEvent, AchievementEvent 사이의 다형성에 대해 재정의 필요
         AchievementEvent achievementEvent = event.getEvent();
@@ -60,9 +82,6 @@ public class AchievementMessageConsumer {
         } catch (NoSuchFieldException e) {
             // handle to ex
         }
-
-        // 메시지 소비가 성공적으로 처리되면, 브로커에게 커밋 요청
-        acknowledgment.acknowledge();
 
         eventHelper.publishEvent(achievementEvent);
     }
