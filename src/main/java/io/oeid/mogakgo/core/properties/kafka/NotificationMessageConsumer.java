@@ -37,7 +37,8 @@ public class NotificationMessageConsumer {
         Acknowledgment acknowledgment) {
 
         Event<NotificationEvent> event = record.value();
-        log.info("receive event '{}' from producer through topic 'notification'", event);
+        log.info("receive event '{}' with offset '{}' from producer through topic '{}'",
+            event, record.offset(), record.topic());
 
         NotificationEvent notificationEvent = event.getEvent();
         process(notificationEvent);
