@@ -12,6 +12,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.kafka.transaction.KafkaTransactionManager;
 
 /*
  * Deprecated annotation programming -> change to functional programming
@@ -49,6 +50,7 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         props.put(ProducerConfig.ACKS_CONFIG, ACKS);
+        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "my-transaction-id");
 
         return new DefaultKafkaProducerFactory<>(props);
     }
@@ -63,4 +65,8 @@ public class KafkaProducerConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
+    @Bean
+    public KafkaTransactionManager<String, Event<?>> kafkaTransactionManager() {
+        return new KafkaTransactionManager<>(producerFactory());
+    }
 }

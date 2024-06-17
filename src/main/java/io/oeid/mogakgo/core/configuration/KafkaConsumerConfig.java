@@ -48,6 +48,12 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.consumer.enable-auto-commit}")
     private boolean AUTO_COMMIT;
 
+    @Value("${spring.kafka.consumer.max-poll-records}")
+    private Integer MAX_POLL_RECORDS;
+
+    @Value("${spring.kafka.consumer.isolation-level}")
+    private String ISOLATION_LEVEL;
+
     @Bean
     public ConsumerFactory<String, Event<?>> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -58,6 +64,9 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
         props.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, CustomDeserializer.class.getName());
+        // 정확한 한 번, Exactly-Once를 위한 옵션
+        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, ISOLATION_LEVEL);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, MAX_POLL_RECORDS);
 
         return new DefaultKafkaConsumerFactory<>(props,
             new StringDeserializer(),
