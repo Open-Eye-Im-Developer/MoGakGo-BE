@@ -14,7 +14,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Service
-@Transactional
+@Transactional("transactionManager")
 @RequiredArgsConstructor
 public class NotificationEventHandler {
 
