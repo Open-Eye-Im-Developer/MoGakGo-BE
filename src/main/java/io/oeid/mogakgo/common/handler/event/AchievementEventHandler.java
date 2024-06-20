@@ -40,7 +40,6 @@ public class AchievementEventHandler {
         log.info("published event '{}' with messageId '{}' through thread '{}'",
             event, message.getId(), Thread.currentThread().getName());
 
-        // TODO: 토픽에 어떤 메시지 형태로 컨슈머에게 전달할 것인지 고민
         messageProducer.sendMessage(TOPIC, message);
 
     }
