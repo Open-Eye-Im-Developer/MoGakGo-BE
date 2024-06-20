@@ -54,10 +54,11 @@ public class AchievementMessageConsumer {
         Acknowledgment acknowledgment) {
 
         for (ConsumerRecord<String, Event<AchievementEvent>> record : records) {
+            // if process failed to one record, retry for 3 times, and then publish to DLT
             process(record);
         }
 
-        // 메시지 소비가 성공적으로 처리되면, 브로커에게 커밋 요청
+        // If the message consumption is successfully processed, request commit to broker!
         acknowledgment.acknowledge();
     }
 
@@ -65,7 +66,7 @@ public class AchievementMessageConsumer {
     public void process(ConsumerRecord<String, Event<AchievementEvent>> record) {
         String eventId = record.value().getId();
         if (duplicateChecker.isMessageIdProcessed(eventId)) {
-            log.info("this message with eventId'{}' is already processing! no-caching!", eventId);
+            log.info("this message with eventId '{}' is already processing! no-caching!", eventId);
         } else {
             consume(record);
             duplicateChecker.caching(eventId);

@@ -29,18 +29,18 @@ public class MessageProducer {
                     (res, ex) -> {
                         if (ex != null) {
                             // handle the exception scenario
-
-                            // TODO: 메시지 발행 실패에 대한 재처리 전략 구성 필요
+                            // fallback: re-publishing failed message or event using outboxProcessor
                             log.error("Failed to send message due to '{}'", ex.getMessage());
                         } else if (res != null) {
                             // send data to db
-
                             log.info("Sent message '{}' through thread '{}'",
                                 event, Thread.currentThread().getName()); // kafka-producer-network-thread | producer-1
                             log.info("Sent message '{}' with id '{}' and offset '{}' thorugh topic '{}'",
                                 event, event.getId(), res.getRecordMetadata().offset(), topic);
 
-                            // message is already committed!
+                            // message is already committed in broker!
+                            // if execution fail itself, re-publishing processed message,
+                            // and then, consumer will verify duplication with redis cache!
                             threadPoolTaskExecutor.execute(process(res));
                         }
                     }
@@ -49,9 +49,10 @@ public class MessageProducer {
         });
     }
 
-    // TODO: 메시지 전송은 성공했지만 이벤트 저장이 실패한다면?
     private Runnable process(SendResult<String, Event<?>> res) {
         return () -> {
+            // use threadPoolTaskExecutor to avoid bottleneck for db insert task!
+            // if threadPoolTaskExecutor is full, caller thread will execute task
             OutboxEvent outbox = getRequestedEvent(res.getProducerRecord().value().getId());
             outbox.complete();
         };

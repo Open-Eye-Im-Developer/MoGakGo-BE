@@ -6,6 +6,7 @@ import io.oeid.mogakgo.core.properties.event.vo.AchievementEvent;
 import io.oeid.mogakgo.core.properties.event.vo.GeneralEvent;
 import io.oeid.mogakgo.core.properties.kafka.MessageProducer;
 import io.oeid.mogakgo.domain.event.Event;
+import io.oeid.mogakgo.domain.outbox.domain.EventType;
 import io.oeid.mogakgo.domain.outbox.exception.OutboxException;
 import io.oeid.mogakgo.domain.outbox.infrastructure.OutboxJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +38,8 @@ public class AchievementEventHandler {
         Event<AchievementEvent> message = wrap(event, eventId);
 
         // SimpleAsyncTaskExecutor-1
-        log.info("published event '{}' with messageId '{}' through thread '{}'",
-            event, message.getId(), Thread.currentThread().getName());
+        log.info("published event '{}' with messageId '{}' to topic '{}' through thread '{}'",
+            event, message.getId(), TOPIC, Thread.currentThread().getName());
 
         messageProducer.sendMessage(TOPIC, message);
 
@@ -49,7 +50,7 @@ public class AchievementEventHandler {
     }
 
     private String getRequestedEventId(String key) {
-        return outboxRepository.getProcessedEventId(key)
+        return outboxRepository.getProcessedEventId(key, EventType.ACHIEVEMENT)
             .orElseThrow(() -> new OutboxException(OUTBOX_EVENT_NOT_FOUND));
     }
 
