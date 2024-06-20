@@ -11,18 +11,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CacheService {
 
-    private static final String CACHE_KEY_PREFIX = "processed_messages:";
+    private static final String CACHE_KEY_PREFIX = "processed:";
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public void cacheMessageId(String messageId) {
-        String cacheKey = CACHE_KEY_PREFIX + messageId;
+    public void cacheMessageId(String eventId) {
+        String cacheKey = generateCacheKey(eventId);
         redisTemplate.opsForValue().set(cacheKey, true, 1, TimeUnit.DAYS);
     }
 
-    public boolean isMessageIdCached(String messageId) {
-        String cacheKey = CACHE_KEY_PREFIX + messageId;
+    public boolean isMessageIdCached(String eventId) {
+        String cacheKey = generateCacheKey(eventId);
         return Boolean.TRUE.equals(redisTemplate.hasKey(cacheKey));
+    }
+
+    public String generateCacheKey(String eventId) {
+        return CACHE_KEY_PREFIX + eventId;
     }
 
 }
