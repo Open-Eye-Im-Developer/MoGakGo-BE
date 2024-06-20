@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OutboxJpaRepository extends JpaRepository<OutboxEvent, Long> {
+public interface OutboxJpaRepository extends JpaRepository<OutboxEvent, Long>, OutboxRepositoryCustom {
 
     @Query("""
         select obe from OutboxEvent obe where obe.key = :key and obe.status = 'PENDING'

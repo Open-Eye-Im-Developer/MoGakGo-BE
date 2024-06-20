@@ -35,7 +35,6 @@ public class ProjectEventHelper {
 
     private void registerEvent(Long userId, ActivityType activityType, Object target) {
 
-        // TODO: Outbox를 식별할 수 있는 식별자를 어떻게 구성할지 고민
         outboxRepository.save(OutboxEvent.builder()
             .type(EventType.ACHIEVEMENT)
             .key(generateKey(userId, activityType))
