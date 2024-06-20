@@ -1,5 +1,6 @@
 package io.oeid.mogakgo.core.properties.kafka;
 
+import static io.oeid.mogakgo.exception.code.ErrorCode400.INVALID_ACHIEVEMENT_TYPE;
 import static io.oeid.mogakgo.exception.code.ErrorCode400.NON_ACHIEVED_USER_ACHIEVEMENT;
 
 import io.oeid.mogakgo.core.properties.event.vo.AchievementEvent;
@@ -11,6 +12,7 @@ import io.oeid.mogakgo.domain.achievement.domain.entity.UserAchievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.UserActivity;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
+import io.oeid.mogakgo.domain.achievement.exception.AchievementException;
 import io.oeid.mogakgo.domain.achievement.exception.UserAchievementException;
 import io.oeid.mogakgo.domain.achievement.infrastructure.AchievementJpaRepository;
 import io.oeid.mogakgo.domain.achievement.infrastructure.UserAchievementJpaRepository;
@@ -83,7 +85,9 @@ public class AchievementMessageConsumer {
             process(achievementEvent);
         } catch (NoSuchFieldException e) {
             // handle to ex
+            // TODO: Swagger에 추가
             log.warn("This type '{}' is not a supported event type!", event.getEventType());
+            throw new AchievementException(INVALID_ACHIEVEMENT_TYPE);
         }
 
         eventHelper.publishEvent(achievementEvent);
