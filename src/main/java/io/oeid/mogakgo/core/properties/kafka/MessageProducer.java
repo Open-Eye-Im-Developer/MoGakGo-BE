@@ -2,7 +2,6 @@ package io.oeid.mogakgo.core.properties.kafka;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode404.OUTBOX_EVENT_NOT_FOUND;
 
-import io.oeid.mogakgo.core.properties.event.vo.GeneralEvent;
 import io.oeid.mogakgo.domain.event.Event;
 import io.oeid.mogakgo.domain.outbox.domain.entity.OutboxEvent;
 import io.oeid.mogakgo.domain.outbox.exception.OutboxException;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MessageProducer {
 
-    private final ThreadPoolTaskExecutor executor;
+    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
     private final KafkaTemplate<String, Event<?>> kafkaTemplate;
     private final OutboxJpaRepository outboxRepository;
 
@@ -38,10 +37,11 @@ public class MessageProducer {
 
                             log.info("Sent message '{}' through thread '{}'",
                                 event, Thread.currentThread().getName()); // kafka-producer-network-thread | producer-1
-                            log.info("Sent message '{}' with offset '{}' thorugh topic '{}'",
-                                event, res.getRecordMetadata().offset(), topic);
+                            log.info("Sent message '{}' with id '{}' and offset '{}' thorugh topic '{}'",
+                                event, event.getId(), res.getRecordMetadata().offset(), topic);
 
-                            executor.execute(process(res));
+                            // message is already committed!
+                            threadPoolTaskExecutor.execute(process(res));
                         }
                     }
                 );
@@ -52,20 +52,14 @@ public class MessageProducer {
     // TODO: 메시지 전송은 성공했지만 이벤트 저장이 실패한다면?
     private Runnable process(SendResult<String, Event<?>> res) {
         return () -> {
-            OutboxEvent outbox = getRequestedEvent(
-                generateKey((GeneralEvent) res.getProducerRecord().value().getEvent())
-            );
+            OutboxEvent outbox = getRequestedEvent(res.getProducerRecord().value().getId());
             outbox.complete();
         };
     }
 
-    private OutboxEvent getRequestedEvent(String key) {
-        return outboxRepository.findByKey(key)
+    private OutboxEvent getRequestedEvent(String eventId) {
+        return outboxRepository.findByEventId(eventId)
             .orElseThrow(() -> new OutboxException(OUTBOX_EVENT_NOT_FOUND));
-    }
-
-    private String generateKey(final GeneralEvent event) {
-        return event.getUserId().toString() + event.getActivityType().toString();
     }
 
     public void sendMessage(String topic, String key, Event<?> event) {

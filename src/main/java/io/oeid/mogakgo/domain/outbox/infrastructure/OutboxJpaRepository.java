@@ -14,4 +14,7 @@ public interface OutboxJpaRepository extends JpaRepository<OutboxEvent, Long> {
         order by obe.createdAt desc limit 1
     """)
     Optional<OutboxEvent> findByKey(String key);
+
+    @Query("select obe from OutboxEvent obe where obe.eventId = :eventId")
+    Optional<OutboxEvent> findByEventId(String eventId);
 }

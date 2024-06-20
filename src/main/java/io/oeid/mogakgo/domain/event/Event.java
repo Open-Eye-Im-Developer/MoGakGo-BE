@@ -2,7 +2,6 @@ package io.oeid.mogakgo.domain.event;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.oeid.mogakgo.common.generator.UUIDGenerator;
 import io.oeid.mogakgo.core.properties.event.vo.AchievementEvent;
 import io.oeid.mogakgo.core.properties.event.vo.NotificationEvent;
 import io.oeid.mogakgo.domain.event.vo.EventType;
@@ -32,8 +31,8 @@ public class Event<T> {
     }
 
     @Builder
-    private Event(T event) {
-        this.id = UUIDGenerator.generateUUID();
+    private Event(String id, T event) {
+        this.id = id;
         this.eventType = setEventType(event);
         this.eventCreatedAt = LocalDateTime.now();
         this.event = event;

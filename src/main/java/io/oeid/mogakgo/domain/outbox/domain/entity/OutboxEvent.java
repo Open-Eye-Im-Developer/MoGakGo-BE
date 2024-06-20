@@ -2,6 +2,7 @@ package io.oeid.mogakgo.domain.outbox.domain.entity;
 
 import static io.oeid.mogakgo.exception.code.ErrorCode400.EVENT_ALREADY_COMPLETED;
 
+import io.oeid.mogakgo.common.generator.UUIDGenerator;
 import io.oeid.mogakgo.domain.outbox.domain.EventStatus;
 import io.oeid.mogakgo.domain.outbox.domain.EventType;
 import io.oeid.mogakgo.domain.outbox.exception.OutboxException;
@@ -28,6 +29,9 @@ public class OutboxEvent {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "event_id")
+    private String eventId;
+
     @Column(name = "event_type")
     private EventType type;
 
@@ -46,6 +50,7 @@ public class OutboxEvent {
 
     @Builder
     private OutboxEvent(EventType type, String key, Integer target) {
+        this.eventId = UUIDGenerator.generateUUID();
         this.type = type;
         this.status = EventStatus.PENDING;
         this.key = key;
