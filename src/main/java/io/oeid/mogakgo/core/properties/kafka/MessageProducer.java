@@ -7,26 +7,22 @@ import io.oeid.mogakgo.domain.event.Event;
 import io.oeid.mogakgo.domain.outbox.domain.entity.OutboxEvent;
 import io.oeid.mogakgo.domain.outbox.exception.OutboxException;
 import io.oeid.mogakgo.domain.outbox.infrastructure.OutboxJpaRepository;
-import java.util.concurrent.ThreadPoolExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class MessageProducer {
 
-
-    private final ThreadPoolExecutor executor;
+    private final ThreadPoolTaskExecutor executor;
     private final KafkaTemplate<String, Event<?>> kafkaTemplate;
     private final OutboxJpaRepository outboxRepository;
 
-    // TODO: 트랜잭션으로 묶는 이유?
-    @Transactional("kafkaTransactionManager")
     public void sendMessage(String topic, Event<?> event) {
         kafkaTemplate.executeInTransaction(operations -> {
             operations.send(topic, event)
@@ -45,7 +41,6 @@ public class MessageProducer {
                             log.info("Sent message '{}' with offset '{}' thorugh topic '{}'",
                                 event, res.getRecordMetadata().offset(), topic);
 
-                            // TODO: 디비 작업의 병목현상을 해결할 수 있는 방안 필요
                             executor.execute(process(res));
                         }
                     }
@@ -54,9 +49,9 @@ public class MessageProducer {
         });
     }
 
+    // TODO: 메시지 전송은 성공했지만 이벤트 저장이 실패한다면?
     private Runnable process(SendResult<String, Event<?>> res) {
         return () -> {
-            // TODO: Outbox를 조회할 식별자를 어떻게 구성할지 고민✓
             OutboxEvent outbox = getRequestedEvent(
                 generateKey((GeneralEvent) res.getProducerRecord().value().getEvent())
             );
