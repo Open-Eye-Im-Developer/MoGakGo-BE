@@ -2,6 +2,7 @@ package io.oeid.mogakgo.domain.event;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.oeid.mogakgo.common.generator.UUIDGenerator;
 import io.oeid.mogakgo.core.properties.event.vo.AchievementEvent;
 import io.oeid.mogakgo.core.properties.event.vo.NotificationEvent;
 import io.oeid.mogakgo.domain.event.vo.EventType;
@@ -14,13 +15,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Event<T> {
 
-    private Long id;
+    private String id;
     private EventType eventType;
     private LocalDateTime eventCreatedAt;
     private T event;
 
     @JsonCreator
-    public Event(@JsonProperty("id") Long id,
+    public Event(@JsonProperty("id") String id,
                  @JsonProperty("eventType") EventType eventType,
                  @JsonProperty("eventCreatedAt") LocalDateTime eventCreatedAt,
                  @JsonProperty("event") T event) {
@@ -32,6 +33,7 @@ public class Event<T> {
 
     @Builder
     private Event(T event) {
+        this.id = UUIDGenerator.generateUUID();
         this.eventType = setEventType(event);
         this.eventCreatedAt = LocalDateTime.now();
         this.event = event;

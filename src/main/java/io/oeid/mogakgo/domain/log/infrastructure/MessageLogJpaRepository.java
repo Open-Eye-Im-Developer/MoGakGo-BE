@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MessageLogJpaRepository extends JpaRepository<MessageLog, Long> {
 
-    boolean existsByMessageId(String messageId);
-    void deletebyMessageId(String messageId);
+    boolean existsByEventId(String eventId);
+    void deleteByEventId(String eventId);
 }

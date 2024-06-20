@@ -26,7 +26,7 @@ public class CustomDeserializer implements Deserializer<Event<?>> {
             if (data == null) return null;
 
             JsonNode jsonNode = objectMapper.readTree(data);
-            Long id = jsonNode.get("id").asLong();
+            String id = jsonNode.get("id").asText();
             EventType eventType = objectMapper
                 .treeToValue(jsonNode.get("eventType"), EventType.class);
             LocalDateTime eventCreatedAt = objectMapper

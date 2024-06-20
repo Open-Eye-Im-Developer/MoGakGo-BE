@@ -21,12 +21,12 @@ public class MessageLog {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "message_id")
-    private String messageId;
+    @Column(name = "event_id")
+    private String eventId;
 
     @Builder
-    private MessageLog(String messageId) {
-        this.messageId = messageId;
+    private MessageLog(String eventId) {
+        this.eventId = eventId;
     }
 
 }
