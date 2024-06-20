@@ -12,7 +12,6 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.kafka.transaction.KafkaTransactionManager;
 
 /*
  * Deprecated annotation programming -> change to functional programming
@@ -30,8 +29,21 @@ public class KafkaProducerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String BOOTSTRAP_SERVERS;
 
+    @Value("${spring.kafka.producer.transaction-id-prefix}")
+    private String TRANSACTION_ID_PREFIX;
+
+    @Value("${spring.kafka.producer.properties.idempotence}")
+    private Boolean IDEMPOTENCE;
+
+    @Value("${spring.kafka.producer.properties.max-in-flight-requests-per-connection}")
+    private Integer MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION;
+
+    @Value("${spring.kafka.producer.retries}")
+    private Integer RETRIES;
+
     @Value("${spring.kafka.producer.acks}")
-    private Integer ACKS;
+    private String ACKS;
+
 
     /**
      * BOOTSTRAP_SERVERS_CONFIG
@@ -50,7 +62,11 @@ public class KafkaProducerConfig {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         props.put(ProducerConfig.ACKS_CONFIG, ACKS);
-        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "my-transaction-id");
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, IDEMPOTENCE);
+        props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, TRANSACTION_ID_PREFIX);
+        // TODO: 트랜잭션 최적화와 프로듀서의 높은 메시지 전송률을 고려하여 설정해야 함. 트랜잭션 사용 시, 1로 설정할 것을 권장
+        props.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION);
+        props.put(ProducerConfig.RETRIES_CONFIG, RETRIES);
 
         return new DefaultKafkaProducerFactory<>(props);
     }
@@ -65,8 +81,6 @@ public class KafkaProducerConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
-    @Bean
-    public KafkaTransactionManager<String, Event<?>> kafkaTransactionManager() {
-        return new KafkaTransactionManager<>(producerFactory());
-    }
+
+
 }
