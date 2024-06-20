@@ -28,12 +28,10 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
-@Transactional
 @RequiredArgsConstructor
 public class AchievementMessageConsumer {
 
@@ -50,43 +48,49 @@ public class AchievementMessageConsumer {
     private final DuplicateLogService duplicateChecker;
 
     @KafkaListener(topics = TOPIC, groupId = "my-group", containerFactory = "kafkaListenerContainerFactory")
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     protected void consumeAchievement(List<ConsumerRecord<String, Event<AchievementEvent>>> records,
         Acknowledgment acknowledgment) {
 
         for (ConsumerRecord<String, Event<AchievementEvent>> record : records) {
-            // TODO: 소비하기 전에 캐시를 이용해 중복 처리 검사 구현
-            String messageId = record.value().getEvent().getId();
-            if (duplicateChecker.isMessageIdProcessed(messageId)) {
-                continue;
-            }
-            consume(record);
-            // TODO: 메시지가 정상적으로 처리되면 디비에 업데이트
-            duplicateChecker.caching(messageId);
+            process(record);
         }
 
         // 메시지 소비가 성공적으로 처리되면, 브로커에게 커밋 요청
         acknowledgment.acknowledge();
     }
 
+    @Transactional("transactionManager")
+    public void process(ConsumerRecord<String, Event<AchievementEvent>> record) {
+        String eventId = record.value().getId();
+        if (duplicateChecker.isMessageIdProcessed(eventId)) {
+            log.info("this message with eventId'{}' is already processing! no-caching!", eventId);
+        } else {
+            consume(record);
+            duplicateChecker.caching(eventId);
+        }
+    }
+
+    @Transactional("transactionManager")
     public void consume(ConsumerRecord<String, Event<AchievementEvent>> record) {
 
         Event<AchievementEvent> event = record.value();
         log.info("receive event '{}' with offset '{}' from producer through topic '{}'",
             event, record.offset(), record.topic());
 
-        // TODO: GeneralEvent, AchievementEvent 사이의 다형성에 대해 재정의 필요
         AchievementEvent achievementEvent = event.getEvent();
+
         try {
             process(achievementEvent);
         } catch (NoSuchFieldException e) {
             // handle to ex
+            log.warn("This type '{}' is not a supported event type!", event.getEventType());
         }
 
         eventHelper.publishEvent(achievementEvent);
     }
 
-    private void process(final AchievementEvent event) throws NoSuchFieldException {
+    @Transactional("transactionManager")
+    public void process(final AchievementEvent event) throws NoSuchFieldException {
 
         // 사용자가 현재 달성할 수 있는 업적 ID
         Long achievementId = validAchievementId(event);
@@ -150,8 +154,7 @@ public class AchievementMessageConsumer {
                     }
                 }
 
-                // TODO: 적절한 에러로 변경해야 함
-                default -> throw new NoSuchFieldException("");
+                default -> throw new NoSuchFieldException("This type is not a supported event type!");
             }
         }
     }
