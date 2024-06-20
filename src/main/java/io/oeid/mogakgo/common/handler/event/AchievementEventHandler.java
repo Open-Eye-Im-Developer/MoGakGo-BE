@@ -45,7 +45,7 @@ public class AchievementEventHandler {
     }
 
     private String generateKey(final GeneralEvent event) {
-        return event.getUserId().toString() + event.getActivityType().toString();
+        return event.getUserId().toString() + ":" + event.getActivityType().toString();
     }
 
     private String getRequestedEventId(String key) {

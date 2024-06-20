@@ -65,7 +65,7 @@ public class MatchingEventHelper {
     }
 
     private String generateKey(Long userId, ActivityType activityType) {
-        return userId.toString() + "-" + activityType.toString();
+        return userId.toString() + ":" + activityType.toString();
     }
 
     private Integer checkMatchedProjectCountByRegion(Long userId) {

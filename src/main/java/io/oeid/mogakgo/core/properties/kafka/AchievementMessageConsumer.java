@@ -197,7 +197,7 @@ public class AchievementMessageConsumer {
     }
 
     private String generateKey(final AchievementEvent event) {
-        return event.getUserId().toString() + event.getActivityType().toString();
+        return event.getUserId().toString() + ":" + event.getActivityType().toString();
     }
 
     private UserAchievement getByUserAndAchievement(Long userId, Long achievementId) {

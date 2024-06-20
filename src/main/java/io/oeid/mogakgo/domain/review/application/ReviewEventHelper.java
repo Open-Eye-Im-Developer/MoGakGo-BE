@@ -54,7 +54,7 @@ public class ReviewEventHelper {
     }
 
     private String generateKey(Long userId, ActivityType activityType) {
-        return userId.toString() + "-" + activityType.toString();
+        return userId.toString() + ":" + activityType.toString();
     }
 
     private Double checkUserJandiRate(Long userId) {

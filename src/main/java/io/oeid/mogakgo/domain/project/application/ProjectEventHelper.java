@@ -66,7 +66,7 @@ public class ProjectEventHelper {
 
     // TODO: key값을 중복이 없는, 온전히 고유한 값으로 만들기 위한 요소가 필요
     private String generateKey(Long userId, ActivityType activityType) {
-        return userId.toString() + "-" + activityType.toString();
+        return userId.toString() + ":" + activityType.toString();
     }
 
     private Integer setTarget(Object target) {
