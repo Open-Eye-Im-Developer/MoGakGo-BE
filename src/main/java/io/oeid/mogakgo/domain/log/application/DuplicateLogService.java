@@ -13,7 +13,6 @@ public class DuplicateLogService {
 
     private final MessageLogJpaRepository messageLogRepository;
     private final CacheService cacheService;
-    private final LocalCache localCache;
 
     public boolean isDuplicate(String eventId) {
         return messageLogRepository.existsByEventId(eventId);
