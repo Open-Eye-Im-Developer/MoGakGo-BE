@@ -25,11 +25,11 @@ public class CacheService {
         localCache.put(cacheKey, "processed");
     }
 
-    // TODO: 조회 수(Hits)를 활용해 동적으로 TTL 증가 로직 구현
     public boolean isMessageIdCached(String eventId) {
         String cacheKey = generateCacheKey(eventId);
 
         if (localCache.containskey(cacheKey)) {
+            log.info("local cache founded!");
             incrementHitsCount(eventId);
             return true;
         }
@@ -46,16 +46,18 @@ public class CacheService {
         return CACHE_KEY_PREFIX + eventId;
     }
 
-    private void incrementHitsCount(String eventId) {
+    public void incrementHitsCount(String eventId) {
         String hitsKey = HITS_COUNT_PREFIX + eventId;
-        Long hits = redisTemplate.opsForValue().increment(hitsKey);
+        Long hits = redisTemplate.opsForValue().increment(hitsKey, 1);
 
-        if (hits != null && hits % 10 == 0) {
+        if (hits != null && hits % 10 != 0) {
             String cacheKey = generateCacheKey(eventId);
             Long currentTTL = redisTemplate.getExpire(cacheKey, TimeUnit.SECONDS);
             if (currentTTL != null && currentTTL < MAX_TTL) {
                 long newTTL = Math.min(currentTTL + 3600, MAX_TTL);
                 redisTemplate.expire(cacheKey, newTTL, TimeUnit.SECONDS);
+                log.info("cache for eventId '{}' TTL is updated now! currrentTTL: '{}', updated TTL: '{}'",
+                    eventId, currentTTL, newTTL);
             }
         }
     }

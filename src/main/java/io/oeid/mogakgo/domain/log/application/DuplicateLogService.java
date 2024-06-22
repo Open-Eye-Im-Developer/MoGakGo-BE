@@ -5,9 +5,11 @@ import io.oeid.mogakgo.domain.log.infrastructure.MessageLogJpaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Transactional("transactionManager")
 @RequiredArgsConstructor
 public class DuplicateLogService {
 
@@ -22,17 +24,17 @@ public class DuplicateLogService {
         messageLogRepository.deleteByEventId(eventId);
     }
 
-    // TODO: 트랜잭션 처리
     public MessageLog caching(String eventId) {
         log.info("received message with eventId '{}' processing and caching complete!", eventId);
         MessageLog messageLog = generate(eventId);
         MessageLog savedLog = messageLogRepository.save(messageLog);
-        cacheService.cacheMessageId(eventId);
+        // cacheService.cacheMessageId(eventId);
         return savedLog;
     }
 
     public boolean isMessageIdProcessed(String eventId) {
-        return cacheService.isMessageIdCached(eventId);
+        return isDuplicate(eventId);
+        //return cacheService.isMessageIdCached(eventId);
     }
 
     public MessageLog generate(String eventId) {
