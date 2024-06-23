@@ -29,9 +29,9 @@ public class MailConfig {
     private String SMTP_AUTH;
 
     @Value("${spring.mail.properties.mail.smtp.starttls.enable}")
-    private String SMTP_STARTTTLS_ENABLE;
+    private String SMTP_STARTTLS_ENABLE;
 
-    @Value("${spring.mail.debug}")
+    @Value("${spring.mail.properties.mail.debug}")
     private String DEBUG;
 
 
@@ -46,7 +46,7 @@ public class MailConfig {
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", TRANSPORT_PROTOCOL);
         props.put("mail.smtp.auth", SMTP_AUTH);
-        props.put("mail.smtp.starttls.enable", SMTP_STARTTTLS_ENABLE);
+        props.put("mail.smtp.starttls.enable", SMTP_STARTTLS_ENABLE);
         props.put("mail.debug", DEBUG);
 
         return mailSender;
