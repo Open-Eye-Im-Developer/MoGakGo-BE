@@ -1,6 +1,7 @@
 package io.oeid.mogakgo.core.configuration;
 
 import io.oeid.mogakgo.common.handler.kafka.DltProcessor;
+import io.oeid.mogakgo.common.handler.mail.MailHandler;
 import io.oeid.mogakgo.core.properties.kafka.constant.KafkaConsumerConstants;
 import io.oeid.mogakgo.core.properties.kafka.deserializer.CustomDeserializer;
 import io.oeid.mogakgo.domain.event.Event;
@@ -10,6 +11,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,6 +56,8 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.consumer.isolation-level}")
     private String ISOLATION_LEVEL;
 
+    private final MailHandler mailHandler;
+
     @Bean
     public ConsumerFactory<String, Event<?>> consumerFactory() {
         Map<String, Object> props = new HashMap<>();
@@ -83,12 +87,14 @@ public class KafkaConsumerConfig {
                         """,
                     record.value(), e.getMessage(), record.topic(), record.partition(), record.offset());
                 // TODO: 재시도 실패로 인해 DLT로 메시지가 전송되면 메일 알림이 자동으로 전송되도록 구현
+                mailHandler.postProcessDltMessage((ConsumerRecord<String, Event<?>>) record,
+                    record.topic(), record.partition(), record.offset(), e.getMessage());
                 return new TopicPartition(record.topic() + ".DLT", record.partition());
             });
 
         var fixedBackOff = new FixedBackOff(1000L, 2L);
         var errorHandler = new DefaultErrorHandler(dlqRecover, fixedBackOff);
-        errorHandler.addRetryableExceptions(SocketTimeoutException.class);
+        errorHandler.addRetryableExceptions(SocketTimeoutException.class, RuntimeException.class);
         errorHandler.addNotRetryableExceptions(NullPointerException.class);
         return errorHandler;
     }

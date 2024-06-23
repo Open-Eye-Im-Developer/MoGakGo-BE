@@ -21,7 +21,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
 @Service
-@Transactional(value = "transactionManager", propagation = Propagation.REQUIRES_NEW)
+@Transactional(value = "transactionManager", readOnly = true)
 @RequiredArgsConstructor
 public class NotificationEventHandler {
 
@@ -31,6 +31,7 @@ public class NotificationEventHandler {
     private final OutboxJpaRepository outboxRepository;
 
     @Async
+    @Transactional(value = "transactionManager", propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void executeEvent(final NotificationEvent event) {
 
