@@ -40,7 +40,7 @@ public class MessageProducer {
 
                             // message is already committed in broker!
                             // if execution fail itself, re-publishing processed message,
-                            // and then, consumer will verify duplication with redis cache!
+                            // and then, consumer will verify duplication!
                             outboxTaskExecutor.execute(process(res));
                         }
                     }

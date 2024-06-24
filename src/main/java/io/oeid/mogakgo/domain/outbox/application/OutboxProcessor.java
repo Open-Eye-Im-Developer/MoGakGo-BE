@@ -30,7 +30,7 @@ public class OutboxProcessor {
     private final OutboxJpaRepository outboxRepository;
     private final MessageProducer messageProducer;
 
-    @Scheduled(cron = "0 30 23 * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     public void firstProcess() {
 
         // 첫 번째 이벤트 발행부터 실패한 케이스에 대한 re-publishing
@@ -38,7 +38,7 @@ public class OutboxProcessor {
         republish(failedEvents, FIRST_TOPIC);
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 3 * * *")
     public void secondProcess() {
 
         // 두 번째 이벤트 발행만 실패한 케이스에 대한 re-publishing
