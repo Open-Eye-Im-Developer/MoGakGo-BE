@@ -29,7 +29,8 @@ public class ReviewEventHelper {
         registerEvent(userId, ActivityType.FRESH_DEVELOPER, checkUserJandiRate(userId) + jandiRate);
     }
 
-    private void registerEvent(Long userId, ActivityType activityType, Object target) {
+    @Transactional
+    public void registerEvent(Long userId, ActivityType activityType, Object target) {
 
         outboxRepository.save(OutboxEvent.builder()
             .type(EventType.ACHIEVEMENT)
@@ -41,8 +42,7 @@ public class ReviewEventHelper {
         publishEvent(userId, activityType, target);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void publishEvent(Long userId, ActivityType activityType, Object target) {
+    private void publishEvent(Long userId, ActivityType activityType, Object target) {
 
         // -- 업적 이력 및 달성 처리에 대한 이벤트 발행
         eventPublisher.publishEvent(AchievementEvent.builder()

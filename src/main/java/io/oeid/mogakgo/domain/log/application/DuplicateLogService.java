@@ -27,14 +27,13 @@ public class DuplicateLogService {
     public MessageLog caching(String eventId) {
         log.info("received message with eventId '{}' processing and caching complete!", eventId);
         MessageLog messageLog = generate(eventId);
-        MessageLog savedLog = messageLogRepository.save(messageLog);
         // cacheService.cacheMessageId(eventId);
-        return savedLog;
+        return messageLogRepository.save(messageLog);
     }
 
     public boolean isMessageIdProcessed(String eventId) {
-        return isDuplicate(eventId);
         //return cacheService.isMessageIdCached(eventId);
+        return isDuplicate(eventId);
     }
 
     public MessageLog generate(String eventId) {

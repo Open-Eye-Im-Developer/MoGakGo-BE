@@ -40,7 +40,8 @@ public class MatchingEventHelper {
         registerEvent(participantId, ActivityType.MY_DESTINY, checkMatchingCountWithSameUser(userId, participantId));
     }
 
-    private void registerEvent(Long userId, ActivityType activityType, Object target) {
+    @Transactional
+    public void registerEvent(Long userId, ActivityType activityType, Object target) {
 
         outboxRepository.save(OutboxEvent.builder()
             .type(EventType.ACHIEVEMENT)
@@ -52,7 +53,6 @@ public class MatchingEventHelper {
         publishEvent(userId, activityType, target);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishEvent(Long userId, ActivityType activityType, Object target) {
 
         // -- 업적 이력 및 달성 처리에 대한 이벤트 발행

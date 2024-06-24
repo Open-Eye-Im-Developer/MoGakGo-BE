@@ -53,6 +53,9 @@ public class AchievementMessageConsumer {
     protected void consumeAchievement(List<ConsumerRecord<String, Event<AchievementEvent>>> records,
         Acknowledgment acknowledgment) {
 
+        log.info("messageConsumer for topic '{}' received message completely and consuming through thread '{}",
+            TOPIC, Thread.currentThread().getName());
+
         for (ConsumerRecord<String, Event<AchievementEvent>> record : records) {
             // if process failed to one record, retry for 3 times, and then publish to DLT
             process(record);
@@ -170,8 +173,8 @@ public class AchievementMessageConsumer {
         );
     }
 
-    private void saveActivity(final AchievementEvent event, User user) {
-        userActivityRepository.save(UserActivity.builder()
+    private UserActivity saveActivity(final AchievementEvent event, User user) {
+        return userActivityRepository.save(UserActivity.builder()
             .user(user)
             .activityType(event.getActivityType())
             .build()

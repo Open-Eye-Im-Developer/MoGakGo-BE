@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
-@Transactional(propagation = Propagation.REQUIRED)
+@Transactional(propagation = Propagation.REQUIRED, readOnly = true)
 @RequiredArgsConstructor
 public class ProjectEventHelper {
 
@@ -25,6 +25,7 @@ public class ProjectEventHelper {
     private final ProjectJpaRepository projectRepository;
     private final ApplicationEventPublisher eventPublisher;
 
+    @Transactional
     public void publishEvent(Long userId) {
 
         // -- '생성자' 프로젝트를 생성한 사용자에 대한 업적 이벤트 발행
@@ -33,7 +34,11 @@ public class ProjectEventHelper {
         registerEvent(userId, ActivityType.BRAVE_EXPLORER, checkCreatedProjectCountByRegion(userId));
     }
 
-    private void registerEvent(Long userId, ActivityType activityType, Object target) {
+    @Transactional
+    public void registerEvent(Long userId, ActivityType activityType, Object target) {
+
+        log.info("eventHelper register event type of '{}' completely and publish event through thread '{}",
+            activityType, Thread.currentThread().getName());
 
         outboxRepository.save(OutboxEvent.builder()
             .type(EventType.ACHIEVEMENT)
@@ -46,8 +51,7 @@ public class ProjectEventHelper {
         publishEvent(userId, activityType, target);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void publishEvent(Long userId, ActivityType activityType, Object target) {
+    private void publishEvent(Long userId, ActivityType activityType, Object target) {
 
         // -- 업적 이력 및 달성 처리에 대한 이벤트 발행
         // TODO: 이벤트 발행 자체가 실패하더라도 도메인 로직은 롤백되어서는 안되므로 재발행 로직 구현해야 함

@@ -28,7 +28,8 @@ public class NotificationEventHelper {
         registerEvent(event.getUserId(), event.getActivityType());
     }
 
-    private void registerEvent(Long userId, ActivityType activityType) {
+    @Transactional
+    public void registerEvent(Long userId, ActivityType activityType) {
 
         outboxRepository.save(OutboxEvent.builder()
             .type(EventType.NOTIFICATION)
@@ -39,7 +40,6 @@ public class NotificationEventHelper {
         publishEvent(userId, activityType);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void publishEvent(Long userId, ActivityType activityType) {
 
         eventPublisher.publishEvent(NotificationEvent.builder()

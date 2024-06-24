@@ -37,7 +37,6 @@ public class AchievementEventHandler {
         String eventId = getRequestedEventId(generateKey(event));
         Event<AchievementEvent> message = wrap(event, eventId);
 
-        // SimpleAsyncTaskExecutor-1
         log.info("published event '{}' with messageId '{}' to topic '{}' completely through thread '{}'",
             event, message.getId(), TOPIC, Thread.currentThread().getName());
 
