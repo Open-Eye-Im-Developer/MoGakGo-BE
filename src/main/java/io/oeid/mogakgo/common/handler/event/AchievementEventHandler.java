@@ -29,8 +29,7 @@ public class AchievementEventHandler {
     private final MessageProducer messageProducer;
     private final OutboxJpaRepository outboxRepository;
 
-    // TODO: 'Achievement' 'Notification' 에 대해 각각의 비동기 스레드 처리를 위한 설정 추가
-    @Async // 비동기로 호출, 즉 별도의 tx에서 처리
+    @Async("achievementTaskExecutor") // 비동기로 호출, 즉 별도의 tx에서 처리
     @Transactional(value = "transactionManager", propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void executeEvent(final AchievementEvent event) {
@@ -39,7 +38,7 @@ public class AchievementEventHandler {
         Event<AchievementEvent> message = wrap(event, eventId);
 
         // SimpleAsyncTaskExecutor-1
-        log.info("published event '{}' with messageId '{}' to topic '{}' through thread '{}'",
+        log.info("published event '{}' with messageId '{}' to topic '{}' completely through thread '{}'",
             event, message.getId(), TOPIC, Thread.currentThread().getName());
 
         messageProducer.sendMessage(TOPIC, message);

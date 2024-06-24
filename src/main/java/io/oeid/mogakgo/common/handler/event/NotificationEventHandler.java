@@ -30,7 +30,7 @@ public class NotificationEventHandler {
     private final MessageProducer messageProducer;
     private final OutboxJpaRepository outboxRepository;
 
-    @Async
+    @Async("notificationTaskExecutor")
     @Transactional(value = "transactionManager", propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void executeEvent(final NotificationEvent event) {

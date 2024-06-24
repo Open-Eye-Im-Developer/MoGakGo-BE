@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MessageProducer {
 
-    private final ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    private final ThreadPoolTaskExecutor outboxTaskExecutor;
     private final KafkaTemplate<String, Event<?>> kafkaTemplate;
     private final OutboxJpaRepository outboxRepository;
 
@@ -35,13 +35,13 @@ public class MessageProducer {
                             // send data to db
                             log.info("Sent message '{}' through thread '{}'",
                                 event, Thread.currentThread().getName()); // kafka-producer-network-thread | producer-1
-                            log.info("Sent message '{}' with id '{}' and offset '{}' thorugh topic '{}'",
+                            log.info("Sent message '{}' with id '{}' and offset '{}' completely thorugh topic '{}'",
                                 event, event.getId(), res.getRecordMetadata().offset(), topic);
 
                             // message is already committed in broker!
                             // if execution fail itself, re-publishing processed message,
                             // and then, consumer will verify duplication with redis cache!
-                            threadPoolTaskExecutor.execute(process(res));
+                            outboxTaskExecutor.execute(process(res));
                         }
                     }
                 );
@@ -51,6 +51,9 @@ public class MessageProducer {
 
     private Runnable process(SendResult<String, Event<?>> res) {
         return () -> {
+            log.info("status of message published successfully will be updated to 'COMPLETE' thorugh thread '{}'",
+                Thread.currentThread().getName());
+
             // use threadPoolTaskExecutor to avoid bottleneck for db insert task!
             // if threadPoolTaskExecutor is full, caller thread will execute task
             OutboxEvent outbox = getRequestedEvent(res.getProducerRecord().value().getId());
