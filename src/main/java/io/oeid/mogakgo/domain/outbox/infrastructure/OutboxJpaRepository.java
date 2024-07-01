@@ -1,0 +1,26 @@
+package io.oeid.mogakgo.domain.outbox.infrastructure;
+
+import io.oeid.mogakgo.domain.outbox.domain.EventStatus;
+import io.oeid.mogakgo.domain.outbox.domain.EventType;
+import io.oeid.mogakgo.domain.outbox.domain.entity.OutboxEvent;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface OutboxJpaRepository extends JpaRepository<OutboxEvent, Long>, OutboxRepositoryCustom {
+
+    @Query("""
+        select obe from OutboxEvent obe where obe.key = :key and obe.status = 'PENDING'
+        order by obe.createdAt desc limit 1
+    """)
+    Optional<OutboxEvent> findByKey(String key);
+
+    @Query("select obe from OutboxEvent obe where obe.eventId = :eventId")
+    Optional<OutboxEvent> findByEventId(String eventId);
+
+    @Query("select obe from OutboxEvent obe where obe.status = :status and obe.type = :eventType")
+    List<OutboxEvent> findByStatusAndType(EventStatus status, EventType eventType);
+}

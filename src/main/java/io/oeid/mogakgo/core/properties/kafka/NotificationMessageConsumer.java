@@ -1,37 +1,55 @@
-package io.oeid.mogakgo.common.event.handler;
+package io.oeid.mogakgo.core.properties.kafka;
 
 
-import io.oeid.mogakgo.common.event.domain.vo.AchievementNotificationEvent;
+import io.oeid.mogakgo.core.properties.event.vo.GeneralEvent;
+import io.oeid.mogakgo.core.properties.event.vo.NotificationEvent;
 import io.oeid.mogakgo.domain.achievement.application.AchievementFacadeService;
 import io.oeid.mogakgo.domain.achievement.application.AchievementProgressService;
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
+import io.oeid.mogakgo.domain.event.Event;
 import io.oeid.mogakgo.domain.notification.application.NotificationService;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Slf4j
-@Service
+@Component
 @Transactional
 @RequiredArgsConstructor
-public class NotificationListener {
+// TODO: 인터페이스 도입 고려
+public class NotificationMessageConsumer {
 
-    private final NotificationService notificationService;
-    private final AchievementProgressService achievementProgressService;
+    private static final String TOPIC = "notification";
+
     private final AchievementFacadeService achievementFacadeService;
+    private final AchievementProgressService achievementProgressService;
+    private final NotificationService notificationService;
 
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
-    public void executeEvent(final AchievementNotificationEvent event) {
+    @KafkaListener(topics = TOPIC, groupId = "my-group", containerFactory = "kafkaListenerContainerFactory")
+    protected void consumeNotification(ConsumerRecord<String, Event<NotificationEvent>> record,
+        Acknowledgment acknowledgment) {
+
+        Event<NotificationEvent> event = record.value();
+        log.info("receive event '{}' with offset '{}' from producer through topic '{}'",
+            event, record.offset(), record.topic());
+
+        NotificationEvent notificationEvent = event.getEvent();
+        process(notificationEvent);
+
+        acknowledgment.acknowledge();
+    }
+
+    private void process(final NotificationEvent event) {
 
         // 사용자가 현재 달성할 수 있는 업적 ID
-        Long achievementId = achievementFacadeService
-            .getAvailableAchievementId(event.getUserId(), event.getActivityType());
+        Long achievementId = validAchievementId(event);
 
         if (achievementId != null) {
 
@@ -45,6 +63,12 @@ public class NotificationListener {
                 notificationService.createAchievementNotification(event.getUserId(), achievement);
             }
         }
+    }
+
+    private Long validAchievementId(final GeneralEvent event) {
+        return achievementFacadeService.getAvailableAchievementId(
+            event.getUserId(), event.getActivityType()
+        );
     }
 
     private Integer getProgressCountForAchievement(Long userId, Achievement achievement) {
