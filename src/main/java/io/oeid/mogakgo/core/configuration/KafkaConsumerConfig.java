@@ -1,8 +1,6 @@
 package io.oeid.mogakgo.core.configuration;
 
-import io.oeid.mogakgo.common.handler.kafka.DltProcessor;
 import io.oeid.mogakgo.common.handler.mail.MailHandler;
-import io.oeid.mogakgo.core.properties.kafka.constant.KafkaConsumerConstants;
 import io.oeid.mogakgo.core.properties.kafka.deserializer.CustomDeserializer;
 import io.oeid.mogakgo.domain.event.Event;
 import java.net.SocketTimeoutException;
@@ -25,10 +23,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.listener.ContainerProperties.AckMode;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
-import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
-import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
-import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
-import org.springframework.kafka.support.EndpointHandlerMethod;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
 
@@ -145,6 +139,7 @@ public class KafkaConsumerConfig {
      */
 
     // TODO: DefaultErrorHandler와의 장단점 비교 필요, 추후 변경 가능
+    /**
     public RetryTopicConfiguration retryTopicConfig(KafkaTemplate<String, Event<?>> kafkaTemplate) {
 
         return RetryTopicConfigurationBuilder
@@ -162,5 +157,5 @@ public class KafkaConsumerConfig {
             .dltHandlerMethod(new EndpointHandlerMethod(DltProcessor.class, "postProcessDltMessage"))
             .create(kafkaTemplate);
     }
-
+    */
 }
