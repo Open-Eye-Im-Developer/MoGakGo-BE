@@ -32,7 +32,7 @@ public class NotificationMessageConsumer {
     private final AchievementProgressService achievementProgressService;
     private final NotificationService notificationService;
 
-    @KafkaListener(topics = TOPIC, groupId = "my-group", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = TOPIC, groupId = "mogak-go", containerFactory = "kafkaListenerContainerFactory")
     protected void consumeNotification(ConsumerRecord<String, Event<NotificationEvent>> record,
         Acknowledgment acknowledgment) {
 

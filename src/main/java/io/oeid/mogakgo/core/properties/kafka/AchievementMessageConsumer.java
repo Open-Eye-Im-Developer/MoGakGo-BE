@@ -49,7 +49,7 @@ public class AchievementMessageConsumer {
     private final NotificationEventHelper eventHelper;
     private final DuplicateLogService duplicateChecker;
 
-    @KafkaListener(topics = TOPIC, groupId = "my-group", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = TOPIC, groupId = "mogak-go", containerFactory = "kafkaListenerContainerFactory")
     protected void consumeAchievement(List<ConsumerRecord<String, Event<AchievementEvent>>> records,
         Acknowledgment acknowledgment) {
 
