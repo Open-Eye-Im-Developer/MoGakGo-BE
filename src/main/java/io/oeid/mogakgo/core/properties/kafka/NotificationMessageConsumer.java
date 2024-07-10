@@ -8,6 +8,7 @@ import io.oeid.mogakgo.domain.achievement.application.AchievementProgressService
 import io.oeid.mogakgo.domain.achievement.domain.entity.Achievement;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.RequirementType;
 import io.oeid.mogakgo.domain.event.Event;
+import io.oeid.mogakgo.domain.log.application.DuplicateLogService;
 import io.oeid.mogakgo.domain.notification.application.NotificationService;
 import java.util.List;
 import java.util.Objects;
@@ -21,29 +22,60 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
-@Transactional
+@Transactional("transactionManager")
 @RequiredArgsConstructor
 // TODO: 인터페이스 도입 고려
 public class NotificationMessageConsumer {
 
     private static final String TOPIC = "notification";
 
+    private final DuplicateLogService duplicateChecker;
     private final AchievementFacadeService achievementFacadeService;
     private final AchievementProgressService achievementProgressService;
     private final NotificationService notificationService;
 
     @KafkaListener(topics = TOPIC, groupId = "mogak-go", containerFactory = "kafkaListenerContainerFactory")
-    protected void consumeNotification(ConsumerRecord<String, Event<NotificationEvent>> record,
+    protected void consumeNotification(List<ConsumerRecord<String, Event<NotificationEvent>>> records,
         Acknowledgment acknowledgment) {
+
+        log.info("messageConsumer for topic '{}' received message completely and consuming through thread '{}",
+            TOPIC, Thread.currentThread().getName());
+
+        for (ConsumerRecord<String, Event<NotificationEvent>> record : records) {
+            // if process failed to one record, retry for 3 times, and then publish to DLT
+            process(record);
+        }
+
+        acknowledgment.acknowledge();
+
+        log.info("acknowledge for 'notification' success!");
+    }
+
+    @Transactional("transactionManager")
+    public void process(ConsumerRecord<String, Event<NotificationEvent>> record) {
+        String eventId = record.value().getId();
+        if (duplicateChecker.isMessageIdProcessed(eventId)) {
+            log.info("this message with eventId '{}' is already processing! no-caching!", eventId);
+        } else {
+            consume(record);
+            duplicateChecker.caching(eventId);
+        }
+    }
+
+    public void consume(ConsumerRecord<String, Event<NotificationEvent>> record) {
 
         Event<NotificationEvent> event = record.value();
         log.info("receive event '{}' with offset '{}' from producer through topic '{}'",
             event, record.offset(), record.topic());
 
         NotificationEvent notificationEvent = event.getEvent();
-        process(notificationEvent);
 
-        acknowledgment.acknowledge();
+        try {
+            process(notificationEvent);
+        } catch (Exception e) {
+            // handle to ex
+            log.warn(e.getMessage());
+        }
     }
 
     private void process(final NotificationEvent event) {
