@@ -38,7 +38,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.2
         with:
           host: ${{ secrets.EC2_KAFKA_HOST }}
-          username: ubuntu
+          username: ec2-user
           key: ${{ secrets.EC2_KAFKA_PEM_KEY }}
           script: |
             sudo service docker start
@@ -49,7 +49,7 @@ jobs:
       ##   run: docker-compose up -d
   
       ## create application.yml
-      - name: make application.yml
+      - name: make application.yml경
         run: |
           mkdir -p ./src/main/resources
           touch ./src/main/resources/application.yml
