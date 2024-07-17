@@ -1,6 +1,8 @@
-package io.oeid.mogakgo.domain.project_join_req.application;
+package io.oeid.mogakgo.domain.notification.application;
+
 
 import io.oeid.mogakgo.core.properties.event.vo.AchievementEvent;
+import io.oeid.mogakgo.core.properties.event.vo.NotificationEvent;
 import io.oeid.mogakgo.domain.achievement.domain.entity.enums.ActivityType;
 import io.oeid.mogakgo.domain.outbox.domain.EventType;
 import io.oeid.mogakgo.domain.outbox.domain.entity.OutboxEvent;
@@ -16,47 +18,39 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(propagation = Propagation.REQUIRED)
 @RequiredArgsConstructor
-public class ProjectJoinRequestEventHelper {
+public class NotificationEventHelper {
 
-    private final OutboxJpaRepository outboxRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final OutboxJpaRepository outboxRepository;
 
-    public void publishEvent(Long userId) {
+    public void publishEvent(final AchievementEvent event) {
 
-        // -- '생성자' 매칭 요청을 수신한 사용자에 대한 업적 이벤트 발행
-        registerEvent(userId, ActivityType.CATCH_ME_IF_YOU_CAN, null);
+        registerEvent(event.getUserId(), event.getActivityType());
     }
 
     @Transactional
-    public void registerEvent(Long userId, ActivityType activityType, Object target) {
+    public void registerEvent(Long userId, ActivityType activityType) {
 
         outboxRepository.save(OutboxEvent.builder()
-            .type(EventType.ACHIEVEMENT)
+            .type(EventType.NOTIFICATION)
             .key(generateKey(userId, activityType))
-            .target(setTarget(target))
             .build()
         );
 
-        publishEvent(userId, activityType, target);
+        publishEvent(userId, activityType);
     }
 
-    public void publishEvent(Long userId, ActivityType activityType, Object target) {
+    public void publishEvent(Long userId, ActivityType activityType) {
 
-        // -- 업적 이력 및 달성 처리에 대한 이벤트 발행
-        eventPublisher.publishEvent(AchievementEvent.builder()
+        eventPublisher.publishEvent(NotificationEvent.builder()
             .userId(userId)
             .activityType(activityType)
-            .target(target)
             .build()
         );
     }
 
     private String generateKey(Long userId, ActivityType activityType) {
         return userId.toString() + ":" + activityType.toString();
-    }
-
-    private Integer setTarget(Object target) {
-        return target != null ? (Integer) target : null;
     }
 
 }

@@ -15,6 +15,7 @@ public enum ErrorCode404 implements ErrorCode {
     CHAT_ROOM_NOT_FOUND("E110301", "해당 채팅방이 존재하지 않습니다."),
     CHAT_USER_NOT_FOUND("E110302", "해당 채팅 유저가 존재하지 않습니다."),
     ACHIEVEMENT_NOT_FOUND("E130301", "해당 업적이 존재하지 않습니다."),
+    OUTBOX_EVENT_NOT_FOUND("E160301", "해당 이벤트 요청 기록이 존재하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.NOT_FOUND;

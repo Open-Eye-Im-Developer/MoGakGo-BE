@@ -16,7 +16,7 @@ public class UserActivityRepositoryCustomImpl implements UserActivityRepositoryC
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<UserActivity> getActivityHistoryByActivityType(Long userId, ActivityType activityType, Integer limit) {
+    public List<UserActivity> getHistoryByActivityType(Long userId, ActivityType activityType, Integer limit) {
         return jpaQueryFactory
             .selectFrom(userActivity)
             .where(

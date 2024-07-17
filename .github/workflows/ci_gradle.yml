@@ -33,12 +33,23 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      ## Connect to EC2 SSH and Run script
+      - name: Execute remote command
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: ${{ secrets.EC2_KAFKA_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_KAFKA_PEM_KEY }}
+          script: |
+            sudo service docker start
+            docker-compose -f ~/docker-compose.yml up -d
+
       ## Run docker-compose.yml
-      - name: run docker-compose.yml
-        run: docker-compose up -d
+      ## - name: run docker-compose.yml
+      ##   run: docker-compose up -d
   
       ## create application.yml
-      - name: make application.yml
+      - name: make application.yml경
         run: |
           mkdir -p ./src/main/resources
           touch ./src/main/resources/application.yml

@@ -74,10 +74,13 @@ public enum ErrorCode400 implements ErrorCode {
 
     NON_ACHIEVED_USER_ACHIEVEMENT("E140101", "미달성 업적을 사용할 수 없습니다."),
     ACHIEVEMENT_SHOULD_BE_DIFFERENT("E140102", "이미 해당 업적을 대표 업적으로 사용중입니다."),
-    ACHIEVEMENT_ALREADY_COMPLETED("E140103", "이미 달성한 업적입니다,"),
+    ACHIEVEMENT_ALREADY_COMPLETED("E140103", "이미 달성한 업적입니다."),
+    INVALID_ACHIEVEMENT_TYPE("E140104", "유효하지 않은 업적 타입입니다."),
 
     INVALID_EVENT_LISTENER_REQUEST("E150101", "요청한 이벤트 처리에 실패하였습니다."),
-    EVENT_LISTENER_REQUEST_FAILED("150102", "요청한 이벤트가 예상치 못한 오류로 실패하였습니다."),
+    EVENT_LISTENER_REQUEST_FAILED("E150102", "요청한 이벤트가 예상치 못한 오류로 실패하였습니다."),
+
+    EVENT_ALREADY_COMPLETED("E160101", "이미 해당 이벤트는 완료 처리되었습니다."),
     ;
 
     private final HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
