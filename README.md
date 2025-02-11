@@ -13,7 +13,7 @@
 ## ⚙️ 아키텍처
 
 <h3 align="center">
-  <img width="1600" alt="image" src="https://github.com/Open-Eye-Im-Developer/MoGakGo-BE/assets/85854384/cfdbc5f7-f0a8-453f-bcc2-f6ca94379c85">
+  <img width="1600" alt="image" src="https://github.com/user-attachments/assets/fba8821b-9d1c-457c-8003-44046bf37fed">
 </h3>
 
 ## 📁 DB ERD
